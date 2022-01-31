@@ -1,0 +1,117 @@
+% ************** Programcion estructurada y multicapa *****************
+%                NOV 2000
+\documentclass[a4paper,12pt,twoside,english]{book}
+\usepackage[pctex32]{graphics}
+%\usepackage[dvips]{graphics} % el scalebox no funciona
+\usepackage{bezier}
+%\usepackage[spanish]{babel}
+\usepackage{makeidx}
+\usepackage{latexsym}
+\usepackage[latin1]{inputenc}
+
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\makeindex
+% *** Macros
+        %  \input{definiciones.tex}
+
+% *** text dimensions
+        % \input{formato.tex}
+%       \input{./portadas/f17x24.tex}
+%       \input{definiciones.tex}
+%       \input{./portadas/titulo.tex}
+
+%  *** begin document
+       \pagestyle{empty}
+       \begin{document}
+
+% *** Title page
+%      \input{titulo.tex}
+%      \titulo{FORTRAN 2003 :  \\
+%              Programación   Multicapa  \\ \vspace{0.1cm}
+%              para   la \\ \vspace{0.3cm}
+%              Simulación de Sistemas Físicos
+%             }
+%             {Juan A. Hernández}
+%             {Mario A. Zamecnik}{,}
+
+
+
+\title{How to learn Applied Mathematics through modern FORTRAN }
+
+% *** table of contents
+      \newpage
+      \pagenumbering{roman}
+   
+%     \listoffigures
+%     \listoftables
+
+% *** preface
+%     \input{prologo.tex}
+
+% *** chapters
+      \newpage
+      \pagenumbering{arabic}
+     \parskip = \baselineskip
+  %    \input{./portadas/cabecera}
+
+%     ** Todos los capitulos
+    %   \input{chapter.tex}
+    %   \input{first_course.tex}
+ 
+ \maketitle     
+        \tableofcontents 
+   %*************************************************************************
+   %     CHAPTER 1: BATCH FILES
+   %*************************************************************************  
+     
+   \input{1.BatchFiles/BatchFiles.tex}
+
+
+   %*************************************************************************
+   %     CHAPTER 2: LINEAR ALGEBRA
+   %************************************************************************* 
+   \input{2.LinearAlgebra/LinearAlgebra.tex}   
+   
+  
+   %*************************************************************************
+   %     CHAPTER 3: INTERPOLATION
+   %************************************************************************* 
+   \input{3.Interpolation/Interpolation.tex}   
+   
+   
+   %*************************************************************************
+   %     CHAPTER 4: PDEs
+   %************************************************************************* 
+   \input{4.PDEs/PDEs.tex}       
+  
+        
+   %*************************************************************************
+   %     CHAPTER 5: HOFD
+   %************************************************************************* 
+   \input{5.HOFD/HOFD.tex}       
+       
+       
+       
+       
+       
+       
+
+
+% *** appendices
+%     \appendix
+%     \input{samples.tex}
+
+% *** bibliography
+      \input{bibliografia.tex}
+
+% *** index
+\pagestyle{headings}
+
+     \addcontentsline{toc}{chapter}{Índice}
+     \cleardoublepage
+     \printindex
+
+   \end{document}

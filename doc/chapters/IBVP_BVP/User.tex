@@ -1,0 +1,127 @@
+     
+ %*************************************************************************
+\chapter{Mixed Boundary and Initial Value Problems   }\label{user:IBVP_BVP}
+ %*************************************************************************  
+\vspace{-1cm}
+\section{Overview}
+ In this chapter, a mixed problem coupled with elliptic and parabolic equations  is solved making use of the module \verb|IBVP_and_BVP|. 
+ Briefly and not rigorously, these problems are governed by a parabolic time dependent problem for $\vect{u}(\vect{x}, t)$ and an elliptic problem or a boundary value problem for $\vect{v}(\vect{x}, t)$. 
+ Let $\Omega $  
+ be an open and connected set and $\partial \Omega$ its boundary. 
+ These problems are formulated with the following set of equations: 
+           \begin{align*}
+           & \frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}}_u (\vect{x},t,\vect{u}(\vect{x},t),\vect{v}(\vect{x},t)) ,   & \forall & \ \vect{x} \in  \Omega, \\
+           & \vect{h}_u (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega, \\ 
+           & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}),  & \forall & \ \vect{x} \in  D, \\ \\
+           & \vect{\mathcal{L}}_v (\vect{x},t,\vect{v}(\vect{x},t),\vect{u}(\vect{x},t)) = 0 ,  & \forall & \ \vect{x} \in  \Omega, \\
+           & \vect{h}_v (\vect{x},t,\vect{v}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega,
+           \end{align*}
+ where $\vect{\mathcal{L}}_u$ is the spatial differential operator of the initial value problem of $N_u$ equations, $\vect{u}_0(\vect{x})$ is the initial value, $\vect{h}_u$ represents the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$,  $\vect{\mathcal{L}}_v$ is the spatial differential operator of the boundary value problem of $N_v$ equations and $\vect{h}_v$ represents the boundary conditions operator for $\vect{v}$  at the boundary points $\vect{v} \big\rvert_{\partial \Omega}$. 
+       
+     
+       
+\newpage      
+\section{Non Linear Plate Vibration}
+The vibrations $ w(x,y,t)$  of an nonlinear plate subjected to a transversal load $ p(x,y,t) $ are governed by the following set of equations: 
+\begin{align*}
+\frac{\partial^2{w}}{\partial{t}^2}+ \nabla^4{w}
+&= p(x,y,t) + \mu \ \mathcal{B}(w,\phi), \\ 
+\nabla^4 \phi & + \mathcal{B}(w,w) =0 ,
+\end{align*}
+where $\mathcal{B}$ is the bilinear operator:
+%
+\begin{align*}
+	\mathcal{B}(w,\phi) 
+	= 
+	\pdv[2]{w}{x}\pdv[2]{\phi}{y}
+	+
+	\pdv[2]{\phi}{x}\pdv[2]{w}{y}
+	-
+	2\pdv[2]{\phi}{x}{y}\pdv[2]{w}{x}{y}.
+\end{align*}
+These equations together with boundary and initial conditions allow predicting the oscillations of the plate. Since second order derivatives of the displacement $ w(x,y,t) $ are involved, the initial position and the initial velocity are given. In this example, 
+\begin{align*}
+& w(x,y,0)  =   e^{-10(x^2+y^2)}. \\ 
+& \frac{\partial w}{\partial t} (x,y,0) = 0. 
+\end{align*} 
+Besides, simple supported edges are considered which means that the displacement  $ w(x,y,t) $ and the bending moments $ \nabla^2  w $ are zero at boundaries. 
+In this example, the  spatial domain $\Omega \equiv \{ (x,y) \in [-1,1] \times [-1,1] \}$ and the time domain  $t \in [0,1]$.
+Since the module \verb|IBVP_and_BVP| is written for systems of second order derivatives in space and first order in time, the problem is rewritten by means of the following transformation:
+        \begin{equation*}
+           \vect{u} = [ \  w, \ w_2, \ w_3 \ ],
+        \end{equation*}
+        which leads to the evolution system of equations for $ \vect{u}(x,y,t) $ with: 
+        \begin{align*}
+                    \vect{\mathcal{L}}_u = [ \  w_2, \  -\nabla^2 w_3 + p + \mu \ \mathcal{B}(w, \phi),  \ \nabla^2 w_2 \ ],
+       \end{align*} 
+To implement the elliptic boundary problem in terms of second order derivatives, the following transformation is used:
+                       \begin{equation*}
+                          \vect{v} = [ \ \phi, \ F \ ],
+                       \end{equation*}
+which leads to the system  $ \vect{\mathcal{L}}_v (\vect{x},t,\vect{v},\vect{u}) = 0 $ with: 
+        \begin{align*}
+                   \vect{\mathcal{L}}_v = [ \  \nabla^2 \phi - F, \  \nabla^2 F +  \mathcal{B}(w, w) \ ].
+        \end{align*}
+        
+The evolution differential operator $ \vect{\mathcal{L}}_u $ together with the elliptic differential $ \vect{\mathcal{L}}_v $ are implemented in the following vector functions: 
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_IBVP_and_BVP.f90}
+{function Lu}
+{end function}{API_Example_IBVP_and_BVP.f90}
+   
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_IBVP_and_BVP.f90}
+{function Lv}
+{end function}{API_Example_IBVP_and_BVP.f90}
+
+
+To impose simple supported edges, the values of all components of  $ \vect{u}(x,y,t) $ and 
+ $ \vect{v}(x,y,t) $ must be determined analytically at boundaries. Since $ w(x,y,t) $ is zero at boundaries for all time and $  w_2  = \partial w / \partial t$ then, $ w_2 $ is zero at boundaries. Since $ \nabla^2 w $ is zero at boundaries for all time and 
+ $$ 
+ \frac{\partial w_3 }{ \partial t }  = \frac{\partial  \nabla^2 w }{  \partial t}
+ $$ 
+ then, $ w_3 $ is zero at boundaries. The same reasoning is applied to determine
+ $ \vect{v}(x,y,t) $ components at boundaries.% For the initial conditions 
+With these considerations, the boundary conditions $ \vect{h}_u $ and  $ \vect{h}_v $ are implemented by:
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_IBVP_and_BVP.f90}
+{function BCu}
+{end function}{API_Example_IBVP_and_BVP.f90}
+
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_IBVP_and_BVP.f90}
+{function BCv}
+{end function}{API_Example_IBVP_and_BVP.f90}
+
+
+These differential operators \verb|Lu| and \verb|Lv| together with their boundary conditions \verb|BCu| and \verb|BCv|  are used as input arguments for the subroutine \verb|IBVP_and_BVP|
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_IBVP_and_BVP.f90}
+{Nonlinear Plate Vibration}
+{IBVP}{API_Example_IBVP_and_BVP.f90}
+
+
+In figure \ref{fig:NLPlate_Vibrations_Pulse}, the oscillations of a plate with zero external loads starting from an elongated position with zero velocity  are shown. 
+
+\fourgraphs
+{\input{./doc/chapters/IBVP_BVP/figures/NLvibrationsa.tex}}
+{\input{./doc/chapters/IBVP_BVP/figures/NLvibrationsb.tex}}
+{\input{./doc/chapters/IBVP_BVP/figures/NLvibrationsc.tex}}
+{\input{./doc/chapters/IBVP_BVP/figures/NLvibrationsd.tex}}
+{Time evolution of nonlinear vibrations $w(x,y,t) $ with  $11 \times 11$ nodal points and order $q=6$. (a)  $w(x,y,0.25)$. (b)  $w(x,y,0.5)$. (c) Numerical solution at $w(x,y,0.75)$. (d)Numerical solution at $w(x,y,1)$.}{fig:NLPlate_Vibrations_Pulse}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+%\pagestyle{myheadings}
+\pagestyle{headings}
+
+%\usepackage{fancyheadings}
+%\pagestyle{fancy}
+ %\pagestyle{fancy} 
+%\lhead[\rm \thepage]{\rm \rightmark}
+%\rhead[\sl \leftmark]{\rm \thepage}  
+
+%\makeatletter
+%  \def\@evenhead{ 
+%               \vbox{ \hbox to \hsize{ \bf \thepage \hfill \sl \leftmark } 
+ %              \vspace{2pt} \hbox to \hsize {\hrulefill}}} 
+ %  \def\@oddhead{ 
+%               \vbox{ \hbox to \hsize{ \sl \rightmark  \hfill \bf \thepage } 
+%               \vspace{2pt} \hbox to \hsize {\hrulefill}}} 
+
+%\makeatother
+
+\makeatletter
+  \def\@evenhead{ 
+               \vbox{\hbox to \hsize{{\bf  \thepage}  \hfill  {\small \leftmark}} 
+               \vspace{2pt} \hbox to \hsize{\hrulefill}}} 
+  \def\@oddhead{ 
+               \vbox{\hbox to \hsize{{\small \rightmark}  \hfill  {\bf \thepage}} 
+               \vspace{2pt} \hbox to \hsize{\hrulefill}}} 
+\makeatother
+
+
+
+
+
+%\makeatletter
+%\def\@evenhead{ 
+   %                               \vbox{ \hbox to \hsize{{\bf \thepage}  \hfill  \leftmark} 
+      %                                         \vspace{2pt} \hbox to \hsize{\hrulefill}
+         %                                    }
+            %                      } 
+
+%\def\@evenhead{  \vbox{
+   %                     {\bf \thepage} \hfill   \leftmark 
+      %                   \vspace{2pt} \hrulefill}
+%} 
+    %      {\bf  \thepage}  \hfill  \leftmark 
+                                           % \vspace{2pt} \\ \hrulefill  
+       %                                  \vspace{2pt} \hbox to \hsize {\hrulefill}
+                                    %     \hline 
+                   %               }
+ % \def\@oddhead{ 
+    %          \vbox{ \hbox to \hsize{  \rightmark  \hfill  {\bf \thepage}  } 
+       %       \vspace{2pt} \hbox to \hsize {\hrulefill}}} 

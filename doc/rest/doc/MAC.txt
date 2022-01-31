@@ -1,0 +1,112 @@
+Informatics 2017/2018 Aerospace Engineering (UPM) 
+ 
+How to install FORTRAN and graphical windows in MAC OS 
+
+Author: Juan A. Hernandez:  juanantonio.hernandez@upm.es 
+
+
+1) How to execute a Terminal 
+
+    Applications/ Utilities/ Terminal
+    
+2) How to execute a Terminal in a specific folder
+
+    Sistem Preferences/ Keyboard/ Speed functions/ Services - scroll and select "Terminal in the folder"
+    
+    
+    
+3) Install gFortran to compile
+
+       3.1) Install manager HOMEBREW (https://brew.sh)
+       3.2) $ brew install gcc
+       
+     
+4) Install Openmotiff
+
+      4.1) Install server X11 through XQuartz (https://www.xquartz.org)
+           Capability to start 64-bit GUI-programs using x-windows from the shell 
+        
+      4.1)$ brew install openmotif
+     
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+    
+3) Install gFortran to compile
+
+    Download the corresponding version in https://gcc.gnu.org/wiki/GFortranBinaries (e.g. for macOS Sierra download gfortran 6.3)
+    
+4) Install DISLIN to plot 
+
+    a) Install dislin (from dislin distribution page 64 bits MAC http://www.mps.mpg.de/dislin/mac-osx-darwin ) following all the steps
+   
+        Create a dislin folder in directory HOME (main folder of the user, where documents, photos, music,.. are) and copy all the folders inside.
+   
+    b) Install OpenMotif library 
+   
+        b.1) Install server program X11 through XQuartz (https://www.xquartz.org)
+        
+        b.2) Install manager HOMEBREW (https://brew.sh)
+
+        b.3) Execute in a Terminal: brew install openmotif
+
+        b.4) Search the path where HOMEBREW has been installed by writing in the Terminal:  which brew 
+         
+        b.5) copy the path up to HOMEBREW and write in the terminal:  open <path obtained after which brew>/homebrew/Cellar/openmotif
+    
+        b.6) Finder window will pop up. Open the folder OpenMotif followed by its version (e.g. 2.3.7)
+
+        b.7) Open the lib folder and copy libXm.4.dylib in the dislin folder
+
+        b.8) Rename all the libraries (dylib) in the dislin folder removing the version numbers:  libdislin.dylib libdislin_d.dylib libXm.dylib 
+
+        b.9) Open a Terminal in the dislin folder: cd dislin (or clicking the right buton of the mouse over the folder)
+
+        b.10) Modify permissions of OpenMotif library:  chmod +x libXm.dylib chmod +uw libXm.dylib 
+
+        b.11) Execute the following commands: install_name_tool -id "@loader_path/libXm.dylib" libXm.dylib  install_name_tool -id "@loader_path/libdislin.dylib" libdislin.dylib  install_name_tool -id "@loader_path/libdislin_d.dylib" libdislin_d.dylib 
+
+        b.12) Modify PATH so that Terminal can find user HOME and execute:  open -e .bash_profile or touch ~/.bash_profile; open ~/.bash_profile
+
+        b.13) Program TextEdit window will open to edit session configuration for the Terminal. Add the following line at the end of the file:  export PATH=/usr/local/bin:${PATH}
+
+        b.14) Save and close TextEdit and Terminal 
+
+        b.15) Open a new Terminal and write: gfortran --version
+
+6) Compile Fortran using Hello World program with dislin libraries
+    
+    a) Create a folder in the working space and copy the following libraries: dislin.f90 libdislin.dylib libXm.dylib, as well as our sources: Hello_world.f90 and plot_graph.f90 
+
+    b) Compile DISLIN source:  gfortran -c dislin.f90
+    
+    c) Compile the program source: gfortran -c Hello_world.f90
+
+    d) Link files with libraries to obtain executable file: gfortran -o Hello world Hello_world.o -L. -ldislin -L. -lXm
+    
+    e) To test the compiled program, write in the Terminal: ./Hello_world   
+
+    f) Compile the program source: gfortran -c plot_graph.f90
+
+    g) Link files with libraries to obtain executable file: gfortran -o plot_graph plot_graph.o -L. -ldislin -L. -lXm
+    
+    h) To test the compiled program, write in the Terminal: ./plot_graph
+    
+    i) An X Window should open with a graph. If it display cannot be opened go to Application/ Utilities and open XQuartz for the first time

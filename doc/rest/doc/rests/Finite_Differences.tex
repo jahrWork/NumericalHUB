@@ -1,0 +1,281 @@
+\section{Overview}
+
+This is a library is designed to prepare a PDE problem for a future resolution. The finite differences library obtains the discretization, interpolation and derivative of a function and boundary conditions needed to solve a PDE problem. This will be achieved with the subroutines \textbf{Grid\_initialization}, \textbf{Derivative}, \textbf{Dirichlet} and \textbf{Neumann}. 
+
+
+The library has two modules: \textbf{Finite\_differences} and \textbf{Non\_uniform\_grid}. But the API is contained only in the \textbf{Finite\_differences} module.
+
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{API\_Example\_Finite\_Differences.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Finite\_differences}.
+
+In the following subroutine, denoted as \textbf{Derivative\_example}, two derivatives of a certain function $y(r,\theta)$ are obtained by means of the function \textbf{Derivative}. Firstly, through the function \textbf{Grid\_Initialization}, a discretization of the domain is carried out, both in the variables $r$ and $\theta$. Afterwards, and taking into account the values of the function $y(r,\theta)$ at the nodes of the discretized domain, some derivatives are computed by the function \textbf{Derivative}:
+
+\begin{itemize}
+	\item The second derivative with respect to $r$.
+	\item The first derivative with respect to $\theta$.
+	\item The derivative with restpect to $\theta$ and with respect to $r$.
+\end{itemize}
+
+\newpage
+
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+\lstinputlisting[language=Fortran]{../sources/Derivative_example.f90}
+
+
+\section{Finite\_differences module}
+
+
+\subsection*{Grid\_Initalization}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Grid_Initialization( grid_spacing , direction , q , grid_d )
+\end{lstlisting}
+
+This subroutine will calculate a set of points within the space domain defined; $[-1,1]$ by default. The arguments of the routine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				grid\_spacing & character & in &   Here the grid structure must be chosen. It can be \textbf{'uniform'}   (equally-spaced) or \textbf{'nonuniform'}.  \\ \hline
+				
+				direction &  character  & in & Selected by user. If the name of the direction has already been used along the program, it will be overwritten. \\ \hline
+				
+				q & integer & in &   This is the order chosen for the interpolating polynomials. This label is for the software to be sure that the number of nodes ($N$) is greater than the polynomials order (at least $ N = \text{order} +1 $).  \\ \hline
+				
+				grid\_d & vector of reals  & inout &  Contains the mesh nodes.  \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Grid\_Initalization} arguments}
+\end{table}
+
+If \textbf{grid\_spacing} is \textbf{'nonuniform'}, the nodes are calculated by obtaining the extrema of the polynomial error associated to the polynomial of degree $N-1$ that the unknown nodes form.
+
+\subsection*{Derivative for 1D grids}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Derivative ( direction , derivative_order , W , Wxi )
+\end{lstlisting}
+
+The subroutine \textbf{Derivative} approximates the derivative of a function by using finite differences. It performs the operation:
+
+\begin{equation*}
+\frac{\partial^k W}{\partial x^k}= W_{xk}
+\end{equation*}
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				direction & character & in &  It selects the direction which composes the grid from the ones that have already been defined.  \\ \hline
+				
+				derivative\_order &  integer & in & Order of derivation ($k=1$ first derivate, $k=2$ second derivate and so on).\\ \hline
+				
+				W &  vector of reals & in & Values that the function has at the given points.\\ \hline
+				
+				Wxi & vector of reals & out & Result. Value of the k-derivate of the given function.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Derivative} arguments for 1D grids}
+\end{table}
+
+\subsection*{Derivative for 2D and 3D grids}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Derivative ( direction , coordinate , derivative_order , W , Wxi )
+\end{lstlisting}
+
+The subroutine \textbf{Derivative} approximates the derivative of a function by using finite differences. It performs the operation:
+
+\begin{equation*}
+\frac{\partial^k W}{\partial x^k}= W_{xk}
+\end{equation*}
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				direction & vector of characters & in & It selects the directions  which compose the grid from the ones that have already been defined. The first component of the vector will be the first coordinete and so on. \\ \hline
+				
+				coordinate & integer & in & Coordinate at which the derivate is calculated. It can be 1 or 2 for 2D grids and 1, 2 or 3 for 3D grids.  \\ \hline
+				
+				derivative\_order &  integer & in & Order of derivation ($k=1$ first derivate, $k=2$ second derivate and so on).\\ \hline
+				
+				W &  N-dimensional array of reals & in & Values that the function has at the given points.\\ \hline
+				
+				Wxi & N-dimensional array of reals & out & Result. Value of the k-derivate of the given function.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Derivative} arguments for 2D and 3D grids}
+\end{table}
+
+The subroutine is prepared to be called equally in 2D and 3D problems ($N = 2$ or $3$). 
+
+\subsection{Boundary conditions}
+
+%When dealing with a PDE problem, the boundary conditions, BC, should be discretized as well. Sometimes %the BC can be as complex as the main equations, however, there are some coomon conditions that can be %written in an universal notations, so the library can solve them.
+
+This library is capable of discretizating two type of boundary conditions: Dirichlet and Neumann. Previously to calling this libraries, \textbf{Grid\_Initializartion} must be used. The way they are used will be explained below.
+
+\subsection*{Dirichlet }
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Dirichlet( coordinate , N , W , f )\end{lstlisting}
+
+A boundary condition type Dirichlet is defined as:
+
+\begin{equation*}
+W(\vec{x}_{0},t)= f(\vec{x}_{0}, t)   \hspace{1cm}   \vec{x}_{0} \; \in \; \partial \Omega
+\end{equation*}
+
+The subroutine \textbf{Dirichlet} imposes the Dirichlet condition. The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				coordinate & integer & in &  It can be 1 or 2. If 1, the boundary condition will be imposed along the coordinate 2 with the coordinate 1 fixed and vece versa. \\ \hline
+				
+				N &  integer & in & Boundary point at which the codition is imposed.\\ \hline
+				
+				W &  two-dimensional array of reals & inout & It will contain the solution. After entering the subroutine it will have imposed the boundary condition determined by \textbf{f}. \\ \hline
+				
+				f &  vector of reals & in & Value of the boundary condition. \\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Dirichlet} arguments}
+\end{table}
+
+This subroutine only can work with 2D grids.
+
+\subsection*{Neumann for 1D grids}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Neumann( direction , N , W , f )\end{lstlisting}
+
+A boundary condition type Neumann is defined as:
+
+\begin{equation*}
+\frac{dW}{dn}(\vec{x}_{0},t)= f(\vec{x}_{0},t)   \hspace{1cm}   \vec{x}_{0} \; \epsilon \; \partial \Omega
+\end{equation*}
+
+The subroutine \textbf{Neumann} imposes the Neumann condition. The arguments of the subroutine are described in the following table.
+
+%igual que en el anterior no tengo claro como definir f y W
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				direction & character & in &   It selects the direction which composes the grid from the ones that have already been defined. \\ \hline
+				
+				N &  integer & in & Boundary point at which the condition is imposed.\\ \hline
+				
+				W &  vector of reals & inout & It will contain the solution. After entering the subroutine it will have imposed the boundary condition determined by \textbf{f}.\\ \hline
+				
+				f & vector of reals & in & Value of the boundary condition.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Neumann} arguments for 1D grids}
+\end{table}
+
+\subsection*{Neumann for 2D grids}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Neumann( direction , coordinate , N , W , f )\end{lstlisting}
+
+A boundary condition type Neumann is defined as:
+
+\begin{equation*}
+\frac{dW}{dn}(\vec{x}_{0},t)= f(\vec{x}_{0},t)   \hspace{1cm}   \vec{x}_{0} \; \epsilon \; \partial \Omega
+\end{equation*}
+
+The subroutine \textbf{Neumann} imposes the Neumann condition. The arguments of the subroutine are described in the following table.
+
+%igual que en el anterior no tengo claro como definir f y W
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				direction & vector of characters & in & It selects the directions  which compose the grid from the ones that have already been defined. The first component of the vector will be the first coordinate and so on.  \\ \hline
+				
+				coordinate & integer & in &  It can be 1 or 2. If 1, the boundary condition will be imposed along the coordinate 2 with the coordinate 1 fixed and vice versa. \\ \hline
+				
+				N &  integer & in & Boundary point at which the condition is imposed.\\ \hline
+				
+				W &  vector of reals & inout & It will contain the solution. After entering the subroutine it will have imposed the boundary condition determined by \textbf{f}.\\ \hline
+				
+				f & vector of reals & in & Value of the boundary condition.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Neumann} arguments for 2D grids}
+\end{table}

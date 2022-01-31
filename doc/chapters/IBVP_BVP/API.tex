@@ -1,0 +1,85 @@
+\chapter{Mixed Boundary and Initial Value Problems   }
+\section{Overview}
+
+
+
+This library is intended  to solve an initial value boundary problem for a vectorial variable $\vect{u}$ with a coupled boundary value problem for $\vect{v}$. 
+ 
+\vspace{0.1cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/IBVP_BVP}
+  \listings{\home/sources/IBVP_and_BVPs.f90}
+       {module IBVPs_and_BVPs}
+       {IBVP_and_BVP}{IBVP_and_BVPs.f90}
+
+
+
+
+
+\newpage
+
+\section{Mixed BVP and IBVP module}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection*{Mixed Boundary and Initial Value Problems for 2D problems} 
+
+The subroutine \verb|IBVP_and_BVP| calculates the solution to a boundary initial value problem in a rectangular domain $(x,y)\in[x_0,x_f] \times [y_0,y_f]$:
+
+\begin{align*}
+& \frac{\partial \vect{u}}{\partial t} = \vect{\mathcal{L}}_u(x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}, \vect{v}, \vect{v}_x, \vect{v}_y, \vect{v}_{xx}, \vect{v}_{yy}, \vect{v}_{xy}) \\
+& \vect{\mathcal{L}}_v(x,y,t, \vect{v}, \vect{v}_x, \vect{v}_y, \vect{v}_{xx}, \vect{v}_{yy}, \vect{v}_{xy}, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}) = 0, \\
+& \eval{\vect{h}_u ( x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y)}_{\partial \Omega} = 0, \qquad 	
+\eval{\vect{h}_v ( x,y,t,\vect{v}, \vect{v}_x, \vect{v}_y)}_{\partial \Omega} = 0.
+\end{align*}
+
+
+%\begin{align*}
+%\vect{f}_{x=a}\left(x,\ y,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}\right)=0  \quad ; \quad \vect{f}_{x=b}\left(x,\ y,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}\right)=0  \\
+%\vect{f}_{y=c}\left(x,\ y,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}\right)=0  \quad ; \quad \vect{f}_{y=d}\left(x,\ y,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}\right)=0  \\
+%\vect{f}_{x=a}\left(x,\ y,\ t,\ \vect{v}, \ \frac{\partial \vect{v}}{\partial x}, \ \frac{\partial \vect{v}}{\partial y}\right)=0  \quad ; \quad \vect{f}_{x=b}\left(x,\ y,\ t,\ \vect{v}, \ \frac{\partial \vect{v}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}\right)=0  \\
+%\vect{f}_{y=c}\left(x,\ y,\ t,\ \vect{v}, \ \frac{\partial \vect{v}}{\partial x}, \ \frac{\partial \vect{v}}{\partial y}\right)=0  \quad ; \quad \vect{f}_{y=d}\left(x,\ y,\ t,\ \vect{v}, \ \frac{\partial \vect{v}}{\partial x}, \ \frac{\partial \vect{v}}{\partial y}\right)=0  
+%\end{align*}
+
+Besides, an initial condition must be stablished: $\vect{u}(x, y , t_0) = \vect{u}_0 (x,y)$. The problem is solved by means of a simple call to the subroutine:
+\begin{lstlisting}[frame=trBL]
+call IBVP_and_BVP( Time, x_nodes, y_nodes, L_u, L_v, BCs_u, BCs_v,  & 
+                   Ut, Vt, Scheme        )
+\end{lstlisting} 
+
+%\newpage
+The arguments of the subroutine are described in the following table.
+
+\btable 		
+				Time & vector of reals & in &  Time domain.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Mesh nodes along $OX$.  \\ \hline
+				
+				y\_nodes & vector of reals & inout &  Mesh nodes along $OY$.  \\ \hline
+				
+			                							
+				L\_u & \raggedright function:     $\vect{\mathcal{L}}_u $   & in  & Differential operator for $\vect{u}$.   \\ \hline
+				
+		    	L\_v & \raggedright function: $\vect{\mathcal{L}}_v $   & in  & Differential operator for $\vect{v}$.   \\ \hline
+
+				
+				\hline
+				
+				%\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline				
+				BCs\_u & \raggedright function: $
+                \vect{h}_u
+				$  & in &  Boundary conditions for $\vect{u}$. \\ \hline
+				
+				BCs\_v & \raggedright function: $     \vect{h}_v
+                $  & in & Boundary conditions for $\vect{v}$.  \\ \hline
+			
+				
+				Ut & four-dimensional array of reals  & out &  Solution $\vect{u} $ of the evolution problem. Fourth index: index of the variable.  \\ \hline
+			
+				Vt & four-dimensional array of reals  & out &  Solution $\vect{v}$ of the boundary value problem. Fourth index: index of the variable. \\ \hline	
+				
+				Scheme & temporal scheme  & optional in & Scheme used to solve the problem. If not given, a Runge Kutta of four steps is used.    \\ \hline
+\etable{Description of \texttt{IBVP\_and\_BVP} arguments for 2D problems}
+
+

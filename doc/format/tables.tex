@@ -1,0 +1,108 @@
+
+
+
+\usepackage{pgfplotstable}
+
+
+\pgfplotstableset{
+    every head row/.style={before row=\toprule,  after row=\midrule},
+    every last row/.style={after row=\bottomrule},
+    col sep=space, 
+      columns/T1/.style={
+        column name=$\theta_{se}$,
+    },
+    columns/TN/.style={
+       column name=$\theta_{si}$,
+    },
+     columns/T_s/.style={
+        column name=$\theta^{OFF} _s$,
+    },
+    columns/qi_off/.style={
+    column name=$q_i^{OFF}$(W/m$^2$),
+    },
+    columns/qi_on/.style={
+    column name=$q_i^{ON}$(W/m$^2$),
+    },
+    columns/qi_a/.style={
+    column name=$q_ia$(W/m$^2$),
+    },
+    columns/qi_b/.style={
+    column name=$q_ib$(W/m$^2$),
+    },
+    columns/T_w/.style={
+    column name=$\theta_w$,
+    },
+    columns/TI_a/.style={
+    column name=$T I_a$(W/m$^2$),
+    },
+    columns/TI_b/.style={
+    column name=$T I_b$(W/m$^2$),
+    },
+    columns/G_d/.style={
+    column name=$G_d$
+    },
+    columns/P/.style={
+    column name=$P$(W/m$^2$),
+    },
+    columns/T_e/.style={
+    column name=$\theta_e$,
+    },
+    columns/T_i/.style={
+    column name=$\theta_i$,
+    },
+    columns/h_i/.style={
+    column name=$h_i(W/m^2 K)$,
+    },
+    columns/h_e/.style={
+    column name=$h_e(W/m^2 K)$,
+    },
+    columns/h_g/.style={
+    column name=$h_g(W/m^2 K)$,
+    },
+    columns/h_w/.style={
+    column name=$h_w(W/m^2 K)$,
+    },
+    columns/c/.style={
+    column name=$c(J/Kg K)$,
+    },
+    columns/T_inlet/.style={
+    column name=$\theta_{INLET}$,
+    },
+    columns/I_beam/.style={
+    column name=$I_{b}(W/m^2)$,
+    },
+    columns/I_diffuse/.style={
+    column name=$I_{d}(W/m^2)$,
+    },
+    columns/Angle_of_incidence/.style={
+    column name=$\gamma$,
+    },
+    columns/flow_rate/.style={
+    column name=$\dot m (l/(min \ m^2))$,
+    },
+    columns/T_a/.style={
+    column name=$T_a$,
+    },
+    columns/alpha_NIR/.style={
+    column name=$\alpha_{NIR}$,
+    },
+    columns/alpha_FIR/.style={
+    column name=$\alpha_{FIR}$,
+    },
+    columns/U_wall/.style={
+    column name=$U_{wall}(W/m^2 K)$,
+    },
+   	columns/T_s/.style={
+   	column name=$\theta_s$(stagnation),
+    },
+    columns/T_se/.style={
+    	column name=$\theta_{sc}$,
+    },
+    columns/T_si/.style={
+    	column name=$\theta_{si}$,
+    },
+    header=true, 
+    string type}
+
+
+

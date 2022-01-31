@@ -1,0 +1,52 @@
+
+%******************************************************************************
+% cajas para la sintaxis oct 2000
+%******************************************************************************
+\newcommand{\ucajas}[1]{
+                \begin{center}
+                            \framebox{   \parbox[t]{10.2cm}{ #1 } }
+                \end{center}
+   }
+
+
+\newcommand{\ucajita}[1]{
+                     \begin{tabular}{c}
+                       \framebox{  \parbox[t]{4cm}{ #1 } }
+                    \end{tabular}
+                       }
+
+
+\newcommand{\ucajon}[1]{
+                     \begin{tabular}{c}
+                       \framebox{  \parbox[t]{6.5cm}{ #1 } }
+                    \end{tabular}
+                       }      
+
+\newcommand{\tcaja}[6]{
+   \begin{center}
+       \begin{tabular}{ccc}
+
+          \parbox[t]{#1}{ \begin{center} #4 \end{center} }
+          \hspace{#2}
+          \framebox{ \parbox[t]{#1}{ \begin{center} #5 \end{center} } }
+          \hspace{#2}
+          \parbox[t]{#1}{ \begin{center} #6 \end{center} }
+
+                    \end{tabular}
+   \end{center}
+
+                    \vspace{#3}
+                  }
+            
+%************************************************************************
+% Blackboard fonts
+%************************************************************************
+\newcommand{\BBR}{{\sf R\hspace*{-0.9ex}\rule{0.15ex}{1.5ex}\hspace*{0.9ex}}}
+\newcommand{\BBC}{{\sf C\hspace*{-0.9ex}\rule{0.15ex}{1.3ex}\hspace*{0.9ex}}}
+
+%**********************************************************************
+% font para los fuentes FORTRAN 
+%**********************************************************************
+\def\fuente{       \small          \begin{minipage}{11.8cm}  \begin{verbatim}          } 
+\def\fin{ \end{minipage} \normalsize \\ } 
+

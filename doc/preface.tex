@@ -1,0 +1,82 @@
+\chapter*{Preface}
+During the process of learning mathematics, it is crucial to understand the theoretical basis associated with each concept. 
+However, this necessary condition is not sufficient for a deep understanding of most mathematical problems. 
+It is required to work the concepts with concrete examples and exercises in which numerical calculations are enlightening. 
+For example, it is quite hard to get an intuitive vision of complex mathematical problems without working with their solutions.
+The solution of a mathematical problem involves designing an algorithm that is then implemented in a programming language. 
+A natural question that can arise in this line of thought is: How closely could the programming language be of the mathematical language?
+It is not easy to provide an answer to this question. 
+One main purpose of this book is to write programming codes with such a level of abstraction that the Fortran code resembles the mathematical language.  To do that,  profound knowledge of the Fortran language as well as the mathematical language is required. 
+
+
+Fortran is a  strongly-typed language in which each data have a precise type, kind, and rank, and each subroutine or function states its communication requirements in terms of these types.
+Usually, when formulating a  mathematical problem, a rigorous definition of the involved variables is stated.  This is in consonance with a strongly-typed language.  Besides, mathematical models are generally expressed in terms of functions and operators. Fortran language suits very elegantly with the functional paradigm. 
+Even being possible to use the Fortran language to write object-oriented programming, the authors do not recommend this kind of programming with the Fortran language. The functional paradigm is much better suited. 
+As in any other high-level programming language, the use of first-class functions allows easily the implementation of mathematical restrictions and functional operators.  Fortran is a vector-based programming language dealing elegantly with mathematical operations between vectors and matrices of any finite vectorial space.
+All of the previously stated characteristics, along with the capabilities of a computer such as the graphical representation of data and the speed of computation, make the programming language a great help to understand many mathematical concepts. 
+When treating with differential equations, which are very common in physical problems, the use of programming is mandatory when there is no analytical solution. The effect of the different terms that are involved in an equation can be observed by changing the value of their coefficients and plotting the solution. Other phenomena, such as the dispersion and diffusion of waves when dealing with linear hyperbolic partial differential equations are much easier to be observed using plotting tools. From this list of examples, we can deduce that the use of programming languages serves as a great reinforcement in the development of intuition for mathematical problems.
+
+
+The use of the functional paradigm of the Fortran language together with the construction of high-level abstractions are discussed in this book. Several mathematical problems of recurrent appearance in engineering are presented. Along with each type of problem, an algorithm for its resolution and its implementation in Fortran language are included. 
+Moreover, an extended library of numerical methods accompanies this book. 
+This library has two different abstraction layers: {\it (i)} the application layer
+in which subroutines are used as black boxes and {\it (ii)} the implementation layer
+that allows building different abstractions based on simpler concepts or functions.  
+
+The book is structured in three different parts:  user manual, developer guidelines and Application Programming Interface (API). 
+Part I, corresponding to the user manual, contains examples of mathematical problems of different natures and their resolution by means of the provided software. 
+The second part describes each one of the problems and the algorithm that solves them. 
+Besides, the deeper layer of the software is presented in order to help in the understanding of the functioning of the code. The final part, the Application Programming Interface, enlists for each type of mathematical problem the available subroutines and functions that compound the corresponding modules. The subprograms are defined by their interface in terms of their inputs and outputs. Every part is divided into chapters, one for each type of a mathematical problem. 
+
+Chapter 1 treats common topics from elementary operations with vectors and matrices from linear algebra and equations expressed in terms of elementary functions. 
+The resolution of linear systems by LU decomposition, finding zeros of a nonlinear function by means of the Newton-Raphson method, eigenvalues, and eigenvectors by means of power method and SVD decomposition. These two latter methods are also applied to the computation of the condition number of a matrix, which gives information about its sensitivity. 
+
+Chapter 2 deals with the interpolation problem, focusing on polynomial interpolation by means of Lagrange polynomials. 
+The Lagrange polynomials, their integrals, and derivatives are computed. 
+The presented interpolation methods are used by the module that computes numerical derivatives of a function. 
+
+In Chapter 3, the computation of high order derivatives by means of Finite differences is carried out. 
+This process is key to solving partial differential equations problems as boundary value problems or evolution problems in spatial domains. 
+The computation of the derivatives is used to discretize the spatial domain by means of Lagrange interpolation. High order finite difference methods permit to transform the differential operator defined on a continuum domain to a differential operator that is evaluated in a finite discrete set of points. 
+
+During Chapter 4 the initial value problem for ordinary differential equations, or also called Cauchy problem, is presented. This problem is of great applications in engineering problems. Starting by most problems of classical mechanics, such as orbital movements, or the attitude control of a satellite which are typical space applications. In other words, any problem that can be modeled as a first-order ordinary differential equation whose solution evolves from a certain initial value. This is achieved by means of temporal schemes that approximate the derivative of the differential equation. 
+
+In Chapter 5, the Boundary Value Problem is presented. This problem consists of determining a scalar or a vector field defined over a certain spatial domain governed by a differential equation with boundary conditions. Its applicability goes from structural static problems to thermal distributions or any physical problem that can be modeled as a partial differential equation with boundary conditions. 
+
+During Chapter 6, the Initial Value Boundary Problem is treated. This problem consists of an evolution problem for a vector field over a spatial domain, satisfying at each instant certain boundary conditions. Many classical problems such as the heat equation or the waves equation are governed by this kind of mathematical model. The method of resolution uses finite differences to discretize the spatial domain and transform the problem into a Cauchy problem, which is solved by the methods stated in Chapter 4.
+
+Finally, in Chapter 7, mixed problems that include an initial value boundary problem coupled with a boundary value problem are presented. Complex physics such as the vibration of non-linear plates can be modeled using these types of problems. 
+
+We hope this book helps the student to understand profound concepts related to numerical mathematical problems and what is more important,  from the point of view of authors, 
+demystifying the chasm between programming and mathematics by making programming as beautiful and formal as the mathematical formulation of a problem. 
+
+\begin{flushright}
+	Juan A. Hernández \\
+	Javier Escoto \\
+	Madrid, Septiembre 2019
+\end{flushright}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

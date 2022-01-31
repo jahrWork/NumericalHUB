@@ -1,0 +1,163 @@
+\chapter{Collocation methods}
+\vspace{-0.5cm}
+\section{Overview}
+
+This library is intended to calculate total or partial derivatives of functions at any specific   $ x  \in  \R{1},\R{2}, \R{3}  $.
+Since the function is known through different data points $(x_i, f(x_i))$, it is necessary to build an interpolant. 
+$$
+  I(x) = f(x_0) \ \phi_0(x)+ f(x_1) \ \phi_1(x)+  \hdots + f(x_N) \ \phi_N(x). 
+$$
+%Once this interpolant is built, the derivatives of the Lagrange polynomials allows to determine the derivative of the function. 
+%$$
+%  \frac{dI(x)}{dx} = f(x_0) \ \frac{d \ell_0}{dx}(x)+ f(x_1) \ \frac{d \ell_1}{dx}(x)+  \hdots + f(x_N) \ \frac{d \ell_N}{dx}(x). 
+%$$
+Hence, given a set of nodals or interpolation points, the coefficients for different derivatives are calculated by means of the subroutine 
+\verb|Grid_initialization|. Later, the subroutine \verb|Derivative| calculates the derivative by multiplying the function values by this calculated coefficients. 
+
+\vspace{0.1cm}
+ %\renewcommand{\home}{../libraries/Numerical_Methods/Finite_Differences}
+%  \listings{\home/sources/Finite_differences.f90}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+   \listings{\home/Collocation_methods.f90} 
+       {module Collocation_methods}
+       {Derivative}{Collocation_methods.f90}
+
+\newpage
+\section{Collocation methods module}
+
+
+\subsection*{Grid Initalization}
+\begin{lstlisting}[frame=trBL]
+call Grid_Initialization( grid_spacing, direction, q, grid_d )
+\end{lstlisting}
+
+ 
+\btable	
+grid\_spacing & character & in &   
+Collocation nodes
+ \\ \hline
+
+direction &  character  & in & Given name of the grid. \\ \hline
+
+q & integer, optional & in &   
+ Degree of the interpolant.
+
+\\ \hline
+
+grid\_d & vector of reals  & inout &  Calculated mesh:\verb|grid_d(0:)|  \\ \hline
+\etable{Description of \texttt{Grid\_Initalization} arguments}
+
+The argument \verb|grid_spacing| can take the values: 
+\verb|'uniform'|(equally-spaced), \verb|'nonuniform'|, \verb|'Fourier'| or 
+\verb|'Chebyshev'|.
+If \verb|grid_spacing| is  \verb|'nonuniform'|, 
+this subroutine calculates an optimum set of points within the space domain 
+defined with the first point at $ x_0 $ 
+and the last point $ x_N $. 
+This set of points depends on the interpolation order \verb|q|.
+Later, it builds the interpolant and its derivatives at the same data points $ x_i $ and it stores their values 
+for future use by the subroutine \verb|Derivative|. 
+ %The arguments of the subroutine are described in the following table:
+The \verb|q| argument is optional and 
+if it is only used when dealing with 
+finite difference methods (\verb|'uniform'| or \verb|'nonuniform'|).  
+It represents the degree of the interpolating polynomial 
+ and \verb|q| nust be smaller or equal to  $N-1$ nodes. 
+ 
+ If the selected collocation method is \verb|'Fourier'| or \verb|'Chebyshev'|, 
+ derivatives are calculated by transforming the nodal points from the physical plane 
+ to the spectral plane. Then, derivatives are calculated in the spectral plane and, 
+ finally, an inverse
+ transform form the spectral plane to the physical plane allows to obtain the 
+ derivatives in the nodal grid or physical plane. 
+%The number of nodes ($N$) should be  greater than the polynomials order (at 
+%least $ N = \text{order} +1 $).  
+%If \verb|grid_spacing| is \verb|'nonuniform'|, the nodes are calculated by obtaining the extrema of the polynomial error associated to the 
+%polynomial of degree $N-1$ that the unknown nodes form.
+%\listings{\home/Collocation_methods.f90} 
+%       {subroutine Grid_Initialization}
+%       {end subroutine}{Collocation_methods.f90}
+
+\newpage
+\subsection*{Derivatives for $x \in \R{k} $ }
+Since the space domain $ \Omega \subset \R{k} $ with $ k=1,2,3$, derivatives (1D,2D or 3D) 
+are calculated depending on the numerical problems. 
+To avoid  dealing with different names associated to different space dimensions, the subroutine 
+\verb|Derivative| is overloaded with the following subroutines: 
+\vspace{0.5cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+    \listings{\home/Collocation_methods.f90} 
+        {interface Derivative}
+       {end interface}{Collocation_methods.f90}
+   
+
+\subsection*{Derivative for 1D grids}
+
+\begin{lstlisting}[frame=trBL]
+call Derivative( direction, derivative_order, W, Wxi, j )
+\end{lstlisting}
+
+
+\btable	
+direction & character & in &  It selects the direction which composes the grid from the ones that have already been defined.  \\ \hline
+
+derivative\_order &  integer & in & Order of derivation.\\ \hline
+
+W &  vector of reals & in & Given nodal values \verb|W(0:N)|.\\ \hline
+
+Wxi & vector of reals & out &  Value of the $k$-th derivate at the same nodal values
+\verb|Wxi(0:N)|.\\ \hline
+j & integer, optional & in &  Index in which the derivative is calculated.\\ \hline
+\etable{Description of \texttt{Derivative} arguments for 1D grids}
+
+If the \verb|j| argument is present then, only the derivative is calculated at $ x_j $. 
+Otherwise, derivatives are calculated at every grid point form $ x_0 $ to $ x_N $. 
+
+\newpage
+To explain how the \verb|Collocation_methods| module works, 
+the following snippet is shown:
+\renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+    \listings{\home/Collocation_methods.f90} 
+        {subroutine Derivative1D}
+       {end subroutine}{Collocation_methods.f90}
+
+Once \verb|Grid_Initialization| has selected the collocation methods, the subroutine 
+\verb|Derivative| calculates derivatives of basis functions $ \phi_k(x)$. 
+These functions are sine or cosine functions in the Fourier method or 
+Lagrange polynomials in the finite difference method. 
+
+
+
+\newpage
+%******************************************************************************************
+\subsection*{Derivative for 2D and 3D grids}
+\begin{lstlisting}[frame=trBL]
+call Derivative( direction , coordinate , derivative_order , W , Wxi )
+\end{lstlisting}
+
+\btable	
+direction & vector of characters & in & 
+It selects the directions  which compose the grid from the ones that have already 
+been defined by \verb|Grid_Initilization|. \\ \hline
+
+coordinate & integer & in & 
+Coordinate at which the derivate is calculated. It can be 1,2 for 2D grids and 1,2 or 3 for 
+3D grids.  \\ \hline
+
+derivative\_order &  integer & in & Order of derivation.\\ \hline
+
+W &  N-dimensional array of reals & in & \verb|W(:,:)| in 2D problems and 
+ \verb|W(:,:,:)| in 3D problems.\\ \hline
+
+Wxi & N-dimensional array of reals & out & 
+Values of the derivative at grid points.
+ \verb|Wxi(:,:)| in 2D and  \verb|Wxi(:,:,:)| in 3D.\\ \hline
+\etable{Description of \texttt{Derivative} arguments for 2D and 3D grids}
+
+
+
+If  \verb|direction = ["x", "y"]|,  \verb|coordinate = 2| and \verb|derivative_order = 1|,  then 
+ \verb|Wxi| represent the first partial derivative of $ W(x,y) $ with respect to $ y $. 
+
+
+

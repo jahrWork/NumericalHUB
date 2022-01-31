@@ -1,0 +1,14 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ height = \textwidth, width = \textwidth,
+        title style={at={(0.5,-0.4)}, yshift=-0.05}, title={(a)},
+        xlabel={ $x$ },    xmin=   -1.00, xmax =    1.00,
+        xlabel={ $y$ },    ymin=   -1.00, ymax =    1.00,
+         view={0}{90}, colormap/blackwhite ]
+  \addplot3[contour/labels=false, contour gnuplot = { levels={   -0.30,  -0.27,  -0.24,  -0.21,  -0.17,  -0.14,  -0.11,  -0.08,  -0.05,  -0.02,   0.02,   0.05,   0.08,   0.11,   0.14,   0.17,   0.21,   0.24,   0.27,   0.30 }},
+            mesh/ordering = y varies,
+            mesh/rows =   21,
+            mesh/cols =   21
+           ]
+           table [skip first n=2] {./doc/chapters/Boundary_Value_Problem/figures/NLPlatea.plt};
+     \end{axis}
+ \end{tikzpicture}

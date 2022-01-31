@@ -1,0 +1,15 @@
+Informatics 2017/2018 Aerospace Engineering (UPM) 
+ 
+How to install FORTRAN and graphical windows in windows 10 
+
+Author: Juan A. Hernandez:  juanantonio.hernandez@upm.es 
+
+
+A) Copy Informatica_2018 to Desktop 
+
+B) Check the compiler 
+     1)open command prompt and type >compile Hello_world
+     2)open  command prompt and type >compile plot_graph
+
+
+

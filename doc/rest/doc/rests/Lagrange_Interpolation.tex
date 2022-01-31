@@ -1,0 +1,244 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% OVERVIEW
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Overview}
+
+This library has been designed to apply lagrangian interpolation in order to carry out different computations. There are two modules, defined as \textbf{Interpolation} and \textbf{Lagrange\_interpolation}. In spite of this, the API is contained only in the \textbf{Interpolation} module. On the whole, this module contains two main functions: \textbf{interpolated\_value} and \textbf{Integral}. Each of them is based on a lagrangian interpolation, which is permormed in the support module \textbf{Lagrange\_interpolation}. 
+
+There are two main objectives of this API. The first one, attained by the function \textbf{interpolated\_value}, computes the value of a function at a certain point taking into account values of that function at other points. The second purpose, carried out by the function \textbf{Integral}, is related to the computation of the integral of a function in a certain interval.
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{API\_Example\_Lagrange\_Interpolation.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Interpolation}.
+
+The first subroutine, called \textbf{interpolated\_Solution}, is devoted to clarify the usage of the function \textbf{interpolated\_value}. Through this function, one could obtain the value of a function at a certain point by means of the values of that function at other points. For instance, the chosen function is a simple cosine, and the inputs of \textbf{interpolated\_value} are four values of the function at other points. The final result is the interpolated value of the function at \textbf{xp}, which is denoted as \textbf{yp}. Since the order of the interpolation has not been defined, it acquires the predefined value of two. 
+
+Subsequently, the second subroutine, coined as \textbf{Integral\_Solution}, carries out the computation of the integral of a certain function in an interval defined by the given points. Again the function is set to be a cosine, and five values of it are known at different points. The function \textbf{Integral} enables to perform the integral computation. Since the degree of the interpolation has not been defined, it acquires the predefined value of two.
+
+\newpage
+
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+
+\lstinputlisting[language=Fortran]{../sources/Interpolation_example.f90}
+\newpage
+
+
+\section{Interpolation module}
+
+
+\subsection*{interpolated\_value}
+
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+yp = interpolated_value( x, y, xp, degree )
+\end{lstlisting}
+
+The function \textbf{interpolated\_value} is devoted to conduct a piecewise polynomial interpolation of the value of a certain function $y(x)$ in $x=x_p$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes.
+
+
+The result of the function is the following:
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Function result & \bf Type & \bf Description \\ \hline \hline
+				
+				yp & real & Interpolated value of the function $y(x)$ in $x=x_p$.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Output of \textbf{interpolated\_value}}
+\end{table}
+
+The arguments of the function are described in the following table.
+
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				
+				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				
+				xp & real & in & Point in which the value of the function $y$ will be interpolated. \\ \hline
+				
+				degree & integer & in (optional) & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{interpolated\_value} arguments}
+\end{table}
+
+
+
+
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% FUNCTION Integral
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Integral}
+
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+I = Integral( x, y, degree )
+\end{lstlisting}
+
+
+The function \textbf{Integral} is devoted to conduct a piecewise polynomial integration of a certain function $y(x)$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes. The limits of the integral correspond to the minimum and maximum values of the nodes.
+
+
+The result of the function is the following:
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Function result & \bf Type & \bf Description \\ \hline \hline
+				
+				I & real & Value of the piecewise polynomial integration of $y(x)$.\\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Output of \textbf{Integral}}
+\end{table}
+
+
+
+The arguments of the function are described in the following table.
+
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | l | l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				
+				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				
+				degree & integer & in (optional) & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Integral} arguments}
+\end{table}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% FUNCTION weighted_average
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%\subsection*{weighted\_average}
+%
+%
+%\lstset{backgroundcolor=\color{Goldenrod!10}}
+%\lstset{language=Fortran}
+%\begin{lstlisting}[frame=trBL]
+%f_average = weighted_average( f, w, x, dg )
+%\end{lstlisting}
+%
+%
+%The function \textbf{weighted\_average} computes the average of the function $f(x)$ weighted by the function $w(x)$:
+%
+%
+%
+%\begin{equation*}
+% f_{average}  =\frac{\int f(x) w(x) dx}{\int w(x)}
+%\end{equation*}
+%
+%
+%
+%
+% The data provided to carry out the interpolation is the value of those functions $f(x)$ and $w(x)$ in a group of nodes. The result of the function \textbf{weighted\_average} is the following:
+%
+%\begin{table}[H]
+%	\begin{center}
+%	\begin{spacing}{1.2}
+%		\begin{tabular}{| l | l | p{6cm} |}
+%			
+%			\hline
+%			
+%			\bf Function result & \bf Type & \bf Description \\ \hline \hline
+%			
+%			f\_average & real & Average of the function $f(x)$ weighted by the function $w(x)$.\\ \hline
+%			
+%		\end{tabular}
+%		\end{spacing}
+%	\end{center}
+%	\caption{Output of weighted\_average}
+%\end{table}
+%
+%
+%The arguments of the function are described in the following table.
+%
+%
+%\begin{table}[H]
+%	\begin{center}
+%	\begin{spacing}{1.2}
+%		\begin{tabular}{| l | l | l | p{6cm} |}
+%\hline
+%			
+%\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+%
+%f & vector of reals & in & Values of the function $f(x)$ in the group of points denoted by $x$. \\ \hline
+%
+%w & vector of reals & in & Values of the function $w(x)$ in the group of points denoted by $x$. \\ \hline
+%			
+%x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+%
+%degree & integer & in (optional) & Degree of the polynomial used in the interpolation. If it is not presented it takes the value 2. \\ \hline
+%			
+%		\end{tabular}
+%		\end{spacing}
+%	\end{center}
+%	\caption{Description of weighted\_average arguments}
+%\end{table}

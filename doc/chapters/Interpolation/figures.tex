@@ -1,0 +1,200 @@
+%%%%%%%%%%%%%%%%%% INTERPOLANT AND ITS DERIVATIVES %%%%%%%%%%%%%%%%%%
+
+\newcommand{\Interpol}[1]
+{
+	\onegraph{$x$}{$I(x)$}{ no marks, xmax = 0.5, xmin = 0}
+	%
+	{./doc/chapters/Interpolation/figures/Interpolant_example.plt}{ }{1}{ #1 }
+}
+
+
+\newcommand{\Iprime}{$I^\prime$}
+\newcommand{\InterpDV}[1]
+{
+	\onegraph{$x$}{$\dv*{I}{x}$}{ no marks, xmax = 0.5, xmin = 0}
+	%
+	{./doc/chapters/Interpolation/figures/Interpolant_example.plt}{ }{2}{ #1 }
+}
+	
+
+
+
+%%%%%%%%%%%%%%%%%% LAGRANGE POLYNOMIALS %%%%%%%%%%%%%%%%%%
+
+\newcommand{\lagrange}{\ell}
+\newcommand{\lagrangep}{\ell^{\prime}}
+
+\newcommand{\LagrPol}[1]
+{   
+	%\onegrapht{cycle list name=exotic, legend columns=5, xlabel = $x$, ylabel = $l_j(x)$, no marks, xmax = 1, xmin = -1, ymin = -1, legend style={at={(0.91,0.15)}} }
+	%
+	%{./doc/chapters/Interpolation/figures/Lagrange_polynomial_example.dat}{$\ell_0$,$\ell_1$,$\ell_2$,$\ell_3$,$\ell_4$}{1,2,3,4,5}{ #1 }
+	\onegraph{$x$}{$\ell_j(x)$}{ mark repeat=35, legend columns=4, xmax = 1, xmin = -1, ymin = -1.3, legend style={at={(0.95,0.26)}}}{./doc/chapters/Interpolation/figures/Lagrange_polynomial_example.dat}{$\ell_0$,$\ell_1$,$\ell_2$,$\ell_3$,$\ell_4$}{1,2,3,4,5}{ #1 }
+}%ymode=log,
+
+%, xlabel = , ylabel = 
+
+\newcommand{\LebesPol}[1]
+{
+	\oneloggraph{$x$}{$\lambda^{(k)}(x)$}{mark repeat=35, legend columns=3, xmax = 1, xmin = -1, ymax = 1400, ymin = 1, legend style={at={(0.98,0.96)}}, legend columns=5}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_polynomial_example.dat}{$\lambda$,$\lambda^{(1}$,$\lambda^{(2}$,$\lambda^{(3}$}{1,2,3,4}{ #1 }
+}
+
+
+%%%%%%%%%%%%%%%%%% ILL POSED INTERPOLATION %%%%%%%%%%%%%%%%%%
+
+
+
+\newcommand{\IllPosedInt}[1]
+{   
+	%\onegrapht{ xlabel = $x$, ylabel = $I(x)$, no marks, xmax = 1, xmin = -1, ymax = 1.5, ymin = -1.5}
+	%
+%	{./doc/chapters/Interpolation/figures/Ill_posed_interpolation_example.plt}{}{1}{ #1 }
+	\onegraph{$x$}{$I_N(x)$}{no marks, xmax = 1, xmin = -1, ymax = 1.5, ymin = -1.5}
+	{./doc/chapters/Interpolation/figures/Ill_posed_interpolation_example.plt}{}{1}{ #1 }
+}
+
+
+\newcommand{\IllPosedIntLeb}[1]
+{   
+	\oneloggraph{$x$}{$\lambda_N(x)$}
+	{ no marks, xmax = 1, xmin = -1, ymin = 1}
+	{./doc/chapters/Interpolation/figures/Ill_posed_interpolation_Lebesgue.dat}{}{1}{ #1 }
+}
+
+
+%%%%%%%%%%%%%%%%%% LEBESGUE AND ERROR FUNCTION %%%%%%%%%%%%%%%%%%
+
+
+
+\newcommand{\ErrorFunction}[1]
+{   
+	\oneloggraph{$x$}{$\pi_{N+1}(x)$}{ no marks, xmax = 1, xmin = -1 }
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{1}{ #1 }
+}
+
+\newcommand{\ErrorFunctionP}[1]
+{   
+	\oneloggraph{$x$}{${\pi_{N+1}^\prime}(x)$}{ no marks, xmax = 1, xmin = -1}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{2}{ #1 }
+}
+
+\newcommand{\ErrorFunctionPP}[1]
+{   
+	\oneloggraph{$x$}{${\pi_{N+1}^{\prime\prime}}(x)$}{ no marks, xmax = 1, xmin = -1}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{3}{ #1 }
+}
+
+\newcommand{\LebesgueFunction}[1]
+{   
+	\oneloggraph{$x$}{${\lambda}_N(x)$}{ no marks, xmax = 1, xmin = -1, ymin = 1}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{4}{ #1 }
+}
+
+
+\newcommand{\LebesgueFunctionP}[1]
+{   
+	\oneloggraph{$x$}{${\lambda_N^\prime}(x)$}{ no marks, xmax = 1, xmin = -1, ymin = 1}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{5}{ #1 }
+}
+
+\newcommand{\LebesgueFunctionPP}[1]
+{   
+	\oneloggraph{$x$}{${\lambda_N^{\prime\prime}}(x)$}{ no marks, xmax = 1, xmin = -1, ymin = 1}
+	%
+	{./doc/chapters/Interpolation/figures/Lebesgue_and_PI_functions.dat}{}{6}{ #1 }
+}
+	
+	
+	
+%%%%%%%%%%%%%%%%%% CHEBYSHEV EXPANSION %%%%%%%%%%%%%%%%%%
+
+\newcommand{\FirstChebyshevPol}[1]
+{
+	%\onegrapht{xlabel=$x$, ylabel={$T(x)$}, no marks, xmax = 1, xmin = -1, ymax = 1.5, legend style={at={(0.94,0.95)}}, cycle list name=exotic, legend columns=5}
+	%
+	%{./doc/chapters/Interpolation/figures/Chebyshev_polynomials.dat}{$T_1$,$T_2$,$T_3$,$T_4$,$T_5$}{1,2,3,4,5}{ #1 }
+	\onegraph{$x$}{$T_k(x)$}{ xmax = 1, xmin = -1, ymax = 2, legend style={at={(0.92,0.97)}},  mark repeat=18, legend columns=3}
+	%
+	{./doc/chapters/Interpolation/figures/Chebyshev_polynomials.dat}{$T_1$,$T_2$,$T_3$,$T_4$,$T_5$}{1,2,3,4,5}{ #1 }
+}
+
+\newcommand{\SecondChebyshevPol}[1]
+{
+	\onegraph{$x$}{$U_k(x)$}{xmax = 1, xmin = -1, legend style={at={(0.84,0.95)}},  mark repeat=18, legend columns=3}
+	%
+	{./doc/chapters/Interpolation/figures/Chebyshev_polynomials_2_kind.dat}{$U_1$,$U_2$,$U_3$,$U_4$,$U_5$}{1,2,3,4,5}{ #1 }
+}
+
+
+\newcommand{\ChebyshevExpansion}[1]
+{
+	%\onegrapht{xlabel=$x$, ylabel={$I(x)$}, no marks, xmax = 1, xmin = -1, ymax = 1.75, legend style={at={(0.74,0.96)}}}
+	%
+	%{./doc/chapters/Interpolation/figures/Chebyshev_expansion.dat}{Discrete Chebyshev,Truncated Chebyshev}{3,2}{ #1 }
+	\onegraph{$x$}{$I_N(x)$}{ mark repeat=30, xmax = 1, xmin = -1, ymax = 1.9, legend style={at={(0.94,0.98)}}}
+	%
+	{./doc/chapters/Interpolation/figures/Chebyshev_expansion.dat}{Discrete Chebyshev,Truncated Chebyshev}{3,2}{ #1 }
+}
+
+\newcommand{\ChebyshevExpansionError}[1]
+{
+	%\onegrapht{xlabel=$x$, ylabel={$E(x)$}, no marks, xmax = 1, xmin = -1, legend style={at={(0.94,0.95)}}}
+	%
+	%{./doc/chapters/Interpolation/figures/Chebyshev_expansion.dat}{Discrete Chebyshev,Truncated Chebyshev}{6,4}{ #1 }
+	\onegraph{$x$}{$E_N(x)$}{ mark repeat=30, xmax = 1, xmin = -1, legend style={at={(0.94,0.98)}}}
+	%
+	{./doc/chapters/Interpolation/figures/Chebyshev_expansion.dat}{Discrete Chebyshev,Truncated Chebyshev}{6,4}{ #1 }
+}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%% DEVELOPER FIGURES %%%%%%%%%%%%%%%%%%%
+
+\newcommand{\InterpolX}[1]
+{
+	\begin{tikzpicture}
+	\begin{axis}[height = \textwidth, width = \textwidth, hide axis,title style={at={(0.5,-0.3)},anchor=south}, title={#1}]
+	\addplot3[mesh, draw = blue,samples=4,domain=0:0.4, mark=*]
+	{x*(1-x)*y*(1-y)};
+	
+	\addplot3[variable=x,samples=4,mesh,domain=0:0.4, color = black, mark=*] (x,0.2, {x*(1-x)*0.2*(1-0.2)});
+	
+	\node[color = red, circle, fill] (xp) at (0.2,0.2,{0.2*(1-0.2)*0.2*(1-0.2)} ){};
+	\node (Ixs) at (-0.025,0.2,0.01){$\tilde{I}(x;s)$};
+	\end{axis}
+	
+	
+	
+	
+	\end{tikzpicture}
+}
+
+
+
+
+
+
+\newcommand{\InterpolY}[1]
+{
+	\begin{tikzpicture}
+	\begin{axis}[height = \textwidth, width = \textwidth, hide axis,title style={at={(0.5,-0.3)},anchor=south}, title={#1}]
+	\addplot3[mesh, draw = blue,samples=4,domain=0:0.4, mark=*]
+	{x*(1-x)*y*(1-y)};
+	
+	\addplot3[variable=y,samples=4,mesh,domain=0:0.4, color = black, mark=*] (0.2,y, {x*(1-x)*y*(1-y)} );
+	
+	\node[color = red, circle, fill] (xp) at (0.2,0.2,{0.2*(1-0.2)*0.2*(1-0.2)} ){};
+		
+	\end{axis}
+	\node (Iys) at (2,-0.05,0){$\tilde{I}(y;s)$};
+
+	\end{tikzpicture}
+}

@@ -1,0 +1,1227 @@
+
+    
+    %*************************************************************************
+    \chapter{Systems of equations}
+    %*************************************************************************
+    \label{Dev:Linear_Algebra}
+    
+    \section{Overview}
+
+    In this chapter, it is intended to cover the implementation of some classic issues that might appear in algebraic problems from applied mathematics. In particular, the operations related to linear and non linear systems and operations with matrices such as: LU factorization, real eigenvalues and eigenvectors computation and SVD decomposition will be presented.
+    
+   
+ 
+ 
+ 
+ 
+ 
+ 
+\newpage 
+%***********************************************
+ \section{Linear systems and LU factorization}
+ %**********************************************
+ 
+ In all first courses in linear algebra, the resolution of linear systems is treated as the fundamental problem to be solved. This problem consists on solving for an unknown $\vect{x} \in \mathbb{R}^N$ the problem:
+ %
+ \begin{equation}
+ A \vect{x} = \vect{b}, \label{eq:Axb}
+ \end{equation}
+ where $A\in\mathcal{M}_{N\times N}$ verifies $\det(A)\neq0$ and $\vect{b} \in \mathbb{R}^N$.
+ 
+ Concepts such as linear combination, pivots and elemental operations matrices are used, leading to the well-known Gauss elimination method. This method operates by rows on an extended matrix which contains all the columns of $A$ and $\vect{b}$ as its last column until the rows of $A$ form an upper diagonal matrix. Once we have the upper diagonal matrix, the resolution of the problem is straightforward. However, even though Gauss elimination is a successful algorithm to deal with linear systems, its straightforward implementation has an inconvenient: it depends on $\vect{b}$. This means that every time we change the independent term we have to apply again the algorithm and perform around $N^3$ operations. This is undesirable as in many situations, we need to compute the solution of $A\vect{x}=\vect{b}$ for different source terms. A more efficient manner to think of Gaussian elimination is through LU factorization. The latter method is based on the fact that to reach the upper diagonal matrix of Gauss method, which we will denote $U$, a bunch of elemental row operations have to be performed over $A$. This means that there exists a $N\times N$ invertible matrix $L^{-1}$ containing these operations such that when $A$ is premultiplied by it we get $U$. In other words this means that we can express $A$ as:
+ \begin{equation}
+ A = LU, \label{eq:LU}
+ \end{equation}
+ where $L$ and $U$ are lower and upper triangular matrices respectively. Note that as $U$ is obtained through a Gaussian elimination process, the number of operations to compute LU factorization is the same. However, relation (\ref{eq:LU}) gives a recursion to obtain both $L$ and $U$ operating only over elements of $A$. The factorization of $A$ is equivalent to the relation between their components:
+ %
+ \begin{equation}
+ A_{ij}= \sum_{m}L_{im} U_{mj}, \quad \mbox{for} \quad m\in[1,\min \{i,j\}], \label{eq:ALU}
+ \end{equation}
+ from which we want to obtain $L_{ij}$ and $U_{ij}$. By definition, the number of non null terms in $L$ and $U$ are $N(N+1)/2$, which leads to $N^2 + N$ unknown variables. However, the number of equations supplied by (\ref{eq:LU}) is $N^2$. This makes necessary to fix the value of $N$ unknown variables. To solve this, we force $L_{kk}=1$. Once this is done, we can obtain the $k$-th row of $U$ from the equation for the components $A_{kj}$ with $j\geq k$ if the previous $k$ rows are known. Taking into account that $U_{11}=A_{11}$ we can compute the recursion
+  \begin{equation}
+ U_{kj} = {A_{kj} - \sum_{m} L_{km}U_{mj} }, 
+ \quad \mbox{for} \quad m \in [1,k-1]. \label{eq:recurrence_b}
+ \end{equation}
+ 
+ Note that the first row of $U$ is just the first row of $A$. Hence, we can calculate each row of $U$ recursively by a direct implementation.    
+ \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {do j=k, N}
+ {end do}{Linear_systems.f90}
+ Note that the upper diagonal matrix $U$ is stored on the upper diagonal elements of $A$.
+ Once we haved calculated $U$, a recursion to obtain the $i$-th row of, if all the previous $i-1$ rows of $L$ are known. Note that for $i>j=1$, $A_{i1}=  L_{i1} U_{11}$ and the first column of $L$ can be given as an initial condition. Therefore, we can compute the recursion as:
+ %
+ \begin{equation}
+ L_{ik} 
+ = 
+ \frac
+ {A_{ik} - \sum_{m} L_{mk}U_{im} }
+ {U_{kk}}
+ , \quad \mbox{for} \quad m \in [1,k-1]. \label{eq:recurrence_c}
+ \end{equation}
+ Again, this recursion can be computed through a direct implementation:
+ \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {do i=k}
+ {end do}{Linear_systems.f90}
+ The factorization of $A$ is implemented in the subroutine \verb|LU\_factorization|
+  \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {subroutine LU_factorization}
+ {end subroutine}{Linear_systems.f90}
+ 
+ 
+ %\subsection{Solving LU system}
+ Once the matrix $A$ is factorized it is possible to solve the system (\ref{eq:Axb}). In first place it is defined $\vect{y}= U \vect{x}$, and thus:
+ %
+ \begin{equation}
+ \sum_{j}
+ L_{ij}y_j 
+ = 
+ b_i,  
+ \quad \mbox{for}\quad j \in [1,i] .\label{eq:Lyb}
+ \end{equation}
+ 
+ As $L_{ij}=0$ for $i<j$, and $L_{ii}=1$ the first row of (\ref{eq:Lyb}) gives $y_1=b_1$ and the value of each $y_i$ can be written on terms of the previous $y_j$, that is:
+ 
+ \begin{equation}
+ y_i = b_i - \sum_{j}L_{ij} y_j, \quad \mbox{for} \quad 1 < j < i, \label{eq:LUy}
+ \end{equation}
+ 
+ thus, sweeping through $i=2, \ldots N$, over (\ref{eq:LUy}) $\vect{y}$ is obtained. This is computed through a direct implementation as:
+ %
+ \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {do i=2,N}
+ {enddo}{Linear_systems.f90}
+ 
+ To obtain $\vect{x}$ it is used the definition of $\vect{y}$, which is written:
+ %
+ \begin{equation}
+ y_i = \sum_{j} U_{ij} x_j ,  \quad \mbox{for} \quad j \in [i,N]. \label{eq:yUx}
+ \end{equation}
+ 
+ In a similar manner than before, as $u_{ij}=0$ for $i>j$, the last row of (\ref{eq:yUx}) gives $x_{\tiny \mbox{\textit{N}}}=y_{\tiny \mbox{\textit{N}}} / u_{\tiny \mbox{\textit{NN}}}$ and each $x_i$ can be written in terms of the next $x_j$ with $i<j\leq N$ as expresses the equation (\ref{eq:LUx}):
+ %
+ \begin{align}
+     x_i = \dfrac{y_i - \sum_{j} U_{ij}x_j}{ u_{ii}}, \quad \mbox{for} \quad \quad j \in [i,N]. \label{eq:LUx}
+ \end{align} 
+ 
+ Therefore, evaluating recursively $i = N-1, \ldots 1$
+ (\ref{eq:LUx}), the solution $\vect{x}$ is obtained. The implementation of this recursion is straightforward:
+ \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {do i=N}
+ {end do}{Linear_systems.f90}
+ 
+ Hence, we can contain the whole process of obtaining the solution of $LU\vect{x}=\vect{b}$ in a subroutine named \verb|Solve_LU| which contains the presented pieces of code along with the initialization $y_1=b_1$.
+ 
+ \vspace{0.5cm} 
+ \listings{\home/sources/Linear_systems.f90}
+ {function Solve_LU}
+ {end function}{Linear_systems.f90}
+ 
+ 
+ 
+ 
+   
+ \newpage   
+ 
+ %******************************************    
+      \section{Condition number} 
+  %******************************************    
+      Let's consider a system of linear equations: 
+       \begin{equation}
+                A  \ \vect{x} = \vect{b},
+                \label{LSE}
+           \end{equation} 
+      where $ A $ is a square system matrix,  $ \vect{b} $ is the independent 
+      term and $ \vect{x}  $ the exact solution.  
+      When solving this linear system of equations by iterative of direct 
+      methods, the approximate solution denoted by  $  \vect{\bar x} $ does not 
+      verify exactly the system of linear equations. 
+      The residual $\vect{r} $  that this solution  leaves in the linear system 
+      is defined by: 
+        \begin{equation}
+                    \vect{r} = \vect{b} - A \ \vect{ \bar x}
+                    \label{residual}
+           \end{equation} 
+      allows to determine the error of the solution by means of the condition 
+      number $\kappa(A)$ of the matrix $A$,  
+       \begin{equation}
+           \frac{\norm{ \vect{x} - \vect{\bar x}  }}{\norm{ \vect{x}}} \ \leq \
+                \kappa(A) \
+                \frac{\norm{ \vect{r}}}{\norm{\vect{b}}}.
+                \label{error}
+      \end{equation}
+      
+      To demonstrate this result, 
+      let subtract equation (\ref{LSE}) and equation (\ref{residual}), 
+        \begin{equation}
+                 A  \ ( \vect{x} - \vect{\bar x} )  = \vect{r},
+                 \label{residual2}
+          \end{equation} 
+     Let's define the norm of a matrix induced by the norm $ \norm{\cdot} $ of 
+     a 
+     vector space $ V $ by: 
+       \begin{equation}
+            \norm{A} =  \sup \frac{ \norm{ A \vect{x} } }{\norm{\vect{x}}},  
+         \end{equation} 
+      for all $ \vect{x}  \in V $. 
+      By multipliying equation (\ref{residual2}) by the inverse of $ A $ and 
+      taking norms,   
+      \begin{equation}
+       \norm{ \vect{x} - \vect{\bar x}  } \le \norm*{ A^{-1} } \ 
+       \norm{\vect{r}}.
+       \label{global_error}
+      \end{equation} 
+      Dividing this equation by $ \norm{ \vect{x} } $
+      \begin{equation}
+            \frac{ \norm{ \vect{x} - \vect{\bar x}  } }
+                 {    \norm{\vect{x}}    }
+            \le \norm{ A^{-1} } \ 
+            \frac{ \norm{\vect{r}} }{ \norm{ \vect{x} } }.
+            \label{relative_error}
+      \end{equation}
+      Finally, taking norms in equation (\ref{LSE}) gives 
+      \begin{equation}
+            \norm{ \vect{x}  } \ge \frac{ \norm{ \vect{b} } }{ \norm{ A } },
+            \label{SUB}
+       \end{equation}
+      and substituting this result in equation (\ref{relative_error})  yields 
+      the expected result: 
+      \begin{equation}
+                \frac{\norm{ \vect{x} - \vect{\bar x}  }}{\norm{ \vect{x}}} \ 
+                \leq \
+                     \norm{ A } \ \norm*{ A^{-1} } \
+                     \frac{\norm{ \vect{r}}}{\norm{\vect{b}}}, 
+                     \label{error}
+           \end{equation}
+  where  $   \norm{ A } \ \norm*{ A^{-1} }  $ is defined as the condition 
+  number 
+  $ 
+  \kappa(A)$ of the matrix $ A$. 
+      
+     
+      
+ When  the quadratic norm $\norm{\cdot}_2$ is considered, it will 
+ be shown in the following section that the norm of a matrix can be obtained by 
+ the square root of maximum eigenvalue of the matrix $ A^T A $ which coincides 
+ with the maximum singular value of the matrix $ A $. Hence, the condition 
+ number is expressed as:  
+ 
+ 
+      \begin{equation*}
+      \kappa(A)= \frac{\sigma_{\mbox{\tiny max}}}{\sigma_{\mbox{\tiny min}}},
+      \end{equation*}
+ where the norm of $ A $ is $\sigma_{\mbox{\tiny max}}$, the norm of 
+ $A^{-1}$ is $ 1/\sigma_{\mbox{\tiny min}} $  and $\sigma_{\mbox{\tiny 
+ max}}$  and $  \sigma_{\mbox{\tiny min}} $ represent the maximum and minimum  
+ singular values of the matrix $A$ respectively. 
+ To implement the condition number computation for a matrix we follow three 
+ steps.
+      \begin{enumerate}
+      	\item \textbf{Maximum singular value of $A^TA$:} This is done calling 
+      	\verb|Power_method| using as input a matrix \texttt{B} that stores 
+      	$A^TA$ and computing the square root of the resulting eigenvalue 
+      	storing it in \verb|sigma_max|
+      \end{enumerate}
+  
+      \begin{enumerate}[resume]
+      	\item \textbf{Minimum eigenvalue of $A^TA$:} This is done calling 
+      	\verb|Power_method| using as input \texttt{B} and computing the square 
+      	root of the resulting eigenvalue storing it in \verb|sigma_min|
+      \end{enumerate}
+       
+      
+      \begin{enumerate}[resume]
+      	\item \textbf{Condition number of $A$:} The condition number is 
+      	calculated for the output of the function \verb|Condition_number| doing 
+      	the ratio \verb|sigma_max/sigma_min| 
+      \end{enumerate}
+      
+      \vspace{0.5cm} 
+      \listings{\home/sources/Linear_systems.f90}
+      {function Condition_number}
+      {end function}{Linear_systems.f90}
+ 
+ 
+ 
+ 
+ 
+   
+ \newpage  
+ %*********************************************** 
+  \section{Non linear systems of equations }
+ %*************************************************     
+      
+A nonlinear system of equations is a set of simultaneous equations in which the unknowns appear non-linearly. In other words, the equations to be solved cannot be written as a linear combination of the unknown variables. 
+As nonlinear equations are difficult to solve, nonlinear systems are commonly approximated by linear equations or linearized. 
+       
+Let $\vect{f}: \mathbb{R}^N \rightarrow \mathbb{R}^N $ be a real mapping and $\vect{x}\in\mathbb{R}^N$ the independent variable. The roots of system can be calculated by solving:
+      %
+      \begin{equation}
+      	\vect{f}(\vect{x}) = \vect{0}.
+      	\label{eq:Non_Linear_Equation}
+      \end{equation}
+      
+As in general there is no analytical way of solving (\ref{eq:Non_Linear_Equation}) for $\vect{x}$, methods which give approximate solutions have been developed historically. There are many ways to approximate the solution of (\ref{eq:Non_Linear_Equation}) but the most famous method for differentiable functions was developed by sir Isaac Newton from whom receives its name. The goal of Newton method is to construct a sequence which converges to the solution $\vect{x}$ by linearizing $\vect{f}$ around a point $\vect{x}_i$, called initial guess. That is, the sequence must provide a point $\vect{x}_{i+1}$ which is closer to $\vect{x}$ than $\vect{x}_{i}$. To do this, the method takes into account that for every differentiable mapping there is a neighborhood of $\vect{x}_i$ in which we can approximate the function as:
+      %
+      \begin{align}
+      	\vect{f}(\vect{x}) 
+      	= \vect{f}(\vect{x}_i) 
+      	+ \nabla\vect{f}(\vect{x}_i)\cdot(\vect{x}-\vect{x}_i)
+      	+ O\left(\norm{\vect{x}-\vect{x}_i}^2\right),
+      	\label{eq:Non_Linear_Taylor}
+      \end{align}
+      where $\nabla \vect{f}$ is the gradient or Jacobian matrix of $\vect{f}$. Hence, the sequence is constructed by evaluating (\ref{eq:Non_Linear_Taylor}) in the next iteration initial guess $\vect{x}_{i}$ and imposing that $\vect{f}(\vect{x}_{i})=\vect{0}$, leading to the system of equations:
+      %
+      \begin{align}
+      \nabla\vect{f}(\vect{x}_i)\cdot(\vect{x}_{i+1}-\vect{x}_{i})
+      =
+      -\vect{f}(\vect{x}_i) ,
+      \end{align}
+      and if $\vect{f}$ is invertible in a neighborhood of $\vect{x}_i$ we can write\footnote{Local invertibility is equivalent to the invertibility of the Jacobian matrix as the inverse function theorem states.}:
+      %
+      \begin{equation}
+      	\vect{x}_{i+1}-\vect{x}_{i} 
+      	= - \left(
+      	\nabla\vect{f}(\vect{x}_{i})
+      	\right)^{-1}  \cdot \vect{f}(\vect{x}_i),
+      	\label{eq:Newton_recursion}
+      \end{equation}
+      %
+      where $(\nabla \vect{f}(\vect{x}_{i}))^{-1} $ is the inverse of the Jacobian matrix. Equation (\ref{eq:Newton_recursion}) provides an explicit sequence which converges to the solution of (\ref{eq:Non_Linear_Equation}) $\vect{x}$ if the initial condition is sufficiently close to it. Hence, a recursive iteration on (\ref{eq:Newton_recursion}) will give an approximate solution of the non linear problem. The recursion is stopped defining a convergence criteria for $\vect{x}$. That is, the recursion will stop when $\norm{\vect{x}_{i+1}-\vect{x}_{i}}\leq\varepsilon$, where $\varepsilon$ is a sufficiently small positive number for the desired accuracy. The implementation of an algorithm which computes the Newton method for any function is presented in the following pages.
+      
+      
+      \begin{enumerate}
+      	\item \textbf{Jacobian matrix calculation}
+      \end{enumerate}
+      In order to implement the Newton method, first, we have to calculate the Jacobian matrix of the function. To avoid an excessive analytical effort, the columns of $\nabla\vect{f}(\vect{x}_i)$ are calculated using order 2 centered finite differences:
+      \begin{align}
+      	\pdv{\vect{f}(\vect{x}_{i})}{x_j}(\vect{x}_{i})
+      	\simeq 
+      	\frac{\vect{f}(\vect{x}_{i} + \Delta x\vect{e}_j) - \vect{f}(\vect{x}_{i} - \Delta x\vect{e}_j)}{2\Delta x},
+      \end{align}
+      where $\vect{e}_j=(0,\ldots,1,\ldots,0)$ is the canonical basis vector whose only non zero entry is the $j$-th. Thus, the implementation of the computation of each column $\pdv*{\vect{f}(\vect{x}_{i})}{x_j}(\vect{x}_{i})$ is straightforward:
+      \vspace{0.5cm} 
+      \listings{\home/sources/Jacobian_module.f90}
+      {*Dx}
+      {*Dx}{Jacobian_module.f90}
+       where \verb|xj| is a small perturbation along the coordinate $x_j$.
+       The calculation of all the Jacobian columns is implemented in a function called \verb|Jacobian|, which computes the gradient at the point $x_i$ sweeping through $j\in[1,N]$, that is introducing the piece of code exposed in a \verb|do| loop:
+      \vspace{0.5cm} 
+      \listings{\home/sources/Jacobian_module.f90}
+      {function Jacobian}
+      {end function}{Jacobian_module.f90}
+      
+      Hence, the Jacobian can be calculated by a simple call.
+      %
+      \vspace{0.5cm} 
+      \listings{\home/sources/Non_linear_systems.f90}
+      {J = Jacobian}{J = Jacobian}{Non_linear_systems.f90}
+      
+      \begin{enumerate}[resume]
+      	\item \textbf{Linear system solution}
+      \end{enumerate}
+      Once the Jacobian is calculated, it is used to compute the next iteration initial guess $\vect{x}_{i+1}$. Instead of computing the inverse of the Jacobian, we solve the system:
+      %
+      \begin{align}
+      	\nabla\vect{f}(\vect{x}_i)\cdot\Delta \vect{x}_i
+      	=
+      	\vect{f}(\vect{x}_i) ,
+      \end{align}
+      %
+      whose solution is $\Delta \vect{x}_i=\vect{x}_i-\vect{x}_{i+1}$. This is implemented by performing a LU factorization as explained in the previous section:
+      \vspace{0.5cm} 
+      \listings{\home/sources/Non_linear_systems.f90}
+      {call LU}
+      {Dx =}{Non_linear_systems.f90}
+      
+      
+      and thus, the calculation of $\Delta \vect{x}_i$ allows to compute $\vect{x}_{i+1}$ as:
+      %
+      \begin{align*}
+      	\vect{x}_{i+1} = \vect{x}_{i} - \Delta \vect{x}_i,
+      \end{align*}
+      \vspace{0.5cm} 
+      \listings{\home/sources/Non_linear_systems.f90}
+      {x0 = x0}
+      {x0 = x0}{Non_linear_systems.f90}
+      
+      \begin{enumerate}[resume]
+      	\item \textbf{Next iteration}
+      \end{enumerate}
+      Once we have calculated the next iteration initial guess $\vect{x}_{i+1}$ we just have to make the assignation:
+      %
+      \begin{align}
+      	i \rightarrow i+1, \qquad \qquad \vect{x}_{i} \rightarrow \vect{x}_{i+1}.
+      \end{align}
+      
+      The assignation of the value $\vect{x}_{i+1}$ to $\vect{x}_{i}$ is done immediately as the value of the former is stored over the latter in the vector \verb|x0|. The iteration evolution is implemented as:
+      \vspace{0.5cm} 
+      \listings{\home/sources/Non_linear_systems.f90}
+      {iteration = iteration}
+      {iteration = iteration}{Non_linear_systems.f90}
+      
+      
+      This process is carried out until $\norm{\Delta \vect{x}_i}\leq\varepsilon=10^{-8}$ or a maximum number of iterations \verb|itmax| is achieved. This means that the pieces of code presented above have to be contained in a conditional loop whose mask takes into account the convergence criteria. Thus, the iterative process is embedded in a subroutine named \verb|Newton| which takes the initial guess through its input \verb|x0| and the function to be solved as a module procedure. To avoid overflows, the mask for the conditional loop is not only the convergence criteria but also that the number of iterations does not overcome \verb|itmax|. In addition, a warning message is displayed on command line if this latter condition is not satisfied. In case that happens it means that the solution may not be as accurate as specified and the subroutine also displays the final value of $\norm{\Delta \vect{x}_i}$ which is stored on the scalar \verb|eps|:
+      \vspace{0.5cm} 
+      \listings{\home/sources/Non_linear_systems.f90}
+      {subroutine Newton}
+      {end subroutine}{Non_linear_systems.f90}
+      
+      
+    
+   
+   
+   
+   
+   
+   
+   
+
+     
+%****************************************     
+ \section{Eigenvalues and eigenvectors}
+%**************************************** 
+     
+     Calculation of eigenvalues and eigenvectors is a fundamental problem from linear algebra with a wide variety of applications: structural analysis, image processing, stability of orbits and even the most famous search engine requires of computing eigenvectors. In this section, an introduction to eigenvalues and eigenvectors computation and a piece of their foundings will be presented. Besides, we shall see how to implement algorithms to obtain eigenvalues and eigenvectors for a certain set of normal matrices. The eigenvalues and eigenvectors problem for a real square matrix $A$ consists on finding all scalars $\lambda_i$ and non zero vectors $\vect{v}_i$ such that:
+     %
+     \begin{equation}
+     (A-\lambda_i I ) \vect{v}_i = 0.
+     \label{eq:Eigenvalues_problem}
+     \end{equation} 
+     
+     In figure \ref{fig:MatrixClass} is given a classification from the spectral point of view, of the possible situations for a real square matrix. The main characteristic which will classify a matrix is whether is normal or not. A normal matrix commutes with its transpose, that is, it verifies $AA^T=A^TA$ and these matrices can be diagonalized by orthonormal vectors. The fact that normal matrices can be diagonalized by a set of orthonormal vectors is a consequence of Schur decomposition theorem\footnote{This theorem asserts that for any square matrix $A$ we can find a unitary matrix $U$ (that is $U^*=U^{-1}$) such that $A=UTU^{-1}$, where $T$ is an upper-triangular matrix and where $U^*$ stands for the conjugate transpose of $U$.} and the fact that all normal upper-triangular matrices are diagonal. A practical manner to check (not to prove) this fact is by taking two eigenvectors $\vect{v}_i$ and $\vect{v}_j$ of $A$ and noticing that:
+     %
+     \begin{align}
+     	\vect{v}_i \cdot A \vect{v}_j = \lambda_j\vect{v}_i \cdot\vect{v}_j,
+     \end{align}
+     and if $\vect{v}_i$ and $\vect{v}_j$ are orthogonal and unitary,  then the matrix whose components are given by
+     %
+     \begin{align*}
+     	D_{ij} = \vect{v}_i \cdot A \vect{v}_j = \lambda_j\delta_{ij},
+     \end{align*}
+     is diagonal and its non zero entries are the eigenvalues of $A$. This means that defining a matrix $V$ whose columns are the eigenvectors of $A$, we can factorize $A$ as:
+     %
+     \begin{align}
+     	A = V D V^*,
+     \end{align}
+     where $V^*$ stands for the conjugate transpose of $V$. Until now, we have not specified to which field ($\R{}$ or $\mathbb{C}$) belong the eigenvalues of $\lambda$ and over which field is defined the vector space containing its eigenvectors. A sufficient condition for a real matrix to have real eigenvalues and eigenvectors is given by the spectral theorem: all symmetric matrices (which are normal) have real eigenvalues and eigenvectors and are diagonalizable. If a matrix is normal but not symmetric then in general its eigenvalues and eigenvectors are complex but they can have zero imaginary part (not only symmetric matrices have real eigenvalues). Non normal matrices are not diagonalizable in the sense we have defined but can be diagonalized by blocks through the Jordan canonical form. In this book we will restrict ourselves to the case of normal matrices with real eigenvalues, that is, to the case in which the eigenvectors of $A$ spans the real vector space $\R{n}$.
+     
+      
+     \nMatrixDiagram{Spectral classification of real matrices.}{fig:MatrixClass} 
+     
+     \FloatBarrier
+ %**********************************************    
+ \section{Power method and deflation method}
+ %**********************************************
+     In this section we will present an iterative method to compute the eigenvalues and eigenvectors of normal matrices whose spectrum spans the whole real vector space $\R{n}$. The power method is an iterative method which gives back the module of the maximum eigenvalue. Let $A\in\M{n}{n}$ be a square real normal matrix
+     with real eigenvalues $|\lambda_1|>|\lambda_2|\geq\dots\geq|\lambda_n|$, and their orthonormal associated eigenvectors $\{\vect{v}_1,\ldots,\vect{v}_n\}$. The method is based on the fact that as the eigenvectors of $A$ form a basis of $\R{n}$ we can write for any vector $\vect{x}_0\in\R{n}$:
+     %
+     \begin{align}
+     	\vect{x}_0 
+     	=
+     	\sum_{i}
+     	a^i\vect{v}_i.
+     	\label{eq:Power_method_basis}
+     \end{align}
+     
+     From (\ref{eq:Power_method_basis}) and the definition of eigenvectors we can compute:
+     %
+     \begin{align*}
+     	A^{k}\vect{x}_0 
+     	&
+     	= \sum_{i} a^i\lambda_i^{k} \vect{v}_i
+     	=
+     	\lambda_1^{k}
+     	\left(
+     	a^1 \vect{v}_1
+     	+
+     	\sum_{i\neq 1} a^i\frac{\lambda_i^{k}}{\lambda_1^{k}} \vect{v}_i
+     	\right)
+     	,
+     \end{align*}
+     therefore we have that:
+     %
+     \begin{align}
+     	\frac
+     	{
+     		A^{k}\vect{x}_0 
+     	}
+     	{
+     		\norm
+     		{A^{k}\vect{x}_0 }
+     	}
+         =
+         {
+         	\left(
+         	a^1 \vect{v}_1
+         	+
+         	\sum_{i\neq 1} a^i\frac{\lambda_i^{k}}{\lambda_1^{k}} \vect{v}_i
+         	\right)
+         }
+         {
+         	\norm
+         	{a^1 \vect{v}_1
+         	+
+         	\sum_{i\neq 1} a^i\frac{\lambda_i^{k}}{\lambda_1^{k}} \vect{v}_i}
+         }^{-1}.
+     \label{eq:Ratio_recursion_power}
+     \end{align}
+     
+     Thus, if we define $\vect{x}_{k}=A^{k}\vect{x}_0/\norm{\vect{x}_0}$ we get a recursion
+     %
+     \begin{align}
+     	\vect{x}_{k+1}
+     	=
+     	\frac{A\vect{x}_{k}}{\norm{\vect{x}_{k}}}
+     	=
+     	\frac
+     	{
+     		A^{k}\vect{x}_0 
+     	}
+     	{
+     		\norm
+     		{A^{k}\vect{x}_0 }
+     	},
+     \label{eq:Power_method_recursion}
+     \end{align}
+     which as $|\lambda_1|>|\lambda_i|$ for all $i> 1$ and taking in account (\ref{eq:Ratio_recursion_power}) verifies:
+     %
+     \begin{align}
+     	\lim_{k\rightarrow\infty}\vect{x}_{k} = \vect{v}_1.
+     	\label{eq:Rayleigh_quotient}
+     \end{align}
+     
+     Hence, by iterating over (\ref{eq:Power_method_recursion}) we can obtain an approximation of the eigenvector associated to the maximum module eigenvalue $\vect{v}_1$. The process of approximating the eigenvector is stopped using a convergence criteria: when $\norm{\vect{x}_{k+1} -\vect{x}_{k}}\leq \epsilon$, where $\epsilon$ is a sufficiently small positive number, the iteration process stops. 
+     
+     Once we have computed this eigenvector we can obtain the associated eigenvalue $\lambda_1$ from the Rayleigh quotient as\footnote{Note that we have used that $\norm{\vect{x}_{k}} \rightarrow 1$ when $k\rightarrow \infty$.}:
+     %
+     \begin{align}
+         \lim_{k\rightarrow\infty}
+     	{\vect{x}_k\cdot A\vect{x}_k}
+     	= 
+     	{\vect{v}_1\cdot A\vect{v}_1} = \lambda_1.
+     \end{align}
+     
+     
+     The algorithm that carries out the power method can be summarized in three steps
+     
+     \begin{enumerate}
+     	\item \textbf{Initial condition}: We can set $\vect{x}_0$ to be any vector, for example its components can be the natural numbers $1,2,\ldots,n$:
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {k, k=1, N}
+     {k, k=1, N}{Linear_systems.f90}
+ 
+     \begin{enumerate}[resume]
+     	\item \textbf{Eigenvector calculation}: The eigenvector is calculated using recursion (\ref{eq:Power_method_recursion}) as:
+     	%
+     	\begin{align}
+     		\vect{v} 
+     		& 
+     		= A \vect{x}_{k}/\norm{\vect{x}_{k}}, 
+     		\\
+     		\vect{u} 
+     		& 
+     		= \vect{v} /\norm{\vect{v}}, 
+     		\\
+     		\vect{x}_{k+1}
+     		& 
+     		= \vect{u} 
+     	\end{align}
+     	
+     	which has an straightforward implementation in a conditional loop. For each iteration
+     	\verb|V| stores $\vect{v} = A\vect{x}_{k}/\norm{ \vect{x}_{k}}$ and the approximation $\vect{u}=\vect{x}_{k+1}/\norm{ \vect{x}_{k+1}}$ is stored in \verb|U| which is finally assigned to. The vector \verb|U0| is used to define the convergence criteria for $\epsilon=10^{-12}$. To avoid overflows in case that the process does not converge a number maximum of 10000 iterations is set.
+     	
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {.and. k < k_max}
+     {end do}{Linear_systems.f90}
+     
+     \begin{enumerate}[resume]
+     	\item \textbf{Eigenvalue calculation}: Once we have computed the approximate eigenvector $\vect{x}_{k}\simeq\vect{v}_1$ and is stored on \verb|U|, the eigenvalue is calculated taking in account equation (\ref{eq:Rayleigh_quotient}) as:
+     	%
+     	\begin{align}
+     		\lambda_1 \simeq \vect{x}_{k}\cdot A\vect{x}_{k}.
+     	\end{align}
+     	
+     	The implementation of this calculation is immediate and the result is stored on \verb|lambda|:
+     \end{enumerate}
+     	\vspace{0.5cm} 
+     	\listings
+     	{\home/sources/Linear_systems.f90}
+     	{lambda = dot_product}
+     	{lambda = dot_product}
+     	{Linear_systems.f90}
+     
+     \newpage
+     All the previous steps are implemented in the subroutine \verb|Power_method| which takes the matrix \verb|A| and gives back the eigenvalue \verb|lambda| and the eigenvector \verb|U|. 
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {subroutine Power_method}
+     {end subroutine}{Linear_systems.f90}
+     
+     This subroutine, given a normal matrix $A$ gives back its maximum module eigenvalue $\lambda_1$ and its associated eigenvector $\vect{v}_1$. The eigenvalue is yielded on the real \verb|lambda| and the eigenvector in the vector \verb|U|.
+     
+     Once we have presented the power method iteration to compute the dominant eigenvalue $\lambda_1$ and its associated eigenvector $\vect{v}_1$, a method to compute all the eigenvalues and eigenvectors of a matrix using power method is presented. This iterative method is call deflation method. Note that for the power method to work properly we need $|\lambda_1|$ to be strictly greater than the rest of eigenvalues, but if $|\lambda_1|=|\lambda_2|$ the method works fine. Deflation method requires a stronger condition which is that the eigenvalues satisfy $|\lambda_1|>|\lambda_2|>\dots>|\lambda_n|$.
+     The method is based on the fact that as the matrix $B_2= A-\lambda_1 \vect{v}_1 \otimes \vect{v}_1 $ replaces the eigenvalue $\lambda_1$ for an eigenvalue of zero value. The symbol $\otimes$ stands for the tensor product in $\R{n}$ which is defined from the contraction $\vect{a}\otimes\vect{b}\cdot \vect{c}=\vect{a}(\vect{b}\cdot \vect{c})$. When this is done $\lambda_1$ is replaced, but the rest of the eigenvalues and eigenvectors remain invariant and therefore the dominant eigenvector of $B_2$ is $\lambda_2$. This is a consequence of the spectral theorem, which asserts that $A$ can be written as:
+     %
+     \begin{align}
+     	A = \sum_{i} \lambda_i \vect{v}_i \otimes\vect{v}_i,
+     \end{align}
+     and therefore we can write $B_2$ as
+     %
+     \begin{align}
+     	B_2 = \vect{v}_1 \otimes\vect{v}_1
+     	+\sum_{i\neq 1} \lambda_i \vect{v}_i \otimes\vect{v}_i,
+     \end{align}
+     where we see explicitly how the eigenvalue is replaced and the rest remain unaltered. Hence, if we define a succession of matrices 
+     %
+     \begin{align}
+     	B_{k+1} = B_{k} - \lambda_k \vect{v}_k\otimes\vect{v}_k,
+     	\qquad
+     	\mbox{for}
+     	\quad k=1,\ldots, n-1,
+     	\label{eq:Deflation_Matrix}
+     \end{align}
+     which starts at the value $B_1=A$, for each $B_k$, the dominant eigenvalue is $\lambda_{k}$. Therefore, if we use the power method for each $B_k$ we can compute both $\lambda_{k}$ and $\vect{v}_{k}$. Thus, the algorithm can be summarized in two steps for which we consider $B_k$ as the initial matrix:
+     
+     \begin{enumerate}
+     	\item \textbf{Power method over the initial matrix}: First we apply the power method to $B_k$ and compute $\lambda_{k}$ and $\vect{v}_{k}$. This is implemented by a simple call to the subroutine \verb|Power_method| where the array \verb|A| stores the entries of $B_k$.    	
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {call Power}
+     {call Power}
+     {Linear_systems.f90}
+     
+     \begin{enumerate}[resume]
+     	\item \textbf{Next step matrix:} Once we have $\lambda_{k}$ and $\vect{v}_{k}$ stored over \verb|lambda(k)| and \verb|U(:,k)| respectively, we can obtain $B_{k+1}$ by simply applying formula (\ref{eq:Deflation_Matrix}) and storing its result on \verb|A|:
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {* Tensor_product}
+     {* Tensor_product}
+     {Linear_systems.f90}
+     
+     
+     
+     To sweep $k$ through the values $1,\ldots, n$, we contain both steps of the algorithm in a loop. Thus, a subroutine named \verb|Eigenvalues| is implemented to carry out the deflation method. Given a square matrix \verb|A| it gives back the scalar \verb|lambda| and the square matrix \verb|U|, whose columns are the eigenvectors of \verb|A|:
+     
+     \newpage
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {subroutine Eigenvalues}
+     {end subroutine}
+     {Linear_systems.f90}
+    
+ %*************************************    
+ \section{Inverse power method}
+ %*************************************
+     
+     For non singular matrices, a method which gives the eigenvalue of lesser module $|\lambda_n|$ and its associated eigenvector $\vect{v}_n$ is presented. If $A$ is non singular, we can premultiply (\ref{eq:Eigenvalues_problem}) by its inverse $A^{-1}$ obtaining:
+     %
+     \begin{align}
+     	A^{-1}\vect{v} = \lambda^{-1}\vect{v}.
+     \end{align}
+     Therefore, we can extract two conclusions, the first is that $A$ and $A^{-1}$ have the same eigenvectors and the second is that their eigenvalues are inversely proportional to each other. This means that if $\mu$ is an eigenvalue of $A^{-1}$ with eigenvector $\vect{v}$, it satisfies $\mu=\lambda^{-1}$. Therefore if the eigenvalues of $A^{-1}$ satisfy $|\mu_n|>|\mu_{n-1}|\geq\dots\geq|\mu_{1}|$, we have that the dominant eigenvalue of $A^{-1}$ is related to the eigenvalue of $A$ of minimum module $\lambda_n$. Hence, if we apply the power method to $A^{-1}$ we get $\lambda_n^{-1}$ and $\vect{v}_n$. This method is known as inverse power method for obvious reasons and the recursion for it is obtained substituting $A$ by $A^{-1}$ in (\ref{eq:Power_method_recursion}), leading to:
+     %
+     \begin{align*}
+     	\vect{x}_{k+1}
+     	=
+     	\frac{A^{-1}\vect{x}_{k}}{\norm{\vect{x}_{k}}}
+     	,
+ %    	\label{eq:Inverse_power_method_recursion}
+     \end{align*}
+     or equivalently:
+     %
+     \begin{align}
+     A\vect{x}_{k+1}
+     =
+     \frac{\vect{x}_{k}}{\norm{\vect{x}_{k}}}
+     ,
+     \label{eq:Inverse_power_method_recursion}
+     \end{align}
+     and for each iteration we solve the system (\ref{eq:Inverse_power_method_recursion}).
+     The algorithm that carries out the inverse power method is summarized in four steps:
+     
+     \begin{enumerate}
+     	\item \textbf{LU factorization of $A$:} Prior to solve the system of the recursion, we factorize $A$ by a simple call for the array that will store the lower and upper matrices of the LU factorization, which is named \verb|Ac|:
+     \end{enumerate}
+   %  \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {call LU_factorization}
+     {call LU_factorization}
+     {Linear_systems.f90}
+  
+    
+     \begin{enumerate}[resume]
+     	\item \textbf{Initial condition}: We can set $\vect{x}_0$ to be any vector, for example its components can be the natural numbers $1,2,\ldots,n$:
+     \end{enumerate}
+   %  \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {k, k=1, N}
+     {k, k=1, N}{Linear_systems.f90}
+     
+     \begin{enumerate}[resume]
+     	\item \textbf{Eigenvector calculation}: The eigenvector is calculated solving recursion (\ref{eq:Inverse_power_method_recursion}) by LU factorization. First, the matrix \verb|Ac| is factorized
+     	%
+     	\begin{align}
+     	\vect{v} 
+     	& 
+     	= A^{-1} \vect{x}_{k}/\norm{\vect{x}_{k}}, 
+     	\\
+     	\vect{u} 
+     	& 
+     	= \vect{v} /\norm{\vect{v}}, 
+     	\\
+     	\vect{x}_{k+1}
+     	& 
+     	= \vect{u} 
+     	\end{align}
+     	which has an straightforward implementation in a conditional loop. For each iteration
+     	\verb|V| stores $\vect{v} = A^{-1}\vect{x}_{k}/\norm{ \vect{x}_{k}}$ and the approximation $\vect{u}=\vect{x}_{k+1}/\norm{ \vect{x}_{k+1}}$ is stored in \verb|U| which is finally assigned to. The vector \verb|U0| is used to define the convergence criteria for $\epsilon=10^{-12}$. To avoid overflows in case that the process does not converge a number maximum of 10000 iterations is set. The only change of this step with respect to the algorithm for power method is that now \verb|V| stores the value that comes out of solving a LU system: 
+     	
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {solve_LU}
+     {solve_LU}{Linear_systems.f90}
+     
+     \begin{enumerate}[resume]
+     	\item \textbf{Eigenvalue calculation}: Once we have computed the approximate eigenvector $\vect{x}_{k}\simeq\vect{v}_n$ and is stored on \verb|U|, the eigenvalue is calculated taking in account equation (\ref{eq:Rayleigh_quotient}) as:
+     	%
+     	\begin{align}
+     	\lambda_n \simeq \vect{x}_{k}\cdot A\vect{x}_{k},
+     	\end{align}
+     	where we have used that $A$ and $A^{-1}$ share eigenvectors. The implementation of this calculation is immediate and the result is stored on \verb|lambda|:
+     \end{enumerate}
+     \vspace{0.5cm} 
+     \listings
+     {\home/sources/Linear_systems.f90}
+     {lambda = dot_product}
+     {lambda = dot_product}
+     {Linear_systems.f90}
+  
+     
+     The algorithm of the inverse power method is implemented in the subroutine \verb|Inverse_power_method|. This subroutine, given a normal matrix \verb|A| whose minimum module eigenvalue $\lambda_n$ is strictly lesser than the rest of eigenvalues, gives $\lambda_n$ and its associated eigenvector $\vect{v}_n$. The eigenvalue is stored on the real \verb|lambda| and the eigenvector in the vector \verb|U|.
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {subroutine Inverse_power_method}
+     {end subroutine}{Linear_systems.f90}
+     
+  
+  
+  
+  
+  
+  \newpage 
+  %**************************************************       
+   \section{Singular Value Decomposition (SVD)}
+  %**************************************************
+   
+   In linear algebra, we can find many factorizations of a matrix: LU factorization, Schur factorization, polar decomposition, 
+   eigendecomposition and Jordan form\ldots In the following pages we will describe a factorization that has many deep theoretical 
+   implications and also numerous practical applications: Singular Value Decomposition. 
+   This decomposition is applicable to any given matrix 
+   and in a sort of way ``diagonalizes'' any matrix. SVD permits to write any matrix $A$ as
+   %
+   \begin{align*}
+   	A = U \Sigma V^*,
+   \end{align*}
+   where $U$ and $V$ are squared unitary matrices and $\Sigma$ is a diagonal matrix. We will see that, singular value decomposition is a 
+   powerful tool which appart from its applications gives a better understanding of the factorized matrix. We will see that the matrices $U$ 
+   and $V$ contain bases for the four fundamental subspaces of $A$, which are: $\Im A$, $\ker A$, $\Im A^*$ and $\ker A^*$. Besides, in the 
+   matrix $\Sigma$ lies the information that tells us (among other things) how far is $A$ from being orthonormal. 
+   \subsection*{Motivation and definition}
+   Let $A$ be an $m\times n$ matrix over the field $\K{}$ (can be $\R{}$ or $\mathbb{C}$). Singular Value Decomposition (SVD) arises from 
+   formulating the following question: Is there an orthonormal basis $\{\vect{v}_i\}_{i=1}^{n}$ of $\K{n}$ which is mapped by $A$ into an 
+   orthogonal set of vectors (not always a basis) of $\K{m}$? First, without loss of generality let's precise that if $A$ is rank 
+   $r\leq\min(m,n)$, the set $\{\vect{v}_i\}_{i=1}^{n}$ we are looking for is mapped into $r$ non zero vectors of $\K{n}$ ordered as
+   %
+   \begin{align}
+   	A \vect{v}_i = \sigma_i \vect{u}_i, \qquad
+   	i = 1,2,\ldots r,
+   	\label{eq:SVD_origin}
+   \end{align}
+   where $\norm{\vect{u}_i}_2 = 1$ and $\sigma_i\neq 0$. Thus defined, $\{\vect{u}_i\}_{i=1}^{r}$ span the image of $A$. The orthogonality 
+   condition for $\vect{u}_i$ can be stated as
+   %
+   \begin{align}
+   	\sigma_i^* \sigma_j \vect{u}_i^* 
+   	 \vect{u}_j
+   	=
+      \vect{v}_i^*	A^* 
+   	A \vect{v}_j
+   	=
+   	\sigma_i^* \sigma_j \delta_{ij},
+   	\label{eq:Orthogonality_u}
+   \end{align}
+   where the superscript $*$ denotes conjugate transpose and $\delta_{ij}$ is the delta Kronecker symbol. Condition 
+   (\ref{eq:Orthogonality_u}) requires each $\vect{v}_i$ to be an eigenvector of $A^* A$ with associated eigenvalue $|\sigma_i|^2$. Let's see 
+   if we can find an orthonormal set of eigenvectors of $A^* A$ with $r$ positive associated eigenvalues.
+   
+   As $A^* A$ is normal we can be sure that an orthonormal set of eigenvectors exists. For the eigenvalues positivity we can check that $A^* 
+   A$ is semidefinite positive as for any $\vect{v}\in\R{n}$
+   %
+   \begin{align}
+   	\vect{v}^* A^* A \vect{v} = \norm{A\vect{v}}_2^2 \geq 0,
+   	\label{eq:Semidefinite_positive}
+   \end{align}
+   and $\norm{A\vect{v}}_2 = 0$ only if $\vect{v}\in \ker A$. Identity (\ref{eq:Semidefinite_positive}) reveals that the rank of $A^* A$ is 
+   the same as $A$. To prove this, check from (\ref{eq:Semidefinite_positive}) that if $\vect{v}\in \ker A^* A$ then $\norm{A\vect{v}}_2 = 0$ 
+   and $\vect{v}\in \ker A$ and is always true that if $\vect{v}\in \ker A$ then $\vect{v}\in \ker A^* A$. Therefore $\ker A = \ker A^* A$ 
+   and their ranks are also equal. As the ranks are equal $A^* A$ has $r$ real positive non zero eigenvalues which correspond to the first 
+   $r$ eigenvectors (in the order chosen) $\{\vect{v}_i\}_{i=1}^{r}$. The other $n-r$ eigenvectors $\{\vect{v}_i\}_{i=r+1}^{n}$ form an 
+   orthonormal basis of $\ker A$.
+   
+   Hence, we see that we can find a set of orthonormal vectors $\{\vect{v}_i\}_{i=1}^{n}$ for which the first $r$ are mapped into an 
+   orthogonal set of vectors $\{\sigma_i\vect{u}_i\}_{i=1}^{r}$ and the rest span the nullspace of $A$. The vectors 
+   $\{\vect{u}_i\}_{i=1}^{r}$ can be interpreted as dual to $\{\vect{v}_i\}_{i=1}^{r}$ in the following sense: $\{\vect{u}_i\}_{i=1}^{r}$ are 
+   the orthonormal eigenvectors of $A A^*$ and also, the first $r$ of them are mapped into a set of orthogonal eigenvectors 
+   %
+   \begin{align}
+   	A^* \vect{u}_i = \sigma_i^*\vect{v}_i , \qquad
+   	i = 1,2,\ldots r.
+   	\label{eq:SVD_dual}
+   \end{align}
+   
+   Analogously as before, $\{\vect{v}_i\}_{i=1}^{r}$ span the image of $A^*$ and $\{\vect{u}_i\}_{i=r+1}^{m}$ constitute a basis for $\ker 
+   A^{*}$.
+   
+   Note that we have treated the values $\sigma_i$ as if they could be real or complex. However, we can always choose the decomposition to 
+   obtain real positive values of $\sigma_i$. This is so as condition (\ref{eq:Orthogonality_u}) only restricts the module of $\sigma_i$ and 
+   we can choose any $\sigma_i = |\sigma_i| e^{i\theta}$. For simplicity we set $\theta$ to be any multiple of $2\pi$ and therefore $\sigma_i 
+   = |\sigma_i|$. Thus defined, the real values $\sigma_i \geq 0$ are called the \textit{singular values} of $A$. Now we are in conditions to 
+   rewrite (\ref{eq:SVD_origin}) in matricial form as
+   %
+   \begin{align}
+   	AV = U \Sigma,
+   \end{align}
+   where $U$ and $V$ are the unitary matrices
+   %
+   \begin{align}
+   	U=
+   	\Matrix{c|c|c}
+   	{
+   		\vect{u}_1 &
+   		\dots&
+   		\vect{u}_{m}
+   	}\in\K{m\times m}
+   ,\quad
+       V=
+       \Matrix{c|c|c}
+       {
+       	\vect{v}_1 &
+       	\dots&
+       	\vect{v}_{n}
+       }\in\K{n\times n},
+   \end{align}
+   and
+   \begin{align}
+   	\Sigma =
+   	\Matrix{cc}
+   	{
+   		\Sigma_{r} & 0  \\ 
+   		0 & 0
+   	}
+   \in \R{m\times n},
+   \end{align}
+   where $\Sigma_{r}$ is a square $r\times r$ diagonal matrix composed of the first $r$ singular values $\sigma_i > 0$
+   %
+   \begin{align}
+   	\Sigma_r =
+   	\Matrix{ccccc}
+   	{
+   		\sigma_{1} & 0 & 0 & \dots &0  \\ 
+   		0          & \sigma_{2} & 0 & \dots &0 \\
+   		0          & 0 & \ddots &  & \vdots \\
+   		\vdots          & \vdots & & \ddots  & \vdots
+   		\\
+   		0          & 0 & \dots & \dots & \sigma_r
+   	},
+   \end{align} 
+   and for convenience we order them as $\sigma_{1}\geq\sigma_{2}\geq\dots\geq\sigma_{r}> 0 $.
+   
+   As $V$ is unitary we finally write the Singular Value Decomposition (SVD) of $A$ as
+   %
+   \begin{align}
+   	A = U \Sigma V^*.
+   	\label{eq:SVD}
+   \end{align}
+   
+   Thus, not only we have found the orthonormal basis $\{\vect{v}_i\}_{i=1}^{n}$ that is mapped into an orthonormal set of vectors but also, 
+   we have found a matrix factorization which is applicable to any given matrix. This factorization permits to write any matrix in terms of a 
+   positive diagonal real matrix $\Sigma$. Besides, we have found two bases $U$ and $V$ which contain explicit bases for the four fundamental 
+   subspaces of $A$ ($\Im A$, $\ker A^*$, $\Im A^*$ and $\ker A$). 
+   
+   An equivalent form to (\ref{eq:SVD}) is called the Reduced Singular Value Decomposition and is written in terms of the tensor product as
+   %
+   \begin{align}
+   	A = \sum_{i=1}^{r}\sigma_i \vect{u}_i\otimes{\vect{v}}_i^*.
+   	\label{eq:SVD_spectral}
+   \end{align}
+   
+   \subsection*{Geometric interpretation of matrix multiplication}
+   From SVD we can extract a nice geometric interpretation of how a matrix $A$ acts on a vector. Using SVD we can write the matrix-vector 
+   product as
+   %
+   \begin{align}
+   	A\vect{x} ={U} {\Sigma}{V^{*}} \vect{x}.
+   	\label{eq:SVD_product}
+   \end{align}
+   
+   Inspecting step by step what happens to $\vect{x}$ in (\ref{eq:SVD_product}) we conclude that matrices submit to their inputs to a process 
+   of (Rotation/Reflection)-(Stretching)-(Rotation/Reflection). First, as $V^{*}$ is unitary, it rotates or reflects $\vect{x}$ in $\K{n}$. 
+   Then, $\Sigma$ maps ${V^{*}} \vect{x}$ into $\K{m}$ stretching it. Finally, another rotation or reflection in $\K{m}$ is performed by $U$. 
+   According to this interpretation, the image of the unit sphere in $\K{n}$ is mapped into an (possibly degenerate) ellipsoid in $\K{m}$. On 
+   Figure \ref{fig:SVD_geometric} the effect of a matrix over the unit sphere is illustrated. The reader can intuitively think about it as if 
+   it was a mapping in the plane but the schematic picture is the same for any dimension: the unitary matrix $V^*$ preserves the unit sphere, 
+   then the matrix $\Sigma$ stretchs it into an ellipsoid and last $U$ rotates or reflects it. The semiaxes of this ellipsoid are the 
+   singular values $\sigma_i$. This comes from the fact that $A\vect{v}_i = \sigma_i \vect{u}_i$ and that $\{\vect{v}_i\}_{i=1}^{n}$ and 
+   $\{\vect{u}_i\}_{i=1}^{m}$ are orthonormal. As $\{\vect{v}_i\}_{i=1}^{n}$ is an orthonormal basis of $\K{n}$ we can express any vector 
+   $\vect{x}$ as the linear combination
+   %
+   \begin{align}
+   	\vect{x} = \sum_{i=1}^{n} x^i \vect{v}_i.
+   \end{align}
+   
+   Expressing $\vect{x}$ in this basis immediately gives the components of $\vect{y}=A\vect{x}$ in the basis $\{\vect{u}_i\}_{i=1}^{m}$
+   %
+   \begin{align}
+   	\vect{y} = A\vect{x} =\sum_{i=1}^{m} y^i \vect{u}_i = \sum_{i=1}^{r} x^i \sigma_i \vect{u}_i.
+   \end{align}
+   
+   Hence, we have 
+   %
+   \begin{align}
+   	x^i = \frac{y^i}{\sigma_i}, \qquad i=1,2,\ldots r,
+   	\label{eq:Ellipsoid_SVD}
+   \end{align}
+   and $y^i = 0$ for $i > r$. 
+   
+   From (\ref{eq:Ellipsoid_SVD}) is clear that for full rank square matrices ($r=n$), condition $\norm{\vect{x}}_2 = 1$ traduces into
+   %
+   \begin{align}
+   	\sum_{i=1}^{n} \left(\frac{y^i}{\sigma_i}\right)^2 = 1,
+   \end{align}
+   which is the ellipsoid equation. For singular matrices, it is more complicated but essentially the result is that the ellipsoid is 
+   degenerate. One can think of it as a crushed ellipsoid along the axes with $\sigma_i = 0$. Note that the image of the unit sphere is the 
+   same as its projection over the $r-$dimensional hyperplane which is orthogonal to $\ker A$ (that is, $\Im A^* $). Hence, for singular 
+   matrices, the image of the unit sphere is just the image of the closed $r-$dimensional disk obtained as the projection of the unit sphere 
+   over $\Im A^*$. One way to think about this is illustrated on Figure \ref{fig:SVD_singular}. The unit sphere is mapped on a degenerate 
+   ellipsoid due to the singularity of the matrix. We can think that for the example represented, the horizontal axis is the $r-$dimensional 
+   hyperplane orthogonal to $\ker A$ and all $\vect{x}$ in the unit sphere are mapped just like the region of this axis with 
+   $\norm{\vect{x}}\leq1$. As before, the drawing can be interpreted as an example in the plane but the essential idea works also for higher 
+   dimensions. Algebraically we can understand the degenerate ellipsoid by splitting $\vect{x} = \vect{n} + \vect{r}$ where $\vect{n} \perp 
+   \ker A$ and $\vect{r}\in\ker A$. Then, by noting that (\ref{eq:Ellipsoid_SVD}) is an expression for the components of $	\vect{n} $ (in 
+   the basis $V$) we can write
+   %
+   \begin{align}
+   	\norm{\vect{x}}_2 = \norm{	\vect{n} }_2^2 + \lambda^2 =  \sum_{i=1}^{r} \left(\frac{y^i}{\sigma_i}\right)^2 + \lambda^2 = 1 ,
+   	\label{eq:Degenerate_ellipsoid_SVD}
+   \end{align}
+   and we have called $\lambda= \norm{	\vect{n} }_2\leq 1$. From (\ref{eq:Degenerate_ellipsoid_SVD}) we can check that for each fixed 
+   $\lambda$ an ellipsoid contained in the $r-$dimensional hyperplane (which is $\Im A$) is defined. Thus, a continuous structure of nested 
+   ellipsoids determines the degenerate ellipsoid in $\K{m}$.  
+   \SVD{Geometric interpretation of singular value decomposition and matrix multiplication through its action on the unit 
+   sphere.}{fig:SVD_geometric}
+   
+   \SVDSingular{Geometric interpretation of singular matrices.}{fig:SVD_singular}
+   
+   
+
+%%\newpage 
+%%****************************************   
+%\section{SVD decomposition}
+%%****************************************
+%    
+%    Once we have seen how we can compute real eigenvalues and eigenvectors of normal matrices whose eigenvalues are strictly ordered, we can 
+%speak of probably the most important matrix factorization. Singular Value Decomposition or SVD is a factorization applicable to any real 
+%matrix $A\in\M{m}{n}$ and that provides all the information about the fundamental sub-spaces of the matrix. Let's recall that the four 
+%fundamental sub-spaces of $A$ are its image $\Im A\subset\R{m}$ and kernel $\ker A\subset\R{n}$ and the image and kernel of its transpose 
+%$\Im A^T \subset\R{n}$ and $\ker A^T \subset\R{m}$. The singular value decomposition is a factorization such that:
+%    %
+%    \begin{align}
+%    	A = U^T \Sigma V,
+%    	\label{eq:SVD}
+%    \end{align}
+%     where $U\in\M{m}{m}$ and $V\in\M{m}{n}$ are orthogonal matrices and $\Sigma\in\M{m}{n}$ is a matrix containing the singular values of 
+%$A$ in its principal diagonal. For the moment, that is all we will say about the matrices involved, and what is a singular value will be 
+%explained in the following lines. We will see that in $U$ is contained the information about $\Im A$ and $\ker A^T$. On other hand, we will 
+%see how is contained all the information about $\Im A^T$ and $\ker A$ in $V$. For the moment, let's begin with some previous definitions 
+%which will help the reader to understand the importance of SVD. 
+%     
+%     Let $A\in\M{m}{n}$ a real matrix, it is easy to check that the matrix $A^TA\in\M{n}{n}$ is symmetric (and therefore normal) and 
+%semi-definite positive. The symmetry is immediate taking into account the rule of the transpose of a product, to prove that is semi-definite 
+%positive we have to check that $\vect{x}\cdot A^TA\vect{x}\geq$ for any $\vect{x}\in\R{n}$. This is done as follows:
+%     %
+%     \begin{align}
+%     	\norm{ A \vect{x}}^2 
+%     	= 
+%     	A\vect{x}\cdot A\vect{x}
+%     	=
+%     	\vect{x}\cdot A^T A\vect{x}
+%     	\geq 0,
+%     	\label{eq:SVD_Semidefinite}
+%     \end{align} 
+%     where the equality holds if $\vect{x}\in\ker A$ or $\vect{x}\in\ker A^TA$.
+%     
+%     That $A^TA$ is semi-definite positive makes that all of its eigenvalues are not only real but positive or zero. If 
+%$\{\lambda_1,\ldots,\lambda_n\}$ and $\{\vect{v}_1,\ldots,\vect{v}_n\}$ are the eigenvalues and associated orthonormal eigenvectors of 
+%$A^TA$ 
+%respectively, we can write:
+%     %
+%     \begin{align*}
+%     	\norm{ A \vect{v}_i}^2 
+%     	=
+%     	\vect{v}_i\cdot A^T A\vect{v}_i
+%     	=
+%     	\lambda_i,
+%     \end{align*}
+%   and therefore we conclude that $\lambda_i\geq 0$ and we define the singular values of $A$ as:
+%   %
+%   \begin{align}
+%   	\sigma_i = \sqrt{\lambda_i}, \qquad \mbox{for}\quad i=1,\ldots,n.
+%   	\label{eq:Singular_Values}
+%   \end{align}
+%   
+%   And now we know that the entries of the main diagonal of $\Sigma$ are just the square roots of the eigenvalues of $A^TA$. The answer to 
+%why (\ref{eq:SVD}) is a correct factorization of $A$ and what are the explicit expressions of $U$ and $V$ requires to state some useful 
+%facts. Let's suppose without loss of generality that only $r$ of the eigenvalues of $A^T A$ are non zero and that they are ordered as:
+%   %
+%   \begin{align}
+%   	\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_r >\lambda_{r+1} = \lambda_{r+2}=\cdots = \lambda_{n} = 0.
+%   \end{align}
+%   
+%   
+%   In first place we must note that the images of the eigenvectors of $A^TA$ by $A$ are an orthogonal set of vectors. That is, the set
+%   $\{A\vect{v}_1,\ldots,A\vect{v}_r\}\subset\R{m}$ is an orthogonal set. To check this we take into account that the eigenvectors of $A^TA$ 
+%form an orthonormal set of $\R{n}$ and we can write:
+%   %
+%   \begin{align}
+%   	A\vect{v}_i \cdot A\vect{v}_j 
+%   	=
+%   	\vect{v}_i \cdot A^T A\vect{v}_j 
+%   	=
+%   	\lambda_j \vect{v}_i \cdot \vect{v}_j
+%   	=
+%   	\lambda_j  \delta_{ij},
+%   	\label{eq:SVD_eigenvalues_ordering}
+%   \end{align}
+%   and is clear that for $i=j$ we get $\norm{ A \vect{v}_i}=\sigma_i$. Hence, if we name:
+%   %
+%   \begin{align}
+%   	    \vect{u}_i 
+%   	    = 
+%   	    \frac{A\vect{v}_i}{\sigma_i}
+%   	    ,
+%   	     \qquad \mbox{for}\quad i=1,\ldots,r,
+%   	     \label{eq:ui_SVD}
+%   \end{align}
+%   is immediate that $\{\vect{u}_1,\ldots,\vect{u}_r\}\subset\R{m}$is an orthonormal set. To prove that (\ref{eq:SVD}) is correct, we just 
+%have to write (\ref{eq:ui_SVD}) in a different manner, extending it to $i>r$ as:
+%   %
+%   \begin{align}
+%   \begin{dcases}
+%   & A\vect{v}_1 = \vect{u}_1 \sigma_1, 
+%   \\
+%   & \qquad \vdots
+%   \\
+%   & A\vect{v}_r = \vect{u}_r \sigma_r
+%   \\
+%   & A\vect{v}_{r+1} = \vect{0}
+%   \\
+%   & \qquad \vdots
+%   \\
+%   & A\vect{v}_n =  \vect{0}
+%   \end{dcases},
+%   \label{eq:ui_SVD_explicit}
+%   \end{align}
+%   and defining the orthogonal matrices:
+%   %
+%   \begin{align}
+%   	 V & = 
+%   	 \Matrix{c|c|c}
+%   	 {
+%   	 	\vect{v}_1 & \cdots & \vect{v}_n
+%   	 }
+%    \in \M{n}{n},
+%    \label{eq:V_SVD}
+%    ,
+%    \\
+%     U & = 
+%     \Matrix{c|c|c}
+%     {
+%     	\vect{u}_1 & \cdots & \vect{u}_m
+%     }\in \M{m}{m},
+%     \label{eq:U_SVD}
+%   \end{align}
+%   where if $r<m$, we can always compute the vectors $\vect{u}_i$ with $i>m$ as orthogonal to each other and to the set 
+%$\{\vect{u}_1,\ldots,\vect{u}_r\}$, therefore both $V$ and $U$ are orthogonal. With the definition above, we can rewrite 
+%(\ref{eq:ui_SVD_explicit}) in matrix form as:
+%   %
+%   \begin{align*}
+%   	AV = U\Sigma ,
+%   \end{align*}
+%   and as $V$ is orthogonal $VV^T=I$, the equation above is equivalent to (\ref{eq:SVD}).
+%   
+%   Now we have seen that such a factorization is possible let's see what information of $A$ is provided by $V$ and $U$. In first place we 
+%have to notice that $\{\vect{u}_1,\ldots,\vect{u}_r\}$ is a basis for $\Im A$, to see this let's pick a generic element $\vect{y}\in\Im A$, 
+%that is $\vect{y} = A\vect{x}$ for some $\vect{x}\in\R{n}$ and taking into account that the eigenvectors of $A^T A$ span $\R{n}$ we can 
+%project $\vect{y}$ over any $A\vect{v}_i$ for $i=1,\ldots, n$ as:
+%   %
+%   \begin{align*}
+%   	\vect{y} \cdot A\vect{v}_i
+%   	=
+%   	A\vect{x} \cdot A\vect{v}_i
+%   	=
+%   	\vect{x} \cdot A^T A\vect{v}_i
+%   	=
+%   	\sum_{j} x_j\vect{v}_j \cdot A^T A\vect{v}_i
+%   	=
+%   	x_i {\lambda_i},
+%   \end{align*} 
+%   
+%   Note that for $i>r$ we have $\vect{y} \cdot A\vect{v}_i = 0$, which means that $A\vect{v}_i$ is perpendicular to any element of the 
+%image. This perpendicularity implies that the subspace spanned by $\{A\vect{v}_{r+1},\ldots,A\vect{v}_{n}\}$ is orthogonal to $\Im A$. This 
+%implies that if we project $\vect{y}$ onto the set $\{\vect{u}_{1},\ldots,\vect{u}_{m}\}$ (which is a basis of $\R{m}$) we have:
+%   %
+%   \begin{align*}
+%   	\vect{y} 
+%   	=
+%   	\sum_{i} \vect{y} \cdot \vect{u}_i \vect{y}
+%   	=
+%   	\sum_{i=1}^{r} \vect{y} \cdot \vect{u}_i \vect{y},
+%   \end{align*}
+%   and therefore $\{\vect{u}_1,\ldots,\vect{u}_r\}$ an orthonormal basis of $\Im A$. 
+%   
+%   The second realization to do is that the set $\{\vect{v}_{r+1},\ldots,\vect{v}_{n}\}$ forms an orthonormal basis for $\ker A$. For this 
+%we first check that $\norm{A^TA\vect{x}}=0$ if and only if
+%   %
+%   \begin{align}
+%   	\vect{x} = \sum_{i=r+1}^{n}  x_i \vect{v}_i,
+%   \end{align}
+%   which means that $\{\vect{v}_{r+1},\ldots,\vect{v}_{n}\}$ forms a basis for $\ker A^T A$. From (\ref{eq:SVD_Semidefinite}) we deduce that 
+%if $\vect{x}\in\ker A^TA$ then $\vect{x}\in\ker A$ ($\ker A^T A\subset\ker A $ ). Conversely, we have that if $\vect{x}\in\ker A$
+%   %
+%   \begin{align}
+%   	0 \leq \norm{ A^T A \vect{x}} \leq \norm{ A^T } \norm{ A \vect{x}} = 0,
+%   	\label{eq:kerAkerAT}
+%   \end{align}
+%   where $\norm{ A^T }$ stands for the induced norm for matrices from the norm in the vector-space:
+%   %
+%   \begin{equation*}
+%   \norm{A^T}= \sup \frac{\norm{A^T \vect{y}}}{\norm{\vect{y}}}, \qquad \forall \ \vect{y} \neq \vect{0} \in \R{m},
+%   \end{equation*}
+%   and from (\ref{eq:kerAkerAT}) we have that $\ker A^T A=\ker A $. Hence, the set $\{\vect{v}_{r+1},\ldots,\vect{v}_{n}\}$ is a basis for 
+%$\ker A $. This implies that these sets of vectors can be used to define projection matrices (matrices whose image is always in the subspace 
+%onto which they project). A dual argument will serve to prove that the remaining vectors of the two sets of orthonormal vectors also serve 
+%as 
+%basis for the remaining fundamental sub-spaces of $A$. Hence, if we define the reduced matrices:
+%   %
+%   \begin{align}
+%   	V_{n-r} & = 
+%   	\Matrix{c|c|c}
+%   	{
+%   		\vect{v}_{r+1} & \cdots & \vect{v}_n
+%   	}
+%   	\in \M{n}{r},
+%   	\label{eq:Vnr_SVD}
+%   	,
+%   	\\
+%   	U_r & = 
+%   	\Matrix{c|c|c}
+%   	{
+%   		\vect{u}_1 & \cdots & \vect{u}_r
+%   	}\in \M{m}{r},
+%   	\label{eq:Ur_SVD}
+%   \end{align}
+%   
+%   We have that the projection matrices onto $\ker A$ and $\Im A$ are respectively.
+%   %
+%   \begin{align}
+%   	P_{\ker A} & = V_{n-r} V_{n-r}^T,\\
+%   	P_{\Im A} & = U_r U_r^T.
+%   \end{align}
+%   
+%   As $\ker A \perp \Im A^T$ and $\Im A \perp \ker A^T$ we have the projection matrices.
+%   %
+%   \begin{align}
+%   P_{\ker A^T} & = I - U_r U_r^T = U_{m-r} U_{m-r}^T,\\
+%   P_{\Im A^T} & = V_r V_r^T = I - V_{n-r} V_{n-r}^T,
+%   \end{align}
+%   where
+%   \begin{align}
+%   U_{m-r} & = 
+%   \Matrix{c|c|c}
+%   {
+%   	\vect{u}_{r+1} & \cdots & \vect{u}_m
+%   }
+%   \in \M{m}{r},
+%   \label{eq:Umr_SVD}
+%   ,
+%   \\
+%   V_r & = 
+%   \Matrix{c|c|c}
+%   {
+%   	\vect{v}_1 & \cdots & \vect{v}_r
+%   }\in \M{n}{r}.
+%   \label{eq:Vr_SVD}
+%   \end{align}
+   
+%************************************************** 
+ \section{Implementation with the NumericalHUB } 
+%****************************************************** 
+   Thus, the reader can have an idea of the importance of SVD factorization as once is done, it provides all the information about the four fundamental sub-spaces condensed on $U$ and $V$. Besides, the rank of $\Sigma$ is the rank of $A$. 
+   
+   For square matrices the SVD is computed in two steps:
+   
+   \begin{enumerate}
+   	     \item \textbf{Eigenvalues and eigenvectors of $A^TA$}: In first place we compute the eigenvalues of $A^TA$ and their associated singular values. As is symmetric we can use the \verb|Eigenvalues| subroutine previously presented.
+   \end{enumerate} 
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {B = matmul}
+    {sigma =}{Linear_systems.f90}
+    
+    \begin{enumerate}[resume]
+    	\item \textbf{Calculation of $U$}: With the eigenvectors of $A^TA$ and the singular values of $A$ we can compute the $i$-th column of $U$ as given by (\ref{eq:ui_SVD}):
+    \end{enumerate}
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {/ sigma}
+    {/ sigma}{Linear_systems.f90}
+    
+    The whole precess is embedded in the subroutine \verb|SVD| which takes \verb|A| as input and gives back the singular values, $U$ and $V$ respectively on the arrays \verb|sigma|, \verb|U| and \verb|V|.
+    \newpage
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine SVD}
+    {end subroutine}{Linear_systems.f90}
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+         

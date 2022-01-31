@@ -1,0 +1,153 @@
+%
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+%\usepackage{amsmath}
+%%\usepackage{txfonts}
+%\usepackage{mathrsfs}
+%\usepackage{mathdots}
+%\usepackage{lmodern}
+%%\usepackage[classicReIm]{kpfonts}
+%\usepackage{physics}    %  partial and total derivatives  
+%
+%
+%%___________ MATH THEOREMS
+%
+%%\newtheorem{definition}{a}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{example}{Example}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+
+%\newcommand{\definicion}[1]
+%{
+%	\begin{definition}
+%		\normalfont #1
+%	\end{definition}
+%}
+
+\newcommand{\proposicion}[1]
+{
+	\begin{proposition}
+		\normalfont #1
+	\end{proposition}
+}
+
+\newcommand{\ejemplo}[1]
+{
+	\begin{example}
+		\normalfont #1
+	\end{example}
+}
+
+\newcommand{\definicion}[1]
+{
+	\begin{definition}
+		\normalfont #1
+	\end{definition}
+}
+
+
+
+
+
+\newcommand{\Eqn}[2]
+{
+	\begin{align}
+	#1
+	\label{#2}
+	\end{align}
+}
+
+\newcommand{\Set}[2]
+{
+	\left\lbrace #1  \,\middle|\, #2 \right\rbrace
+}
+
+\newcommand{\scalar}[2]{
+	\langle#1,#2\rangle
+}
+
+\newcommand{\R}[1]
+{ 
+	\mathbb{R}^{#1}
+}
+
+\newcommand{\M}[2]
+{
+	\mathcal{M}_{#1 \times #2}
+}
+
+\newcommand{\application}[3]
+{
+	#1 : #2 \longrightarrow #3
+}
+
+\newcommand{\applicationr}[5]
+{
+	#1 : \underset{#4}{#2}  \underset{\longmapsto }{ \longrightarrow }  \underset{#5}{#3}
+}
+
+%\newcommand{\C}[1]
+%{ 
+%	\mathbb{C}^{#1}
+%}
+
+\newcommand{\N}[1]
+{ 
+	\mathbb{N}^{#1}
+}
+
+\newcommand{\Z}[1]
+{ 
+	\mathbb{Z}^{#1}
+}
+
+\newcommand{\K}[1]
+{ 
+	\mathbb{K}^{#1}
+}
+
+\newcommand{\B}[1]
+{ 
+	\mathbb{B}^{#1}
+}
+
+
+
+\newcommand{\qmarks}[1]
+{
+	`` #1 ''
+}
+ 
+
+\newcommand{\btable}
+{
+  \begin{table}[H]
+      \begin{center}
+          \begin{spacing}{1.2}
+              \begin{tabular}{| p{2.5cm} |  p{2.8cm}  | p{1.1cm} | p{4.5cm} |}
+                  \hline
+ \bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline   
+}
+
+\newcommand{\etable}[1]
+{        \end{tabular}
+      \end{spacing}
+   \end{center}
+   \vspace*{-0.8cm}
+   \caption{#1}
+\end{table}     
+}
+
+
+\newcommand{\Matrix}[2]
+{
+	\mleft[
+	\begin{array}{#1}
+		#2
+	\end{array}
+	\mright]
+}
+
+

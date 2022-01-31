@@ -1,0 +1,83 @@
+<html><head><title>NRcdrom.  Server/Internet Use Prohibited.</title>
+</head><body bgcolor="#FFF8E0">
+<h1>Troubleshooting</h1>
+
+1.  <em>When I click on a recipe or example file (ending in .for or .f),
+it doesn't display correctly in my browser and/or it opens
+an inappropriate external application.</em><p>
+
+<font size="-1">
+You need to teach your browser how to handle Fortran files with
+.for and/or .f90 extensions.
+<ol>
+<li>In Netscape (version 4.XX -- similar in other
+versions), you go to Edit/Preferences...
+and choose Navigator/Applications.  Now go to step 3.
+
+<li>For Microsoft Internet Explorer, you go to View/Folder Options...
+from the menu bar of any open folder (not from Microsoft Internet
+Explorer!).  Choose File Types.  Now go to step 3.
+
+<li>Highlight, and then page
+through with down arrow, all the file types, looking for any
+that list extension "FOR" or "F90" under "File type details".
+If you find one, then Edit it.  If you don't find one, then
+create a New Type.  In either case set the MIME type to
+text/plain, and be sure that the extensions are .for and .f90 .
+
+<li>For Netscape, now choose whether to display the file within
+Netscape, or to use an external application.  In the latter
+case, you might choose a simple text editor (notepad, emacs, etc.),
+or you might choose a Fortran development environment (Microsoft Visual
+Studio, etc.).  If you want the option of saving the file to disk
+as the default, then check the "Ask me" box.
+
+<li>For Microsoft Internet Explorer, now edit or create an
+action named "open", and choose an external application to
+use. You might choose a simple text editor (notepad, emacs, etc.),
+or you might choose a Fortran development environment (Microsoft Visual
+Studio, etc.).
+</ol>
+
+If these instructions are not sufficient, you'll need to consult
+the help files for your browser.  All our source code files
+are plain text files with conventional extensions.<p>
+
+</font>
+
+2. <em>OK, I can see the files, but how do I save selected
+files to (e.g.) a working directory for a programming project?</em><p>
+
+<font size="-1">
+<ol>
+<li> If you are already displaying the contents of the file,
+go back to where you see a browser page with a link to the file.
+<li> For Netscape, hold down the Shift key and then left-click on
+the link.  You will get a Save As dialog box from which you
+can select a destination folder.
+<li> For Microsoft Internet Explorer, right-click on the link,
+and then choose Save Target As in the context menu.  You will get
+a dialog box from which you can select a destination folder.
+</ol>
+
+If this doesn't work, you can always just get out of your
+browser and copy the files from their folders to your
+destination folder.  They are not in any way encoded.<p>
+</font>
+
+3. <em>Your links are all messed up!  The links are in lower-case,
+but the file names are in upper case.  (Or: some of your links
+are longer than 8 letters, but the file names are truncated to
+8 letters.)</em><p>
+
+<font size="-1">
+This should never happen in Windows.  If it happens in UNIX
+or Linux, it means that you are using a Windows (not UNIX/Linux)
+version of the CDROM, and that you have mounted it incorrectly,
+without mapping the file system to long file names and upper/lower
+case.  Since the Windows disk is not licensed for use on UNIX/Linux
+systems at all, we can offer you no assistance.<p>
+
+</font>
+
+</body></html>

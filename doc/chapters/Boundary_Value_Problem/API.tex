@@ -1,0 +1,258 @@
+\chapter{Boundary Value Problems}
+\vspace{-0.5cm}
+\section{Overview}
+
+This library is intended  to solve linear and nonlinear boundary value problems. 
+An equation involving partial derivatives together with some constraints applied to the frontier of its spatial domain constitute a boundary 
+value problem. 
+ 
+\vspace{0.1cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Boundary_value_problem}
+  \listings{\home/sources/Boundary_value_problems.f90}
+       {module Boundary_value_problems}
+       {end module}{Boundary_value_problems.f90}
+\vspace{-0.1cm}       
+Since the space domain $ \Omega \subset \R{k} $ with $ k=1,2,3$, boundary value problems are stated in 1D, 2D and 3D grids. 
+To have the same name interface when dealing with different space dimensions, the subroutine 
+\verb|Boundary_value_problem| has been overloaded. 
+
+
+
+\newpage
+\section{Boundary value problems  module}
+
+\subsection*{1D Boundary Value Problems}
+\begin{lstlisting}[frame=trBL]
+call Boundary_Value_Problem( x_nodes, Differential_operator,  & 
+                               Boundary_conditions , Solution )  
+\end{lstlisting}   
+
+The subroutine  calculates the solution of the following boundary value problem:
+
+\begin{equation*}
+\mathcal{L}\left(x,\ u, \ \frac{\partial u}{\partial x}, \ \frac{\partial^2 u}{\partial x^2} \right) = 0, 
+\qquad  h \left(x,\ u, \ \frac{\partial u}{\partial x}  \right) = 0
+\end{equation*}
+
+
+
+The arguments of the subroutine are described in the following table.
+
+\btable 		
+				x\_nodes & vector of reals & in &  Mesh nodes.  \\ \hline
+				
+				
+				Differential\_operator & \raggedright scalar function: $\mathcal{L}$ & in  &
+ $\mathcal{L}:\R{} \times \R{} \times \R{}  \times \R{} \rightarrow \R{} $    
+ \\ \hline
+				
+				Boundary\_conditions & \raggedright scalar function: $h$  & in &  
+ $h:\R{} \times \R{} \times \R{}  \rightarrow \R{} $  				
+  \\ \hline
+				
+				Solution & vector of reals  & out &  \verb|Solution(:)|  
+			 \\ \hline
+\etable{Description of \texttt{Boundary\_Value\_Problem}
+ arguments for 1D problems}
+
+
+\newpage
+\subsection*{1D Boundary Value Problems for system of equations} 
+
+
+\begin{lstlisting}[frame=trBL]
+call Boundary_Value_Problem(x_nodes,                      &
+                            Differential_operator,        &
+                            Boundary_conditions, Solution) 
+\end{lstlisting}
+This subroutine calculates the solution of a  boundary value problem  
+of N variables in a one dimensional domain $[a,b]$:
+
+\begin{equation*}
+\vect{\mathcal{L}}	\left({x},\  \vect{u}, 
+\ \frac{\partial \vect{u}}{\partial x}, 
+\ \frac{\partial^2 \vect{u}}{\partial x^2} 
+ \right) = \vect{0}, 
+ \qquad 
+\vect{h}	\left({x},\  \vect{u}, 
+\ \frac{\partial \vect{u}}{\partial x}
+ \right) = \vect{0}. 
+\end{equation*}
+
+%\newpage
+%The arguments of the subroutine are described in the following table.
+
+\btable	
+	x\_nodes & vector of reals & in &  Mesh nodes   \\ \hline
+			
+				
+					
+	Differential\_operator & \raggedright  
+              %  function: $\vect{\mathcal{L}}\left({x}, {y}, \vect{u}, \vect{u}_x,  \vect{u}_y,  %\vect{u}_{xx},  \vect{u}_{yy},  
+              %%\vect{u}_{xy} \right)$ 
+                vector function:$\vect{\mathcal{L}}$  
+                & in  & 
+   $\vect{\mathcal{L}}:\R{} \times \R{N} \times \R{N} \times  \R{N}  \rightarrow \R{N} $   \\ \hline
+					Boundary\_conditions & \raggedright vector function:$\vect{h}$  & in & 
+   $\vect{h}:\R{} \times \R{N} \times \R{N}  \rightarrow \R{N} $  
+   \\ \hline
+				
+				Solution & two-dimensional array  of reals  & out &  
+				\verb|Solution(:,:)|. First index stands for x 
+				and the second index stands for different variables. 
+				                                                                                     \\ \hline
+\etable{Description of \texttt{Boundary\_Value\_Problem} arguments for 1D vector problems}
+
+
+
+
+\newpage
+%****************************************************************************
+\subsection*{2D Boundary Value Problems}
+\begin{lstlisting}[frame=trBL]
+call Boundary_Value_Problem( x_nodes, y_nodes,                  & 
+                               Differential_operator,           &  
+                               Boundary_conditions, Solution )
+\end{lstlisting}   
+
+%\vspace{-1cm} 
+This subroutine calculates the solution to a linear boundary value problem in a 
+rectangular domain $[a,b] \times [c,d]$.
+The differential operator $\mathcal{L}$  and the boundary conditions 
+ $h$ are functions expressed as:
+
+%\vspace{-3cm }
+\begin{align*}
+\mathcal{L}\left(x,\ y,\ u, 
+\ \frac{\partial u}{\partial x}, 
+\ \frac{\partial u}{\partial y}, 
+\ \frac{\partial^2 u}{\partial x^2}, 
+\ \frac{\partial^2 u}{\partial y^2}, 
+\ \frac{\partial^2 u}{\partial x \partial y} \right) = 0,
+\end{align*} 
+
+\begin{align*}
+h \left(x,\ y,\ u, 
+\ \frac{\partial u}{\partial x}, 
+\ \frac{\partial u}{\partial y} 
+ \right) = 0.
+\end{align*} 
+
+
+The arguments of the subroutine are described in the following table.
+
+\btable	
+				x\_nodes & vector of reals & in &  Mesh nodes in $x$ direction.  \\ \hline
+				
+				y\_nodes & vector of reals & in &  Mesh nodes in $y$ direction.  \\ \hline
+				
+						
+				Differential\_operator &  real function: $\mathcal{L} $ & 
+                in  & 
+                  $\mathcal{L}:\R{} \times \R{} \ldots \times  \R{} \rightarrow \R{} $ 
+                 \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $h$  & in &   
+	  $h:\R{} \times \R{} \times \R{} \times  \R{}  \times  \R{} \rightarrow \R{} $
+				 \\ \hline
+				
+				Solution & two-dimensional array of reals  & out &  
+				\verb|Solution(:,:)|. First  index stands for 
+				x and second index stands for y. \\ \hline
+\etable{Description of \texttt{Boundary\_Value\_Problem} arguments for 2D problems}
+
+
+\newpage
+\subsection*{2D Boundary Value Problems for system of equations} 
+
+\begin{lstlisting}[frame=trBL]
+call Boundary_Value_Problem(x_nodes, y_nodes,                       &
+                                     Differential_operator,         &
+                                     Boundary_conditions, Solution) 
+\end{lstlisting} 
+This subroutine calculates the solution of a 2D boundary value problem  of N variables in a 
+rectangular domain $[a,b] \times [c,d]$. 
+The differential operator $\vect{\mathcal{L}}$  and the boundary conditions 
+ $\vect{\mathcal{L}}$ are expressed as: 
+
+
+%\vspace{-0.5cm}
+
+\begin{equation*}
+\vect{\mathcal{L}}	\left({x},\ {y},\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}, \ 
+\frac{\partial^2 \vect{u}}{\partial x^2}, \ \frac{\partial^2 \vect{u}}{\partial y^2}, \ \frac{\partial^2 \vect{u}}{\partial x \partial y} 
+\right) = \vect{0},
+\end{equation*}
+
+\begin{equation*}
+\vect{h}	\left({x},\ {y},\ \vect{u}, 
+\ \frac{\partial \vect{u}}{\partial x}, 
+\ \frac{\partial \vect{u}}{\partial y}
+ \right) = \vect{0}. 
+\end{equation*}
+
+
+The solution of this problem is calculated using the libraries by a simple call to the subroutine:
+
+%\newpage
+%The arguments of the subroutine are described in the following table.
+
+\btable	
+				x\_nodes & vector of reals & in &  Mesh nodes in  $x$  direction.  \\ \hline
+				
+				y\_nodes & vector of reals & in &  Mesh nodes in $y$ direction.  \\ \hline
+				
+					
+				
+				Differential\_operator & \raggedright  
+              %  function: $\vect{\mathcal{L}}\left({x}, {y}, \vect{u}, \vect{u}_x,  \vect{u}_y,  %\vect{u}_{xx},  \vect{u}_{yy},  \vect{u}_{xy} \right)$ 
+                function: $\vect{\mathcal{L}}$  
+                & in  & Vector function to implement the differential operator.   \\ \hline
+				
+				Boundary\_conditions & \raggedright function: $\vect{h}$  & in &  
+				Vector function to implement different boundary conditions.  \\ \hline
+				
+				Solution & three-dimensional array  of reals  & out &  
+		\verb|Solution(:,:,:).| Third index stands for different variables. 
+				                                                                                     \\ \hline
+\etable{Description of \texttt{Boundary\_Value\_Problem} arguments for vector 2D problems}
+
+
+
+\newpage
+\subsection*{3D Boundary Value Problems for systems of equations}
+
+%\vspace{-3cm}
+
+\begin{lstlisting}[frame=trBL]
+call Boundary_Value_Problem(x_nodes, y_nodes, z_no        & 
+                            Differential_operator,        & 
+                            Boundary_conditions, Solution )
+\end{lstlisting}  
+This subroutine calculates the solution of a boundary value problem system of N variables in a rectangular domain $[a,b] \times [c,d]\times [e,f]$:
+
+
+
+\begin{equation*}
+\vect{\mathcal{L}}	\left({x},\ {y},\ {z},\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial \vect{u}}{\partial y}, \ \frac{\partial \vect{u}}{\partial z}, \ \frac{\partial^2 \vect{u}}{\partial x^2}, \ \frac{\partial^2 \vect{u}}{\partial y^2}, \ \frac{\partial^2 \vect{u}}{\partial z^2}, \ \frac{\partial^2 \vect{u}}{\partial x \partial y}, \ \frac{\partial^2 \vect{u}}{\partial x \partial z}, \ \frac{\partial^2 \vect{u}}{\partial y \partial z} \right) = \vect{0}
+\end{equation*}
+
+
+\btable		
+				x\_nodes & vector of reals & in &  Nodes in  $x$ direction.  \\ \hline
+				
+				y\_nodes & vector of reals & in &  Nodes in $y$ direction.  \\ \hline
+				
+				z\_nodes & vector of reals & in &  Nodes in $z$ direction.  \\ \hline
+				
+			
+				
+				Differential\_operator & 
+                 function: $ \vect{\mathcal{L}} $
+				 & in  & Differential operator.   \\ \hline
+				
+				Boundary\_conditions & \raggedright function: $\vect{h}$  & in &  Boundary conditions.  \\ \hline
+				
+				Solution & 4-dimensional array of reals  & out &  
+				\verb|Solution(:,:,:,:).| Fourth index stands for different variables. \\ \hline
+\etable{Description of \texttt{Boundary\_Value\_Problem} arguments for 3D vector problems}

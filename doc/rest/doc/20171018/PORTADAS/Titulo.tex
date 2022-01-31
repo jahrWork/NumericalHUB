@@ -1,0 +1,60 @@
+
+%*************************************************************************************
+%* Pagina de alineación y su reverso
+%*************************************************************************************
+
+%\unitlength 1cm
+%\begin{picture}(17, 14)(0, 7.5)
+%            \put(-2.95,     0){       \line(1,0){17} }
+ %           \put(-2.95,   24){       \line(1,0){17} }
+  %          \put(-2.95,     0){       \line(0,1){24} }
+   %         \put(14.05,  24){       \line(0,-1){24}}
+%\end{picture}
+
+%\clearpage
+%~\clearpage
+
+%***************************************************************************************
+%* Título y su reverso con el ISBN
+%***************************************************************************************
+\newcommand{\titulo}[4]{
+\begin{flushright} {\huge  {\bf #1}} \end{flushright}
+\vspace{3cm}
+\begin{flushright}
+ {\Large {\bf #2}  } \\ \vspace{0.2cm}  {\Large {\bf #3} }
+\end{flushright}
+
+\vfill
+{\it
+\begin{flushright}
+{\large Departamento de Matemática Aplicada y Estadística \\
+Escuela Técnica Superior de Ingenieros Aeronáuticos \\  \vspace{0.08cm}
+Universidad Politécnica de Madrid}
+\end{flushright}
+}
+
+\vspace{5cm}
+\begin{center}
+\scalebox{0.5}{ \includegraphics{./portadas/logoadi.eps} }
+\end{center}
+
+       \clearpage
+\noindent Portada:
+
+\noindent
+Simulación numérica de la rotura de frentes de concentración de partículas fluidizadas
+mediante una corriente ascendente de gas  (Juan A. Hernández).
+
+\vfill
+\noindent
+Queda prohibida la reproducción de cualquier parte del texto por cualquier medio, incluido fotocopia,
+sin permiso escrito del autor.
+\vspace{1cm}
+
+\noindent \copyright  \ \ #2#4 #3 \\
+\noindent \copyright  \ \ AULA DOCUMENTAL DE INVESTIGACIÓN \\
+Martín de los Heros, 67. 28008 Madrid  \\
+\noindent I.S.B.N. : 84-931805-1-3 \\
+\noindent Depósito Legal: M-3036-2001
+\clearpage
+}

@@ -1,0 +1,1256 @@
+
+    
+ %*************************************************************************
+\chapter{Cauchy Problem  }\label{Dev:Cauchy_Problem}
+    %*************************************************************************
+\section{Overview}
+    
+In this chapter,  a mathematical description of the Cauchy Problem is presented. Different temporal schemes are discussed as different algorithms to obtain the solution of a Cauchy problem. These algorithms are implemented by using vector operations 
+that allows the Fortran language. 
+    
+From the physical point of view, a Cauchy problem represents the evolution of any physical system with different degrees of freedom. From the movement of a material point in a three-dimensional space to the movement of satellites or stars, the movement is governed by  a system  of ordinary differential equations. If the initial condition of all degrees of freedom of this system is know, the movement can be predicted and the problem is named a Cauchy problem. Generally, this system involves first and second order derivatives of functions that depend on time. In order to design and to use the different temporal schemes, the problem is always  formulated  a system of first order equations. 
+          
+From the mathematical point of view, a Cauchy problem is composed by a  system of first order ordinary differential equations for
+$U: \mathbb{ R} \rightarrow \mathbb{ R}^N$ together with an initial condition  $U (t_0) \in \mathbb{ R}^N$. 
+ \begin{align}
+ &  \frac{d U}{d t} \ = \ F (U; \ t) ,  \qquad F : \mathbb{R}^N \times \mathbb{R} \rightarrow \mathbb{R}^N , \label{Cauchy_problem} \\ 
+ \displaystyle  
+ & U (t_0) \ = \ U^0 , \quad \forall \ t \ \in \ [ t_0, \ + \infty ) .
+ \end{align}
+
+
+    
+       
+%********************************************************       
+\section{Algorithms or temporal schemes}
+%********************************************************   
+To obtain temporal schemes,  equation (\ref{Cauchy_problem}) is integrated between  $t_{n}$ and $t_{n + 1}$
+ \begin{equation}
+ \displaystyle
+ U (t_{n + 1}) \ = \ U (t_{n}) \ + \ \int_{t_{n}}^{t_{n + 1}} \ F (U; \ t) \ dt. 
+ \label{quadrature}
+ \end{equation} 
+The idea of any temporal scheme is to approximate the integral appearing in (\ref{quadrature}) with an approximate value. 
+Once the integral is approximated, $ U^n $ is used to denote the approximate value to differentiate it from the exact value 
+$ U(t_n) $.
+In figure \ref{nomenclature}, an scheme with the nomenclature of this chapter is shown. Superscript $n$ stands for the approximated value at the temporal instant $ t_n $. The approximated value of $ F(U(t_n), t_n) $ is denoted by $ F^n $. 
+ 
+ \nomenclature 
+\vspace{-1cm}   
+Depending on how the integral appearing in equation (\ref{quadrature})  is carried out, different schemes are divided in the following groups: 
+  \begin{enumerate}
+  \item Adams-Bashforth Moulton methods. 
+   If a polynomial interpolant to calculate  the integral of equation (\ref{quadrature})  based on $ s $ time steps 
+   $$ F^{n+1-j},  \ \ \j=0, \ldots, s
+   $$ 
+   is used, the 
+   resulting schemes are called Adams-Bashforth-Moulton methods.     
+  
+  \item Runge-Kutta methods. In this case, the integral of equation (\ref{quadrature}) is approximated by internal evaluations or 
+  temporal stages
+  of $F(U,t $ ) between $ t_n $ and $ t_{n+1} $.
+  \item Gragg-borslish-Stoer methods. An algorithm based on successive refined grids inside the interval $ [t_n, t_{n+1} ]$ and using the Richardson extrapolation  technique yields this schemes. 
+  \end{enumerate}     
+ 
+From the implementation point of view, two main main subroutines are designed. 
+Given a temporal domain partition $ [t_i, \ \ i=0, \ldots M ]$, a subroutine called \verb|Cauchy_ProblemS| is responsible to call different temporal schemes to approximate (\ref{quadrature}).
+In the following code the implementation of this subroutine is shown: 
+      \vspace{0.5cm} 
+      \listings{\home/sources/Cauchy_problem.f90}
+      {subroutine Cauchy_ProblemS}
+      {contains}{Cauchy_problem.f90}
+ 
+ The arguments of this subroutine are: the \verb|Time_Domain|  represented in figure (\ref{nomenclature}), 
+ the \verb|Differential_operator| or the vector function $ F(u,t) $, the \verb|Solution| or the vector $ U $ and the selected temporal scheme to carry out the integral of equation 
+ (\ref{quadrature}). Note that \verb|Solution| is a two-dimensional array that stores the value of every variable of system (second index) at every time step (first index). 
+ 
+ It can be seen that the temporal scheme is an optional argument, if it is  not present, this subroutine uses a classical fourth order Runge-Kutta scheme. Besides, advanced high order methods, belonging to different families or groups, can be used. 
+ 
+ \newpage 
+ 
+ Once the arguments of \verb|Cauchy_ProblemS| are associated, this subroutine calls the selected temporal scheme to integrate from 
+ $ t_i $ to $ t_{i+1} $. In this way, the \verb|Scheme| subroutine calculates \verb|Solution(i+1,:)| from the input value 
+ \verb|Solution(i,:)|.
+ Hence, the intelligence of the particular details of any specific algorithm is hidden in \verb|Scheme|. 
+ In the following code the implementation of this subroutine \verb|Runge_Kutta4| is shown: 
+       \vspace{0.5cm} 
+       \listings{\home/sources/Temporal_Schemes.f90}
+       {subroutine Runge_Kutta4}
+       {end subroutine}{Temporal_Schemes.f90}
+ 
+ This is the classical fourth order Runge-Kutta. Given the input value \verb|U1|, and the vector function \verb|F|,the scheme calculates the value \verb|U2|. 
+ In the following code the interface of the vector function \verb|F| is shown: 
+  
+ \vspace{0.5cm} 
+        \listings{\home/sources/ODE_Interface.f90}
+        {function ODES}
+        {end function}{ODE_Interface.f90}
+ 
+ 
+  
+  
+ %******************************************************
+ \section{Implicit temporal schemes}
+ %*******************************************************
+ 
+ When the integral of equation (\ref{quadrature}) done by any the the different temporal schemes involves the value $ U^{n+1} $, the resulting scheme becomes implicit and a nonlinear system of $ N $ equations must be solved at each time step. Since the complexity and the computational cost of implicit methods is much greater than the explicit methods, the only reason to implement these methods relies on the stability behavior.  Generally, implicit methods do nor require time steps limitations or constraints to be numerically stable. The simplest implicit method is the inverse Euler method, 
+ \begin{equation}
+ U^{n+1} = U^n + \Delta t_n \ F^{n+1}.
+ \label{inverse_euler}
+ \end{equation}
+ It is obtained when interpolating in equation (\ref{quadrature}) with a constant value $ F^{n+1} $.  
+ If $ U^n $ is known from the last time step, equation (\ref{inverse_euler}) can be formulated  as the determination of roots of the following equation: 
+ \begin{equation}
+     G(X) = X - U^n - \Delta t \ F( X, \ t_{n+1} ).
+     \label{roots_IE}
+ \end{equation} 
+ From the implementation point of view, the scheme can be implemented with the methodology presented above. 
+ In the following code, the subroutine \verb|Inverse_Euler| uses a Newton method to solve the  equation (\ref{roots_IE}) each time step. 
+ 
+   \vspace{0.5cm} 
+        \listings{\home/sources/Temporal_Schemes.f90}
+        {subroutine Inverse_Euler}
+        {end subroutine}{Temporal_Schemes.f90}
+ 
+ 
+  \newpage
+ %**************************************************    
+ \section{Richardson's extrapolation to determine error}
+ %***************************************************      
+ 
+ Since the error of a numerical solution is defined as the difference between the exact solution $\vect{u}(t_n) $ minus the the approximate solution $ U^n $ at the same instant $ t_n $ 
+\Eqn{
+E^{n} = \vect{u}(t_n) - U^n, 
+}{eq:Error} 
+the  determination the error  requires knowing the exact solution. 
+This situation is unusual and  makes necessary to find some technique out. 
+ 
+If the global error could be expanded in power series of $ \Delta t $ like 
+\Eqn{
+E^{n} = k(t_n) \Delta t ^q + O( \Delta t^{q+1}),
+}{eq:expansion}  
+with $ K(t_n)$ independent of $ \Delta t $, then  an estimation based on Richardson's extrapolation could be done. 
+
+For one-step methods this expansion can be found. However, for multi-step methods, the presence of spurious solutions do not allow this expansion. 
+To cure this problem and to eliminate the oscillatory behavior of the error, averaged values $ \overline{U}^n $ can be defined as:
+\Eqn{
+\overline{U}^n = \frac{1}{4} \left( U^{n} + 2 U^{n-1} + U^{n-2}   \right),
+}{eq:mean}  
+allowing expansions like (\ref{eq:expansion}).  
+
+If the error can be expanded like in (\ref{eq:expansion}) and by integrating two grids one with time step $ \Delta t_n $ and other with $ \Delta t_n / 2 $, an estimation of the error based on Richardson's extrapolation can be found. 
+Let $ U_1 $ be the solution integrated with  $ \Delta t_n $ and $ U_2 $ the solution integrated with $ \Delta t_n /2 $.
+The expression (\ref{eq:expansion}) for the two solutions is written:
+\Eqn{
+ & \vect{u}(t_n) - U_1^n = k(t_n) \Delta t ^q + O( \Delta t^{q+1}), \label{eq:u1} \\ 
+ &  \vect{u}(t_n) - U_2^{2n} = k(t_n) \left( \frac{\Delta t}{ 2}   \right)^q + O( \Delta t^{q+1}). 
+}{eq:u2} 
+Substracting equation (\ref{eq:u1}) and equation (\ref{eq:u2}),
+\Eqn{
+ &  U_2^{2n} - U_1^n = k(t_n) \Delta t ^q \left( 1 - \frac{1}{ 2^q}   \right)+ O( \Delta t^{q+1}), 
+}{eq:u2u1} 
+allowing the following error estimation: 
+\Eqn{
+ &  E^n = \frac{ U_2^{2n} - U_1^n }{   1 - \frac{1}{ 2^q}      }. 
+}{eq:u2u1} 
+
+In the following code, the error estimation based on Richardson's extrapolation is implemented: 
+
+\vspace{0.5cm} 
+             \listings{\home/sources/tools/Temporal_error.f90}
+             {subroutine Error_Cauchy_Problem}
+             {end subroutine}{Temporal_error.f90}  
+  
+Given a \verb|Time_Domain|, two temporal grids are defined \verb|t1| and \verb|t2|. While \verb|t1| is the original temporal grid, \verb|t2| has double of points than \verb|t1| and it is obtained by halving the time steps of \verb|t1|. 
+Then, two independent simulations \verb|U1| and \verb|U2| are carried out starting from the same initial condition. They are averaged with expression (\ref{eq:mean}) to eliminate oscillations and \verb|Error| is calculated with expresion (\ref{eq:u2u1}).
+Finally, the \verb|Error| is used to correct the  \verb|U1| solution to give the \verb|Solution|. 
+
+      
+  
+ 
+ 
+ 
+ \newpage 
+ %**************************************************    
+ \section{Convergence rate of temporal schemes}
+ %*************************************************** 
+ A numerical scheme is said to be of order $ q $ if its numerical error is $ O(\Delta t ^q) $. 
+ It means that if $ \Delta t $ is small enough,  error tends to zero with the same velocity than  $ \Delta t ^q $. 
+ Taking norms and logarithms in the error expression (\ref{eq:expansion}) and taking into account that $ \Delta t \propto N^{-1}$, 
+ \Eqn{
+    \log \|E^n \| = C - q \ \log N. 
+ }{eq:logE}
+ When plotting this expression in log scale, it appears a line with a negative slope $ q$ which is the order of the method. 
+ When dealing with complex temporal schemes or when developing new methods, it is importance to know the convergence rate of the scheme or its real order. To do that, the error must be known. As it was shown in the  last section, error can be determined  based on Richardson's extrapolation. In the following code, a sequence of Cauchy problems  with $ \Delta t_n / 2^k $ is integrated. This subroutine allows obtaining the dependency of logarithm of the error \verb|log_E| with the logarithm of number of time steps \verb|log_N|.  
+    \vspace{0.2cm} 
+           \listings{\home/sources/tools/Temporal_error.f90}
+           {subroutine Temporal_convergence_rate}
+           {end subroutine}{Temporal_error.f90} 
+    
+    
+      
+%  \newpage     
+%  %**************************************************    
+%  \section{Regions of absolute stability}
+%  %***************************************************
+%   \vspace{0.5cm} 
+%          \listings{\home/sources/tools/Stability_regions.f90}
+%          {subroutine Absolute_Stability_Region}
+%          {end subroutine}{Stability_regions.f90}
+%  
+  
+ 
+ 
+ 
+      
+
+              
+  
+  
+       
+% %**************************************************    
+% \section{High order methods for the Cauchy problem}
+% %***************************************************
+%      \vspace{0.5cm} 
+%             \listings{\home/sources/Temporal_Schemes.f90}
+%             {subroutine Inverse_Euler}
+%             {end subroutine}{Temporal_Schemes.f90} 
+%       
+%  Besides the presented multistep algorithms 
+% In this section two algorithms of Variable Step and Variable Order (VSVO) for solving ordinary differential equations are provided: Gragg-Bulirsch-Stoer algorithm and Embedded Runge-Kutta formulas. 
+            
+      
+ 
+ \newpage   
+ %********************************************************     
+ \section{Embedded Runge-Kutta methods}
+ %********************************************************
+ Adaptive Runge-Kutta methods are designed to produce an estimate of the local truncation error. If that error is below the required tolerance, the time step is accepted and the ne time step is increased. If not, the time step is reduced based on the local truncation error.  
+ This is done by having two Runge-Kutta methods at the same time, one with order $ q $  and one with order $ q+1$. These methods are interwoven sharing intermediate steps or stages. Thanks to this, the error estimation  has negligible computational.
+ Moreover, the time adapts automatically depending on the gradients of the solution reducing the computational cost.  
+      
+The two Runge-Kutta formulas calculate the approximation  $\vect{u}^{n+1}$ of order $ q $ and another approximation $\vect{\hat{u}}^{n+1}$ of order $ q+1$. The subtraction $\vect{u}^{n+1}-\vect{\hat{u}}^{n+1}$ gives an estimation of the local truncation error. Hence, the local error can be controlled by changing the step size for each temporal step.
+      
+A Runge-Kutta method of $e$ stages predicts the approximation $\vect{u}^{n+1}$ from the previous value $\vect{u}^{n+1}$  by the 
+following expression: 
+      \Eqn
+      {
+      	\vect{u}^{n+1} = \vect{u}^{n} + h \sum_{i=1}^{e} \vect{k}_i \, b_i,
+      }{eq:Runge_Kutta_method}
+where $ h = t_{n+1}- t_n$, matrix  $a_{ij} $  is the Butcher's array, $ b_i$ and $  c_i $ are constant of the scheme and 
+$$
+\vect{k}_i = \vect{F} \left(t_n + c_i h, \vect{u}^{n} + \sum_{j=1}^{e} a_{ij} \, \vect{k}_j \right).
+$$
+
+The Butcher array for a generic Runge-Kutta is written as follows:
+      \Eqn
+      {\renewcommand\arraystretch{1.4}
+      	\begin{array}
+      		{c|ccc}
+      		& a_{11} & \ldots & a_{1e}\\
+      		c_2    & a_{21} & \ldots & a_{2e}\\
+      		\vdots & \vdots &        & \vdots \\
+      		c_e    & a_{e1} & \ldots & a_{ee} \\
+      		\hline 
+      		\vect{{u}}^{n+1}	  & b_{1} & \ldots & b_{e} 
+      	\end{array}
+      }{eq:Butcher_array_generic}
+      Note that as $c_1=0$, it does not appear on the Butcher array.
+     In the special case in which $a_{ij}=0,$ $\forall \, i\leq j$, then the Runge-Kutta is explicit, that is, $\vect{k}_i$ can be obtained  from $\{ \vect{k}_1, \ldots, \vect{k}_{i-1} \} $.
+      
+      
+      The embedded Runge-Kutta method uses two explicit schemes sharing $c_i$ and $a_{ij}$ for all $i,j\leq e$. Therefore, this method has the extended  Butcher's array:
+      \Eqn
+      {	\renewcommand\arraystretch{1.4}
+      	\begin{array}
+      		{c|ccc}
+      		c_2    & a_{21} &        &        \\
+      		\vdots & \vdots &        &        \\
+      		c_e    & a_{e1} & \ldots & a_{ee-1} \\
+      		\hline 
+      		\vect{{u}}^{n+1}	& b_{1} & \ldots & b_{e} \\
+      		\hline 
+      		\vect{\hat{u}}^{n+1}	& \hat{b}_{1} & \ldots & \hat{b}_{e} 
+      	\end{array}
+      }{eq:Butcher_embedded}
+      In which $b_i$ and $\hat{b}_i$ are respectively the coefficients of the approximated solutions $ \vect{{u}}^{n+1} $ and $\vect{\hat{u}}^{n+1}.$ 
+      Since the local truncation error of  $ \vect{{u}}^{n+1} $ is $ C \ h ^{q+1}$ and the error of  $ \vect{\hat{u}}^{n+1} $ is $ \hat{C}  \ h ^{q+2}$, 
+      the estimation of the local truncation error $\vect{T}^{n+1}$ of order $q+1$ is obtained by substantiating the two approximations:
+      %
+      \Eqn
+      {
+      	\vect{T}^{n+1} = \vect{{u}}^{n+1} - \vect{\hat{u}}^{n+1} = \vect{C} \ h ^{q+1}.
+      }{eq:error}
+If the norm of the local truncation error should less than a prescribed tolerance $ \epsilon $, then 
+the optimal time step $ \hat{h} $ can be obtained from equation  (\ref{eq:error}) to yield: 
+      \Eqn
+      {
+      	\epsilon   = \| \vect{C} \| \ \hat{h} ^{q+1}.
+      }{eq:epsilon}
+Taking norms into equation (\ref{eq:error}) and dividing the result by equation (\ref{eq:epsilon})
+      \Eqn
+      {
+      	\frac{\epsilon  }{\|  \vect{T}^{n+1}\|}   =     \left(   \frac{   \hat{h} }{ h }      \right)^{q+1}
+      }{eq:div}
+and the optimum time step can be obtained from the previous time step
+      \Eqn
+            {
+            	 \hat{h} =  h \left(   \frac{ \epsilon }{\|  \vect{T}^{n+1}\|}  \right)^{ \frac{1}{q+1}}.
+            }{eq:div}
+This step size selection is implemented in the following code:      
+        \vspace{0.5cm} 
+                 \listings{\home/sources/High_order/Embedded_RKs.f90}
+                 {real function Step_size}
+                 {end function}{Embedded_RKs.f90}
+        
+        
+With this time step selection,  an embedded Runge-Kutta scheme is implemented: 
+        \vspace{0.5cm} 
+                  \listings{\home/sources/High_order/Embedded_RKs.f90}
+                  {subroutine ERK_scheme}
+                  {end subroutine}{Embedded_RKs.f90}          
+    
+The subroutine \verb|RK_scheme| is called twice to calculate the approximate solution \verb|V1| and \verb|V2| form the previous solution \verb|U1|.  Once the subroutine \verb|set_tolerance|  assign a specific value to the required tolerance \verb|RK_tolerance|,
+the subroutine \verb|Step_size| validates or reduces the time step \verb|h=t2-t1|. 
+Then, with the resulting time step \verb|h| and by means of the \verb|"First"| Runge-Kutta scheme, the approximate solution \verb|U2| is obtained.     
+    
+    
+    
+    
+\newpage 
+In the following code, the subroutine \verb|RK_schme is implemented|
+      \vspace{0.5cm} 
+      \listings{\home/sources/High_order/Embedded_RKs.f90}
+      {subroutine RK_scheme}
+      {end subroutine}{Embedded_RKs.f90}
+ A pair of Runge-Kutta  schemes are identified by its \verb|name| which must be previously selected by the subroutine \verb|set_solver|. If the subroutine is called with \verb|tag="First"|, the butcher's array is created and the values of different stages $\vect{k}_i$ are calculated and stored in \verb|k(i,:)| where the first index stands for the stage index and the second index represents the index of the variable. Later, an approximate value for \verb|U2| is calculated by using \verb|b| coefficients previously defined.
+ If the subroutine is called with \verb|tag="Second"| and since the butcher's array and the \verb|k(i,:)| are saved,  an approximate value for \verb|U2| is calculated by using \verb|bs| coefficients previously defined.
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     
+     
+     
+     
+ \newpage    
+ %******************************************************    
+ \section{Gragg-Bulirsch-Stoer method}
+ %******************************************************
+The GBS algorithm improves error solution by halving  consecutively the interval 
+$[t_n,t_{n+1}]$ and by using  the Richardson's extrapolation technique. 
+The method divides consecutively the interval in $2 N_i$ pieces 
+from $i=1 $ to $i =L$ where $N_i$ is the sequence of grid levels.
+The number of grids $L$ is also called the number of levels that the GBS algorithm descends.
+For each level, a solution at the next step $\vect{u}^{n+1}_i$ 
+is obtained applying the Modified midpoint scheme. Note that this solution is 
+the solution for a certain grid at $t_{n+1}$. 
+Hence,  $l$ solutions $\vect{u}^{n+1}_i$ will allow by using the  Richardson's extrapolation to 
+obtain an estimation of the global error of order $2l$. 
+This estimation is used to correct the approximated solution. 
+The algorithm for Gragg-Bulirsch-Stoer method can be summed up as follows:
+\begin{enumerate}
+\setlength\itemsep{-0.1cm}
+\item  Sequence of grid levels.
+\item  Modified midpoint scheme. 
+\item Richardson extrapolation. 
+\end{enumerate}
+     
+     
+\subsection*{Sequence of grid levels}     
+     
+    
+Divide the interval in $2N_i$ pieces.
+For each level, the time step $ h $ is divided into  $2 N_i$ segments:
+     %
+     \Eqn{t_j = t_n + j \ h_i , \qquad j = 0,1, \ldots, 2 N_i,}{eq:GBS_time_division}
+where $ h_i = \ h  / (2 N_i). $
+     
+     
+\listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+{function mesh_refinement}
+{end function}{Gragg_Burlisch_Stoer.f90}
+      
+     
+     
+     
+\newpage   
+\subsection*{Modified midpoint scheme}     
+The midpoint or Leap-Frog scheme is used to obtain solution $ \vect{U_2} $ at $t_{n+1}$ 
+from the given solution $ \vect{U_1} $ at $ t_n $.      
+   
+     
+%The solution $\vect{u}^{n+1}_i$ is obtained in each level by applying the modified midpoint scheme:
+     \Eqn{
+     &	\vect{\tilde{u}}^1   = \vect{U_1} + h_i \vect{f}(t_0,\vect{u}^0), \label{eq:GBS_Euler}\\
+     	%
+      &	\vect{\tilde{u}}^{j+1}  = \vect{\tilde{u}}^{j-1} + 2 h_i \vect{f}(t_j,\vect{\tilde{u}}^j), \qquad j = 1,2\ldots ,2 N_i, 
+      \label{eq:GBS_Leap}\\ 
+     	%
+      &	\vect{U_2} = \left( \vect{\tilde{u}}^{2N_i-2} + 2\vect{\tilde{u}}^{2N_i-1} + \vect{\tilde{u}}^{2N_i}  \right)/4 
+     }{eq:Modified_midpoint}
+The midpoint scheme or the Leap-Frog method is used to determine the solution at the inner points of any level. 
+Since the the Leap-Frog method is a two-step scheme, an extra initial condition is required. This is given an 
+explicit Euler scheme (\ref{eq:GBS_Euler}). Once the Leap-Frog reaches the end of the interval,  the solution is smoothed by equation  
+(\ref{eq:Modified_midpoint}).
+      
+The  modified midpoint method is implemented in the following code:      
+           \vspace{0.5cm} 
+     \listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+     {subroutine Modified_midpoint_scheme}
+     {end subroutine}{Gragg_Burlisch_Stoer.f90}
+           
+     
+ \newpage   
+ \subsection*{Richardson extrapolation}   
+     	
+Due to the symmetry of the GBS scheme, it was proven by Gragg (1963) that  
+a solution $U$ can be exapnded in even powers of its time step $ h$: 
+\Eqn
+{    
+\vect{U}(h) = \vect{a}_0 + \vect{a}_1 h^2 + \vect{a}_2 h^4 + \vect{a}_3 h^6 + ...  
+}{} 
+By integrating with the midpoint rule with different time steps $ h_i $, 
+we obtain different evaluations of the above expression: 
+\Eqn{    
+\vect{U}(h_i) = \vect{a}_0 + \vect{a}_1 h_i^2 + \vect{a}_2 h_i^4 + \vect{a}_3 h_i^6 + 
+\cdots +   \vect{a}_L h_i^{2 L },  
+\qquad i=1, \ldots, L.
+}{} 
+The Lagrange interpolation formula allows to express: 
+\Eqn{
+\vect{U}(h) = \ell_1(h) \vect{U}_1 + \cdots + \ell_L(h) \vect{U}_L, 
+}{}
+where $ \ell_j(h)$ is the Lagrange interpolant associated 
+to the interpolation points $ (h_j, \vect{U}_j) $. 
+Once this interpolant is built, the corrected solution is obtained: 
+\Eqn{
+\vect{U}_c(0) = \ell_1(0) \vect{U}_1  + \cdots + \ell_L(0) \vect{U}_L. 
+}{}
+This is done in the following subroutine: 
+\vspace{0.5cm}
+\listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+{function Corrected_solution_Richardson}
+{end function}{Gragg_Burlisch_Stoer.f90}
+  
+ 
+  
+   
+\newpage   
+\subsection*{GBS solution}  
+With the above ingredients, a corrected solution based on $ L $ levels is obtained. 
+This is done with the following subroutine: 
+ \vspace{0.5cm}
+  \listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+   {subroutine GBS_solution_NL}
+   {end subroutine}{Gragg_Burlisch_Stoer.f90}
+The corrected solution $ \vect{U}_2 $ is obtained by integrating $ L $ different solutions 
+with the midpoint scheme through
+$ L $ different grids and by using the Richardson extrapolation technique. 
+
+GBS scheme can run in two different modes: {\it (i)} fixed number of levels $L$ and 
+{\it (ii)} adaptive number of levels $L$. 
+
+\newpage  
+The number of levels $ L $ can be fixed by the following subroutine: 
+ \vspace{0.5cm}
+\listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+{subroutine set_GBS_levels}
+{end subroutine}{Gragg_Burlisch_Stoer.f90}
+
+If the number of levels is not fixed, 
+an specific algorithm should decide automatically the number of levels $L$. 
+This algorithm requires to estimate the error and to decide if it is under tolerance.
+The following subroutine computes two corrected solutions: \verb|Uc|  based on $L $ levels 
+and the \verb|Ucs| based on $ L+1$ levels.  
+ \vspace{0.5cm}
+  \listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+  {subroutine GBS_solutionL}
+  {end subroutine}{Gragg_Burlisch_Stoer.f90}
+ 
+
+
+  
+ \newpage
+ By substracting \verb|Uc| and \verb|Ucs| the error solution is estimated and compared
+ to the required tolerance. 
+ This is done in the following subroutine that finally encapsulates the complete GBS scheme. 
+ If the numer of levels is fixed, GBS scheme integrates with this numer of levels. 
+ Otherwise, GBS scheme begins integrating with two levels. 
+ If the error does not satisfy the tolerance, the algorithm integrates with  one more level until 
+ error tolerance is reached. 
+ 
+  \vspace{0.5cm}
+\listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+{subroutine GBS_Scheme}
+{end subroutine}{Gragg_Burlisch_Stoer.f90}
+
+ 
+ 
+   
+ 
+% 
+% 
+%     
+%  \newpage           
+%In the following discussion, a  formula for the error $\vect{E}^{n+1} $ based on the solutions  $ \vect{u}^{n+1}_i $ will be given.  
+%It was proven that the global error 
+% \Eqn{
+% \vect{E}(t_{n+1}) = \vect{u}(t_{n+1}) - \vect{u}^{n+1}
+% }{eq:Error_GBS}
+%posses an asymptotic expansion in terms of even powers of the step $h$:
+%          \Eqn{
+%          	\vect{E}(t_{n+1}) = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h^{2j}.
+%          }{eq:GBS_asymptotic_expansion}
+%For each level or grid,  the temporal step is written $h_i = h/n_i$ which leads to $l$ expressions for the error:
+%     %
+%     \Eqn{
+%     	\vect{E}_1(t_{n+1}) &= \vect{u}(t_{n+1}) - \vect{u}_1^{n+1} = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h_1^{2j} = \sum_{j=1}^{\infty} 
+%\vect{k}_{2j}(t_n) \left(\frac{h}{n_1}\right)^{2j}\nonumber, \\
+%     	\vect{E}_2(t_{n+1}) &= \vect{u}(t_{n+1}) - \vect{u}_2^{n+1} = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h_2^{2j} = \sum_{j=1}^{\infty} 
+%\vect{k}_{2j}(t_n) \left(\frac{h}{n_2}\right)^{2j}\nonumber, \\
+%     	&\vdots \nonumber \\
+%     	\vect{E}_i(t_{n+1}) &= \vect{u}(t_{n+1}) - \vect{u}_i^{n+1} = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h_i^{2j} = \sum_{j=1}^{\infty} 
+%\vect{k}_{2j}(t_n) \left(\frac{h}{n_i}\right)^{2j}\nonumber, \\
+%     	&\vdots \nonumber \\
+%     	\vect{E}_l(t_{n+1}) &= \vect{u}(t_{n+1}) - \vect{u}_l^{n+1} = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h_l^{2j} = \sum_{j=1}^{\infty} 
+%\vect{k}_{2j}(t_n) \left(\frac{h}{n_l}\right)^{2j}.\nonumber
+%     }{}
+% The system of equations can be expressed  for $i=1,2\ldots,l$ as:
+%     %
+%     \Eqn{
+%     	\vect{E}_i(t_{n+1}) &= \vect{u}(t_{n+1}) - \vect{u}_i^{n+1} = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h_i^{2j} = \sum_{j=1}^{\infty} 
+%\vect{k}_{2j}(t_n) \left(\frac{h}{n_i}\right)^{2j}.
+%     }{eq:GBS_Error_levels}
+%     
+%     
+%     Substracting equation of level $ i+1$ and level $ i $ yields: 
+%      \Eqn{
+%          	\vect{u}_{i+1}^{n+1} - \vect{u}_i^{n+1} 
+%          	& = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) \left[ \left(\frac{h}{n_i}\right)^{2j}  - \left(\frac{h}{n_{i+1}}\right)^{2j}  
+%\right], \nonumber \\ 
+%          	& = \sum_{j=1}^{\infty} \vect{k}_{2j}(t_n) h^{2j}\left[ \left(\frac{1}{n_i}\right)^{2j}  - \left(\frac{1}{n_{i+1}}\right)^{2j}  
+%\right], \label{eq:GBS_Error}\\ 
+%          	& = \sum_{j=1}^{\infty} A_{ij} \, \vect{k}_{2j}(t_n) h^{2j}, \nonumber
+%          }{} 
+%     
+%The above expression yields the exact global error but requires an infinite number of terms. If the number of levels is high enough,
+%the rate of convergence of terms of series $ h^{2j}$  allow to truncate the series to give a good approximation. That is, 
+%an estimation of the error can be obtained with $ l $ levels
+%\Eqn{
+%     	\vect{u}_{i+1}^{n+1} - \vect{u}_i^{n+1} 
+%     	\simeq \sum_{j=1}^{l-1} A_{ij} \, \vect{k}_{2j}(t_n) h^{2j},
+%     }{eq:GBS_Richardson} 
+%or in vector form: 
+%     %
+%     \Eqn{
+%     	\begin{bmatrix}
+%     		\vect{u}_{2}^{n+1} - \vect{u}_1^{n+1} \\
+%     		\vdots \\
+%     		\vect{u}_{i+1}^{n+1} - \vect{u}_i^{n+1} \\
+%     		\vdots \\
+%     		\vect{u}_{l}^{n+1} - \vect{u}_{l-1}^{n+1}
+%     	\end{bmatrix}
+%     	= \begin{bmatrix}
+%     		A_{ij}
+%     	\end{bmatrix} 
+%     	\begin{bmatrix}
+%     		\vect{k}_{2}(t_n) h^{2} \\
+%     		\vdots \\
+%     		\vect{k}_{2j}(t_n) h^{2j} \\
+%     		\vdots \\
+%     		\vect{k}_{2(l-1)}(t_n) h^{2(l-1)}
+%     	\end{bmatrix}.
+%     }{eq:GBS_Richardson_vectorial}
+%This system is invertible and can be solved as:
+%     %
+%     \Eqn{
+%     	\begin{bmatrix}
+%     		\vect{k}_{2}(t_n) h^{2} \\
+%     		\vdots \\
+%     		\vect{k}_{2j}(t_n) h^{2j} \\
+%     		\vdots \\
+%     		\vect{k}_{2(l-1)}(t_n) h^{2(l-1)}
+%     	\end{bmatrix} 
+%     	=
+%     	\begin{bmatrix}
+%     		A_{ij}^{-1}
+%     	\end{bmatrix} 
+%     	\begin{bmatrix}
+%     		\vect{u}_{2}^{n+1} - \vect{u}_1^{n+1} \\
+%     		\vdots \\
+%     		\vect{u}_{i+1}^{n+1} - \vect{u}_i^{n+1} \\
+%     		\vdots \\
+%     		\vect{u}_{l}^{n+1} - \vect{u}_{l-1}^{n+1}
+%     	\end{bmatrix}
+%     }{eq:GBS_Richardson_vectorial_resolution}
+% Since an estimation of the error is: 
+%  \Eqn{
+%           	\vect{E}(t_{n+1}) = \sum_{j=1}^{l-1} \vect{k}_{2j}(t_n) h^{2j},
+%           }{eq:GBS_estimation}
+%         \Eqn{
+%         	\vect{E}^{n+1} 
+%         	= 
+%         	\begin{bmatrix}
+%         		1,
+%         		\ldots
+%         		,1
+%         	\end{bmatrix}
+%         	\begin{bmatrix}
+%         		\vect{k}_{2}(t_n) h^{2} \\
+%         		\vdots \\
+%         		\vect{k}_{2j}(t_n) h^{2j} \\
+%         		\vdots \\
+%         		\vect{k}_{2(l-1)}(t_n) h^{2(l-1)}
+%         	\end{bmatrix} 
+%         	=
+%         	\begin{bmatrix}
+%         		1,
+%         		\ldots
+%         		,1
+%         	\end{bmatrix}
+%         	\begin{bmatrix}
+%         		A_{ij}^{-1}
+%         	\end{bmatrix} 
+%         	\begin{bmatrix}
+%         		\vect{u}_{2}^{n+1} - \vect{u}_1^{n+1} \\
+%         		\vdots \\
+%         		\vect{u}_{i+1}^{n+1} - \vect{u}_i^{n+1} \\
+%         		\vdots \\
+%         		\vect{u}_{l}^{n+1} - \vect{u}_{l-1}^{n+1}
+%         	\end{bmatrix}. 
+%         }{eq:GBS_Error_estimation}
+%    
+% By substracting pairs of solutions of levels $ i+1$ and $i $, the system of equations (\ref{eq:GBS_Error_estimation}) allows to estimate 
+%the global error $ \vect{E}^{n+1} $.   
+% This error is used to improve the precision of the solution:
+%          \Eqn
+%              {
+%              	\vect{{u}}^{n+1} = \vect{{u}}_{1}^{n+1} + \vect{E}^{n+1}. \nonumber
+%              }
+%              {}
+%         
+%    
+%
+% \newpage
+%The GBS algorithm described in this section is implemented in the following code:   
+%          \vspace{0.5cm} 
+%          \listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+%          {subroutine GBS_Scheme}
+%          {end subroutine}{Gragg_Burlisch_Stoer.f90}
+%          
+%          
+%     \newpage
+%The required operations described in expression (\ref{eq:GBS_Error_estimation}) to obtain the error estimation is implemented in the 
+%following code: 
+%     \vspace{0.2cm} 
+%     \listings{\home/sources/High_order/Gragg_Burlisch_Stoer.f90}
+%     {subroutine GBS_Richardson_coefficients}
+%     {end subroutine}{Gragg_Burlisch_Stoer.f90}
+%
+%     
+%    
+     
+     
+  
+
+ \newpage  
+ \input{./doc/chapters/Cauchy_problem/ABM.tex}  
+% %******************************************************    
+% \section{ABM or multi-value methods}
+% %******************************************************     
+%  
+%  In this chapter, the last of the classical high order temporal schemes will be presented, the Adams-Bashforth-Moulton methods (ABM). These 
+%methods are based on linear multi-step methods (Adams) which can be explicit (Adams-Bashforth) or implicit (Adams-Moulton).   
+% % The number of steps $s$ of the method is related to the order $q$ of accuracy of the solution, for explicit methods $s=q$ and for 
+%%%%implicit methods $s=q+1$ as described in \cite{HairerI}.
+%   Given an interval $[t_n,t_{n+1}]$ of length $\Delta t$, this family of methods gives the solution at the end of the interval as:
+%  %
+%  \Eqn
+%  {
+%  	\vect{u}^{n+1} = \vect{u}^{n} + \Delta t\sum_{j=0}^{s} \beta_j \vect{F}^{n+1-j},
+%  }{eq:Adams_methods}
+%  
+%  where $\vect{F}^{n+1-j} = \vect{F}(t_{n+1-j}, \vect{u}^{n+1-j})$, and $\beta_j$ are the coefficients of the scheme. Note, that an $s-$step 
+%explicit method satisfies $\beta_0 =0$ and an implicit method of the same number of steps satisfies $\beta_s =0$. The resolution for 
+%explicit 
+%methods is straightforward meanwhile for implicit methods the solution must be obtained by an iterative process. 
+%  
+%  
+%  Adams-Bashforth-Moulton methods consist on a pair of Bashforth and Moulton methods which are used in predictor-corrector configuration. A 
+%predictor-corrector scheme consists on, first a prediction of the solution at next step $\vect{u}^{n+1}_*$ obtained applying an explicit 
+%Adams-Bashforth which is used to evaluate $\vect{F}$ obtaining $\vect{F}^{n+1}_*$, to finally obtain $\vect{u}^{n+1}$ using the implicit 
+%scheme but avoiding the iterative resolution. These schemes can be written as:
+%  %
+%  \Eqn
+%  {
+%  \mbox{Prediction:}\quad	& \vect{u}_*^{n+1} = \vect{u}^{n} + \Delta t\sum_{j=1}^{s} \beta_j \vect{F}^{n+1-j}, \\
+%  \mbox{Correction:}\quad	& \vect{u}^{n+1} = \vect{u}^{n} + \Delta t\beta_0 \vect{F}_*^{n+1}+  \Delta t\sum_{j=1}^{s-1} \beta_j 
+%\vect{F}^{n+1-j}.
+%  }{eq:Adams_methods}
+%  The origin of the coefficients, and therefore of the methods, has its basis on approximating the quadrature
+%  %
+%  \Eqn
+%  {
+%  	\vect{u}^{n+1} = \vect{u}^{n} + \int_{t_n}^{t_{n+1}} \vect{F}(t,\vect{u}) \dd t,
+%  }{eq:ABM_quadrature}
+%  by means of an interpolant of grade $s-1$ (using $s$ points) for $\vect{F}$. The interpolant $\vect{I}$ takes a different form depending 
+%if the scheme is explicit or implicit:
+%  %
+%  \Eqn
+%  {
+%  	\mbox{Explicit:}\quad	&  \vect{I}(t) = \sum_{1}^{s} \vect{F}^{n+1-j}\ell_{n+1-j}(t), \\
+%  	\mbox{Implicit:}\quad	&  \vect{I}(t) = \sum_{0}^{s-1} \vect{F}^{n+1-j}\ell_{n+1-j}(t),
+%  }
+%  {}
+%  where $\application{\ell_{n+1-j}}{\R{}}{\R{}}$ are the Lagrange polynomials given by:
+%  %
+%  \Eqn
+%  {
+%  	\mbox{Explicit:}\quad &\ell_{n+1-j} = \prod_{\substack{k=n+1-s \\ k \neq n+1-j}}^{n} \frac{t-t_k}{t_{n+1-j}-t_k}, \\
+%  	\mbox{Implicit:}\quad &\ell_{n+1-j} = \prod_{\substack{k=n+2-s \\ k \neq n+1-j}}^{n+1} \frac{t-t_k}{t_{n+1-j}-t_k}.
+%  }
+%  {}
+%    Hence, for a fixed step size $\Delta t $ the coefficients are obtained by the approximation:
+%  
+%  %
+%  \Eqn
+%  {
+%  	\mbox{Explicit:}\quad \vect{u}^{n+1} & \simeq \vect{u}^{n} + \int_{t_n}^{t_{n+1}} \vect{I} (t)\dd t \nonumber\\
+%  	& = \vect{u}^{n} + \sum_{1}^{s} \vect{F}^{n+1-j}\int_{t_n}^{t_{n+1}}  \ell_{n+1-j} \dd t,
+%  }{}
+%  
+%  \Eqn
+%  {
+%  	\mbox{Implicit:}\quad \vect{u}^{n+1} & \simeq \vect{u}^{n} + \int_{t_n}^{t_{n+1}} \vect{I} (t)\dd t \nonumber\\
+%  	& = \vect{u}^{n} + \sum_{0}^{s-1} \vect{F}^{n+1-j}\int_{t_n}^{t_{n+1}}  \ell_{n+1-j} \dd t,
+%  }{}
+%  therefore the coefficients for both explicit and implicit schemes (choosing the appropriate interpolant) are written as:
+%  %
+%  \Eqn{\beta_j =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \ell_{n+1-j} \dd t.}{}
+%  One interesting remark is that the coefficients are dependant on the step size distribution of the temporal grid. For this reason, it 
+%becomes very expensive to compute variable step size Adams methods.
+%  
+%  \ejemplo
+%  { 
+%  	\textbf{Two steps Adams-Bashforth}. Let's consider the case $s=2$ and constant $\Delta t$ for an explicit method. In these conditions, 
+%the interpolant for the differential operator can be written:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{I}(t) & = \vect{F}^{n} \ell_n(t)
+%  		            + \vect{F}^{n-1} \ell_{n-1}(t) \nonumber\\
+%  		            & = \vect{F}^{n} \frac{t-t_{n-1}}{\Delta t}
+%  		            - \vect{F}^{n-1} \frac{t-t_{n}}{\Delta t}, \nonumber
+%  	}
+%  	{}
+%  	and the coefficients are calculated as:
+%  	%
+%  	\Eqn
+%  	{
+%  	    \beta_1 & =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \ell_{n} \dd t
+%  	              =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}             \frac{t-t_{n-1}}{\Delta t} \dd t = \frac{3}{2} ,\nonumber \\
+%  		\beta_2 & = \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} \ell_{n-1} \dd t         
+%  	              = -\frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \frac{t-t_{n}}{\Delta t} \dd t = -\frac{1}{2},\nonumber
+%  	}
+%  	{}
+%  	leading to the scheme:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{u}^{n+1} = \vect{u}^{n} + \frac{\Delta t}{2}\left( 3\vect{F}^{n} - \vect{F}^{n-1}\right).
+%  	}{}
+%  }
+%  
+%  \ejemplo
+%  { 
+%  	\textbf{Two steps Adams-Moulton}. Let's consider the case $s=2$ and constant $\Delta t$ for an implicit method. In these conditions, the 
+%interpolant for the differential operator can be written:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{I}(t) & = \vect{F}^{n+1} \ell_{n+1}(t)
+%  		+ \vect{F}^{n} \ell_{n}(t) \nonumber\\
+%  		& = \vect{F}^{n+1} \frac{t-t_{n}}{\Delta t}
+%  		  - \vect{F}^{n} \frac{t-t_{n+1}}{\Delta t}, \nonumber
+%  	}
+%  	{}
+%  	and the coefficients are calculated as:
+%  	%
+%  	\Eqn
+%  	{
+%  		\beta_0 & =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \ell_{n+1} \dd t
+%  		          =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}             \frac{t-t_{n}}{\Delta t} \dd t = \frac{1}{2} ,\nonumber \\
+%  		\beta_1 & = \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} \ell_{n} \dd t         
+%  		= -\frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \frac{t-t_{n+1}}{\Delta t} \dd t = \frac{1}{2},\nonumber
+%  	}
+%  	{}
+%  	leading to the scheme:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{u}^{n+1} = \vect{u}^{n} + \frac{\Delta t}{2}\left( \vect{F}^{n+1} + \vect{F}^{n}\right).
+%  	}{}
+%  }
+%  
+%  \ejemplo
+%  { 
+%  	\textbf{Three steps Adams-Bashforth}. Let's consider the case $s=3$ and constant $\Delta t$ for an explicit method. In these conditions, 
+%the interpolant for the differential operator can be written:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{I}(t) & = \vect{F}^{n} \ell_n(t)
+%  		+ \vect{F}^{n-1} \ell_{n-1}(t) + \vect{F}^{n-2} \ell_{n-2}(t), \nonumber
+%  	}
+%  	{}
+%  	where
+%  	%
+%  	\Eqn
+%  	{
+%  		& \ell_{n}(t) = \frac{(t-t_{n-1})(t-t_{n-2})}{2\Delta t^2} , \nonumber \\
+%  		& \ell_{n-1}(t) = -\frac{(t-t_{n})(t-t_{n-2})}{\Delta t^2} , \nonumber \\
+%  		& \ell_{n-2}(t) = \frac{(t-t_{n})(t-t_{n-1})}{2\Delta t^2} , \nonumber
+%  	}
+%  	{}
+%  	and the coefficients are calculated as:
+%  	%
+%  	\Eqn
+%  	{
+%  		\beta_1 & =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \ell_{n} \dd t
+%  		=  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}             \frac{(t-t_{n-1})(t-t_{n-2})}{2\Delta t^2} \dd t = \frac{23}{12} ,\nonumber \\
+%  		\beta_2 & = \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} \ell_{n-1} \dd t         
+%  		= -\frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \frac{(t-t_{n})(t-t_{n-2})}{\Delta t^2} \dd t = -\frac{16}{12},\nonumber \\
+%  		\beta_3 & = \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} \ell_{n-2} \dd t         
+%  		= \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}}  \frac{(t-t_{n})(t-t_{n-1})}{2\Delta t^2} \dd t = \frac{5}{12},\nonumber
+%  	}
+%  	{}
+%  	leading to the scheme:
+%  	%
+%  	\Eqn
+%  	{
+%  		\vect{u}^{n+1} = \vect{u}^{n} + \frac{\Delta t}{12}\left( 23\vect{F}^{n} - 16\vect{F}^{n-1} + 5 \vect{F}^{n-2}\right).
+%  	}{}
+%  
+%      Note that if for each step $\Delta t$ changed its value, that is $\Delta t_1 = t_{n} - t_{n-1}$, $\Delta t_2 = t_{n-1} - t_{n-2}$, the 
+%Lagrange polynomials would depend on these step sizes:
+%      
+%      %
+%      \Eqn
+%      {
+%      	& \ell_{n}(t) = \frac{(t-t_{n-1})(t-t_{n-2})}{\Delta t_1(\Delta t_1 + \Delta t_2)} , \nonumber \\
+%      	& \ell_{n-1}(t) = -\frac{(t-t_{n})(t-t_{n-2})}{\Delta t_1\Delta t_2} , \nonumber \\
+%      	& \ell_{n-2}(t) = \frac{(t-t_{n})(t-t_{n-1})}{2\Delta t_2(\Delta t_1 + \Delta t_2)} , \nonumber
+%      }
+%      {}
+%      and therefore, for each step it would be necessary to calculate the coefficients which will depend on $(\Delta t_1,\Delta t_2)$.
+%  }
+%  
+%  In sight of the previous examples it is possible to obtain the coefficients for any desired value of $s$ in a similar manner. However, in 
+%order to implement an algorithm that controls the step size, it would require to calculate the coefficents  at each step of the simulation. 
+%This means a high computational cost for the algorithm in terms of computation time, which is undesirable.
+%     
+%     
+%
+%
+%
+%
+%
+%The multi-value formulation will permit to reduce the computational and implementation cost associated to the obtention of the coefficients 
+%$\beta_j$ of Adams methods.
+%
+%
+%For multivalue methods, instead of interpolating the differential operator, a truncated Taylor expansion is performed on the solution:
+%%
+%\Eqn
+%{
+%	\tilde{\vect{u}}(t) = \sum_{j=0}^{s} \frac{ \vect{u}_n^{j)} }{j!}(t - t_n)^j ,
+%}
+%{eq:Nordsieck_expansion} 
+%where is used the notation:
+%%
+%\Eqn
+%{
+%	\vect{u}_n^{j)} = \eval{\dv[j]{\vect{u}}{t}}_{t_n} = \vect{u}_n^{\overbrace{\prime\prime\cdots\prime}^{j}}, \qquad \vect{u}_n^{0)} 
+%=\vect{u}_n. \nonumber
+%}
+%{}
+%From the expansion (\ref{eq:Nordsieck_expansion}) it can be obtained the values of the $s$ first derivatives of $\tilde{\vect{u}}$ on 
+%$t_{n+1}$. In general, the $i-$th derivative can be written:
+%%
+%\Eqn
+%{
+%	\tilde{\vect{u}}_{n+1}^{i)} = \sum_{j=i}^{s} \frac{ \vect{u}_n^{j)} }{(j-i)!}\Delta t^{j-i} ,
+%}
+%{} 
+%where the same notation holds for $\tilde{\vect{u}}_{n+1}^{i)}$. For Nordsieck methods, instead of saving the values of the differential 
+%operator at the $s$ steps, the values of the $s$ derivatives are stored. In particular, the addends $\vect{y}_n^i = \Delta t^i 
+%\vect{u}_n^{i)} / i!$ of the expansion are considered in a new state vector in the following manner:
+%%
+%\Eqn
+%{
+%	\tilde{\vect{y}}_{n+1}^{i} 
+%	= \frac{\Delta t^i}{i!}\tilde{\vect{u}}_{n+1}^{i)} 
+%	= \sum_{j=i}^{s} \frac{ \vect{u}_n^{j)} }{i!(j-i)!}\Delta t^{j} 
+%	= \sum_{j=i}^{s} \frac{ j! }{i!(j-i)!}\vect{y}_n^{j} \nonumber
+%}
+%{}
+%hence, defining a matrix $B\in\M{s+1}{s+1}$ as:
+%%
+%\Eqn
+%{
+%	B_{ij} = 
+%	\begin{cases}
+%		0,                     &\quad \mbox{if }j<i \\
+%		\dfrac{ j! }{i!(j-i)!}, &\quad \mbox{if }j\geq i
+%	\end{cases}, \qquad i,j = 0,1,2\ldots,s   ,\nonumber
+%}
+%{}
+%we can write:
+%%
+%\Eqn
+%{
+%	\tilde{\vect{y}}_{n+1}^{i} = \sum_{j=i}^{s} B_{ij} \vect{y}_n^{j}, \qquad i=0,1,2\ldots,s. 
+%}
+%{}
+%The extrapolation $\tilde{\vect{y}}_{n+1}^{i}$ must be corrected by two parameters $\vect{\alpha}\in\R{N_v}$ and $r_i$ as:
+%%
+%\Eqn
+%{
+%	\vect{y}_{n+1}^{i} = \tilde{\vect{y}}_{n+1}^{i} + r_i \vect{\alpha}, \qquad i=0,1,2\ldots,s. 
+%}
+%{eq:Multivalue_step_y}
+%Note that (\ref{eq:Multivalue_step_y}) is equivalent to:
+%%
+%\Eqn
+%{
+%	\vect{u}_{n+1}^{i)} = \tilde{\vect{u}}_{n+1}^{i)} + \frac{r_i i!}{\Delta t^i} \vect{\alpha}. \nonumber
+%}
+%{}
+%It has not yet defined the value for the coefficients $r_i$ and $\vect{\alpha}$. This quantities will be obtained so the multi-value methods 
+%become equivalent to Adams methods as we will see in the next pages.
+%
+%To obtain the coefficients for the multi-value method, let's consider the case $N_v=1$, as once obtained for it, the case for $N_v>1$ is 
+%straightforward. For this case we can write:
+%%
+%\Eqn
+%{
+%	 y_{n+1}^{i} = \tilde{y}_{n+1}^{i} + r_i \alpha, \qquad i=0,1,2\ldots,s, 
+%}
+%{}
+%which is equivalent to: 
+%%
+%\Eqn
+%{
+%	u_{n+1}^{i)} = \tilde{u}_{n+1}^{i)} + \frac{i! }{\Delta t^i}r_i \alpha, \qquad i=0,1,2\ldots,s.
+%}
+%{} 
+%
+%The value of $\alpha$ is obtained by forcing that the solution for $i=1$, that is, the derivative satisfies the differential equation. In 
+%other words, $u_{n+1}^{1)}=u_{n+1}'=F_{n+1}=F(t_{n+1},u_{n+1})$. Also, as there are $s+2$ unknowns for $s+1$ equations we shall fix $r_1=1$ 
+%for convenience. With this restriction $\alpha$ is determined from the second equation of (\ref{eq:Multivalue_step_y}) as:
+%%
+%\Eqn
+%{
+%	\alpha = \Delta t F_{n+1} - \Delta t \tilde{u}_{n+1}' = \Delta t F_{n+1} - \Delta t\sum_{j=1}^{s} \frac{ u_n^{j)} }{(j-1)!}\Delta 
+%t^{j-1}. \nonumber
+%}
+%{}
+%Note that imposing this value for ${\alpha}$ introduces the information of the differential equation to the multivalue method. The rest of 
+%the coefficients $r_i$ can be obtained as:
+%%
+%\Eqn
+%{
+%	r_i & = \frac{\Delta t^i}{i!}
+%	      \frac{ u_{n+1}^{i)} - \tilde{u}_{n+1}^{i)} }
+%	           {\alpha} \nonumber 
+%	           \\
+%	    & = \frac{\Delta t^{i-1}}{i!}
+%	    \frac{ u_{n+1}^{i)} - \tilde{u}_{n+1}^{i)} }
+%	           {F_{n+1} - \tilde{u}_{n+1}^{1)}} \nonumber
+%	           \\
+%	    & = \frac{\Delta t^{i-1}}{i!}
+%	        \frac{ u_{n+1}^{i)} - \tilde{u}_{n+1}^{i)} }{F_{n+1} - \sum_{j=1}^{s} \frac{ u_n^{j)} }{(j-1)!}\Delta t^{j-1}} \nonumber.
+%}{eq:MV_coefficients}
+%
+%Notice that in this equation, for each $r_i$ there is associated a value of $u_{n+1}^{i)}$. Therefore, the value of the coefficients can be 
+%fixed to satisfy that $u_{n+1}^{i)}$ comes from the $i-1$-th derivative of an interpolant $I(t)$, which is called $I^{i-1)}$. That is, 
+%imposing:
+%%
+%\Eqn
+%{
+%	u_{n+1}^{i)} = \delta_{i0} u_n + I^{i-1)}_{n+1}, \qquad I^{i-1)}_{n+1} := I^{i-1)}(t_{n+1}), 
+%	\\ 
+%	i = 0,2,3\ldots,s, \nonumber
+%}
+%{}
+%where $\delta_{i0}$ is the delta Kronecker, and $I^{-1)}$ is defined as the integral:
+%%
+%\Eqn
+%{
+%	I^{-1)}(t_{n+1}) =  \int_{t_n}^{t_{n+1}} I \dd t.
+%}
+%{}
+%It has not been yet specified the stencil of the interpolant, which as we have seen. For $i>1$ the interpolant must include the differential 
+%operator evaluated at the next step, that is $\vect{F}_{n+1}$. However, in the case $i=0$ it depends on if the Adams method associated to 
+%the 
+%coefficient values is explicit or implicit. As has been stated previously, the interpolant takes a different form depending on this 
+%characteristic of the scheme. However, for Bashforth methods, the value obtained for $u_{n+1}$ is exactly the value of the extrapolation, 
+%when the derivatives of $u_n$ are computed as the derivatives (of one order less) of $I$ in $t_n$, that is: 
+%%
+%\Eqn
+%{
+%	u_{n+1} = u_n + \int_{t_n}^{t_{n+1}} I \dd t = u_n + \sum_{j=1}^{s} F_{n+1-j} \, \ell_{n+1-j}^{-1)}(t_{n+1}), \nonumber
+%}
+%{}
+%%
+%\Eqn
+%{
+%	\tilde{u}_{n+1} &= {u}_n + \sum_{i=1}^{s} \frac{ \Delta t^{i} }{i!}{u}_n^{i)} \nonumber \\
+%	& = {u}_n + 
+%	\sum_{i=1}^{s} \frac{ \Delta t^{i} }{i!}\left(\sum_{j=1}^{s} F_{n+1-j} \, \ell_{n+1-j}^{i-1)}(t_n)\right) \nonumber \\
+%	& = {u}_n + \sum_{j=1}^{s} F_{n+1-j} \, \left( \sum_{i=1}^{s} \frac{ \Delta t^{i} }{i!} \ell_{n+1-j}^{i-1)}(t_n)\right). \nonumber
+%}
+%{}
+%As for Adams Bashforth methods, it is satisfied that:
+%%
+%\Eqn
+%{
+%	\ell_{n+1-j}^{-1)}(t_{n+1}) = \sum_{i=1}^{s} \frac{ \Delta t^{i} }{i!} \ell_{n+1-j}^{i-1)}(t_n), \nonumber
+%}
+%{}
+%we have that the value at the next step $u_{n+1}$ is the same as the extrapolation $\tilde{u}_{n+1}$, and $r_0=0$ for explicit Adams. Note 
+%that this can also be intuited from the equation:
+%%
+%\Eqn
+%{
+%	r_i 
+%	= \frac{u_{n+1}^{i)}-\tilde{u}_{n+1}^{i)}}{F_{n+1}-\tilde{u}_{n+1}'} \frac{\Delta t^{i-1}}{i!} . \nonumber
+%}
+%{}
+%For the case $i=0$, $r_0$ represents the difference between the extrapolation $\tilde{u}_{n+1}$ and the solution given by the scheme 
+%${u}_{n+1}$. This means that for implicit methods, it shall be obtained by determining ${u}_{n+1}$ with the interpolant for implicit methods 
+%which we will call $I$ and $\tilde{u}_{n+1}$ with the interpolant for explicit methods which we will call $\tilde{I}$. Their Lagrange 
+%polynomials respectively will be called $\tilde{\ell}_k$ and $\ell_k$. Therefore, we can write $r_0$ for implicit methods as:
+%%
+%\Eqn
+%{
+%	r_0 
+%	& = \frac{{u}_{n+1}-\tilde{u}_{n+1}}{F^{n+1} - \tilde{u}_{n+1}'} \frac{1}{\Delta t} \nonumber \\
+%	& = \frac{ \sum_{j=0}^{s-1} F^{n+1-j} \ell_{n+1-j}^{-1)} - \sum_{j=1}^{s} F^{n+1-j} \tilde{\ell}_{n+1-j}^{-1)} }{F^{n+1} - \sum_{j=1}^{s} 
+%F^{n+1-j} \tilde{\ell}_{n+1-j}'} \frac{1}{\Delta t}\nonumber \\
+%	& = \beta_0 \frac{F^{n+1-j} +  \sum_{j=1}^{s-1} F^{n+1-j} \beta_j/\beta_0 - \sum_{j=1}^{s} F^{n+1-j} \tilde{\beta}_j/\beta_0  }{F^{n+1} - 
+%\sum_{j=1}^{s} F^{n+1-j} \tilde{\ell}_{n+1-j}'} \nonumber \\
+%	& = 
+%	\beta_0.
+%}
+%{}
+%Hence, for Adams Moulton, the first coefficient $r_0$ for the multivalue expression is the same as the coefficient $\beta_0$ of the 
+%classical approach. To check the veracity of this claims, let's consider some examples.
+%\ejemplo
+%{
+%	\textbf{Two steps Adams Bashforth:} For this method we have that
+%	%
+%	\Eqn
+%	{
+%		\ell_{n}^{-1)}(t_{n+1}) &= \frac{3\Delta t}{2} = \beta_1\Delta t,  &
+%		\ell_{n}'(t_{n}) = \frac{1}{\Delta t} , \nonumber \\
+%		\ell_{n-1}^{-1)}(t_{n+1}) &= -\frac{\Delta t}{2} = \beta_2\Delta t, & \ell_{n-1}'(t_{n}) = -\frac{1}{\Delta t}, \nonumber
+%	}{}
+%	and is satisfied that
+%	%
+%	\Eqn
+%	{
+%		\ell_{n}^{-1)}(t_{n+1}) 
+%		= \sum_{i=1}^{2} \frac{\Delta t^i}{i!}\ell_{n}^{i-1)}(t_{n}) 
+%		= \Delta t + \frac{\Delta t}{2} 
+%		= \frac{3\Delta t}{2}, \nonumber \\
+%		\ell_{n-1}^{-1)}(t_{n+1}) 
+%		= \sum_{i=1}^{2} \frac{\Delta t^i}{i!}\ell_{n-1}^{i-1)}(t_{n})
+%		= 0- \frac{\Delta t}{2} =- \frac{\Delta t}{2}, \nonumber
+%	}{}
+%    hence, for two steps Adams Bashforth $r_0=0$ and $\tilde{u}_{n+1}={u}_{n+1}$.
+%}
+%\ejemplo
+%{
+%	\textbf{Two steps Adams Moulton:} For this method we have that
+%	%
+%	\Eqn
+%	{
+%		u_{n+1}& = u_n + \frac{\Delta t}{2}\left( F^{n+1}  + F^{n}\right) , \nonumber \\
+%		\tilde{u}_{n+1}& = u_n + \frac{\Delta t}{2}\left(3 F^{n}  - F^{n}\right) , \nonumber \\
+%		\tilde{u}_{n+1}'& = u_n' + u_n'' \Delta t = F_n + \underbrace{F_n - F_{n-1}}_{\tilde{I}'_{n+1}} =  2F_n - F_{n-1}, \nonumber
+%	}
+%	{}
+%	And $r_0$ can be computed as: 
+%	%
+%	\Eqn{
+%		r_0 = \frac{1}{2} \frac{ F^{n+1} + F^{n} -3F^{n} + F^{n-1}}{ F^{n+1} - 2F_n + F_{n-1} } = \frac{1}{2} = \beta_0. \nonumber
+%	}{}
+%}
+%Whenever we want to determine the coefficients for $i>1$ (for both explicit and implicit methods), the obtention of $r_i$ must be done with 
+%an interpolant which includes the value of $F$ at $t_{n+1}$. As the interpolant is of grade $s-1$, if we do not inclued the values at 
+%$t_{n+1}$ the value of $u_{n+1}^{s)}$ would be the same as $u_{n}^{s)}$ which is incorrect. For this case we have:
+%%
+%\Eqn
+%{
+%	u_{n+1}^{i)}
+%&   =
+%    \delta_{i0} u_n + I^{i-1)}_{n+1} = 
+%	\delta_{i0} u_n + \sum_{j=0}^{s-1} F_{n+1-j} \, \ell_{n+1-j}^{i-1)}(t_{n+1}), \nonumber \\
+%	u_{n+1}^{i)} 
+%&	=
+%	 \sum_{j=i}^{s} \frac{ u_n^{j)} }{(j-i)!}\Delta t^{j-i} 
+%	 + 
+%	 r_i \Delta t \left( F_{n+1} -\sum_{j=1}^{s} \frac{ u_n^{j)} }{(j-1)!}\Delta t^{j-1} \right) \nonumber
+%}
+%{}
+%
+%
+%\Eqn
+%{
+%	r_i 
+%	& = 
+%	\dfrac{\Delta t^{i-1}}{i!}
+%	\dfrac{ u_{n+1}^{i)} -  \tilde{u}_{n+1}^{i)} }
+%	{F_{n+1} - \tilde{u}_{n+1}' },\nonumber 
+%	\\
+%	& = 
+%	\dfrac{\Delta t^{i-1}}{i!}
+%	\dfrac{\delta_{i0} u_n + \sum_{j=0}^{s-1} F_{n+1-j} \, \ell_{n+1-j}^{i-1)}(t_{n+1}) - \tilde{u}_{n+1}^{i)} }
+%	{F_{n+1} - \tilde{u}_{n+1}' }\nonumber \\ 
+%	& = 
+%	\dfrac{\Delta t^{i-1}}{i!}\ell_{n+1}^{i-1)}(t_{n+1}) \, \eta_i,\nonumber
+%}{}
+%where:
+%%
+%\Eqn
+%{
+%	\eta_i & = \dfrac{ \dfrac{\delta_{i0} u_n}{\ell_{n+1}^{i-1)}(t_{n+1})}  + \sum_{j=0}^{s-1} F_{n+1-j} \, 
+%\dfrac{\ell_{n+1-j}^{i-1)}(t_{n+1})}{\ell_{n+1}^{i-1)}(t_{n+1})} - \dfrac{\tilde{u}_{n+1}^{i)}}{\ell_{n+1}^{i-1)}(t_{n+1})} } 
+%	{F_{n+1} - \tilde{u}_{n+1}' } \nonumber \\
+%	& = 1.
+%}
+%{}
+%And therefore, the coefficients can be written as:
+%%
+%\Eqn
+%{   r_0 & = 
+%	\begin{cases}
+%		0, &\qquad \mbox{for explicit methods.} \\
+%		\dfrac{\ell_{n+1}^{-1)}(t_{n+1})}{\Delta t} = \beta_0 , &\qquad \mbox{for implicit methods.} 
+%	\end{cases}, \nonumber
+%\\ \nonumber
+%\\
+%	r_i & = \dfrac{\Delta t^{i-1}}{i!}\ell_{n+1}^{i-1)}(t_{n+1}) , \qquad \mbox{for } i>1 .
+%}{eq:Multivalue_coefficients}
+%To see that indeed, (\ref{eq:Multivalue_coefficients}) holds, let's consider an example.
+%\ejemplo
+%{\textbf{Two steps Adams} For this method we have seen that for the explicit $r_0 = 0$ and to satisfy the differential equation $r_1 = 1$ 
+%for both explicit and implicit methods ($u_{n+1}'=F_{n+1}$). The only remaining coefficients are $r_0$ and $r_2$, we will see that both can 
+%be computed as given by (\ref{eq:Multivalue_coefficients}).
+%	%
+%	\Eqn
+%	{
+%		&\tilde{u}_{n+1}= u_n + u_n'\Delta t + u_n''\Delta t^2 / 2, \nonumber\\
+%		&\tilde{u}_{n+1}'= u_n' + u_n''\Delta t , \nonumber\\
+%		&\tilde{u}_{n+1}''= u_n'', \nonumber
+%	}
+%	{}
+%	and we saw that $\ell_{n+1}'(t_{n+1}) = 1 / \Delta t$, $\ell_{n+1}^{-1)}(t_{n+1})  = \Delta t / 2$. As was explained the second 
+%derivative is computed as the first derivative of the interpolant $I$.
+%	
+%	Therefore, we have that:
+%	%
+%	\Eqn
+%	{
+%		\eta_0 
+%		& = \dfrac{ \dfrac{ u_n}{\ell_{n+1}^{-1)}(t_{n+1})}  + \sum_{j=0}^{1} F_{n+1-j} \, 
+%\dfrac{\ell_{n+1-j}^{-1)}(t_{n+1})}{\ell_{n+1}^{-1)}(t_{n+1})} - \dfrac{\tilde{u}_{n+1}}{\ell_{n+1}^{-1)}(t_{n+1})} } 
+%		{F_{n+1} - \tilde{u}_{n+1}' } \nonumber \\
+%		& = \dfrac{ \sum_{j=0}^{1} F_{n+1-j} \, \dfrac{\ell_{n+1-j}^{-1)}(t_{n+1})}{\ell_{n+1}^{-1)}(t_{n+1})} - \dfrac{u_n'\Delta t + 
+%u_n''\Delta t^2 / 2}{\ell_{n+1}^{-1)}(t_{n+1})} } 
+%		{F_{n+1} - \tilde{u}_{n+1}' } \nonumber \\
+%		& = 1. \nonumber\\
+%		\eta_2 
+%		& = \dfrac{ \sum_{j=0}^{1} F_{n+1-j} \, \dfrac{\ell_{n+1-j}^{1)}(t_{n+1})}{\ell_{n+1}^{1)}(t_{n+1})} - 
+%\dfrac{\tilde{u}_{n+1}^{1)}}{\ell_{n+1}^{1)}(t_{n+1})} } 
+%		{F_{n+1} - \tilde{u}_{n+1}' } \nonumber  \\
+%		& = \dfrac{ \sum_{j=0}^{1} F_{n+1-j} \, \dfrac{\ell_{n+1-j}^{1)}(t_{n+1})}{\ell_{n+1}^{1)}(t_{n+1})} - \dfrac{u_n' + u_n''\Delta 
+%t}{\ell_{n+1}^{1)}(t_{n+1})} } 
+%		{F_{n+1} - \tilde{u}_{n+1}' } \nonumber \\
+%		& = 1. \nonumber
+%	}
+%	{}
+%	
+%	And finally the coefficients can be calculated as:
+%	%
+%	\Eqn
+%	{r_0 = \ell_{n+1}^{-1)}(t_{n+1}) / \Delta t  = 1 / 2, \qquad r_2 = \ell_{n+1}^{1)}(t_{n+1}) \Delta t/ 2 = 1/2.  \nonumber}
+%	{}
+%}
+%Hence, we have seen that multi-value methods are equivalent to Adams methods. When formulating the multi-step methods in the form given by 
+%(\ref{eq:Multivalue_step_y}), the change of step size is very simple as if we calculate $\vect{y}_{n+1}^i $ for a given $\Delta t_1$, the 
+%solution for another step size $\Delta t_2$ is given by $\Delta t_2^i \vect{y}_{n+1}^i / \Delta t_2^i$. The change of the method from Adams 
+%family is done by simply changing $r_i$. Besides, this formulation permits to write the multi-step methods on a more compact form defining 
+%two new state vectors $Y^{n},U^{n}\in\M{s+1}{N_v}$ given by
+%%
+%\Eqn
+%{
+%	Y^{n} 
+%	= 
+%	\begin{bmatrix}
+%		\vect{y}_{n}^0 \\
+%		\vdots    \\
+%		\vect{y}_{n}^i \\
+%		\vdots    \\
+%		\vect{y}_{n}^s
+%	\end{bmatrix}
+%= 
+%\begin{bmatrix}
+%	\vect{u}_{n} \\
+%	\vdots    \\
+%	\Delta t^i\vect{u}_{n}^{i)} / i! \\
+%	\vdots    \\
+%	\Delta t^s\vect{u}_{n}^{s)}  / s!
+%\end{bmatrix}
+%= A U^n,
+%}
+%{}
+%where $A\in\M{s+1}{s+1}$ is given by $A_{ij}=\delta_{ij} \Delta t^i/i!$. Thus, we can write:
+%%
+%\Eqn
+%{
+%	Y^{n+1} & = BY^n + \vect{r}\otimes \vect{\alpha}, \nonumber \\
+%	 \\
+%	U^{n+1} & = A^{-1} B A U^n + A^{-1} \vect{r}\otimes \vect{\alpha}, \nonumber 
+%}{}
+%where $\application{\otimes}{\R{n}\times\R{m}}{\M{n}{m}}$ denotes the tensor product between real vector spaces. Note that for explicit 
+%methods, the computation of $Y^{n+1}$ (or equivalently $U^{n+1}$) is straightforward as the computation of $\vect{y}_{n+1}^0$ is exactly 
+%$\tilde{\vect{y}}_{n+1}^0$ and can be decoupled from the rest. This means that $\vect{\alpha}$ is known from the initial conditions. 
+%
+%The previous circumstance is taken in advantage by \textit{predictor-corrector multi-value} methods, which are also equivalent to 
+%predictor-corrector methods based on pairs of Adams-Bashforth and Adams-Moulton. For multi-value methods, they can be written as:
+%%
+%\Eqn
+%{
+%	Y^{n+1} & = Y^n + \vect{r}\otimes \tilde{\vect{\alpha}}, \nonumber 
+%}{}
+%where $ \tilde{\vect{\alpha}} = \Delta t F(\tilde{\vect{y}}_{n+1}^0, t_{n+1}) - \tilde{\vect{y}}_{n+1}^0$, and $\vect{r}$ is the 
+%coefficients vector. Note that the multi-value formulation permits to compute the Adams-Bashforth-Moulton methods and to easily change the 
+%method changing $\vect{r}$ and the step size scaling the solution $U^{n+1}$ by a proper $A^{-1}$.
+%
+%     

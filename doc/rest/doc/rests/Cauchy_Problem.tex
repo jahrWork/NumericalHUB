@@ -1,0 +1,152 @@
+\section{Overview}
+
+This library is designed to solve the Cauchy problem. The Cauchy problem is defined as:
+
+\begin{equation*}
+\frac{\text{d}\vec{U}}{\text{d}t}=\vec{f}\ (\vec{U},\ t) 
+\end{equation*}
+\begin{equation*}
+\vec{U}=\vec{U}_0
+\end{equation*}
+
+The library has two modules: \textbf{Cauchy\_problem} and \textbf{Temporal\_Schemes}. However, the API is contained only in the \textbf{Cauchy\_problem} module.
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{API\_Example\_Cauchy\_Problem.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Cauchy\_Problem}. 
+
+This example consists of a trajectory. This problem needs to solve a second degree equation. The problem approach is:
+
+\begin{equation*}
+\frac{\text{d}}{\text{d}t}\begin{pmatrix}
+U_{1}\\
+U_{2}
+\end{pmatrix}
+=
+\begin{bmatrix}
+0 & 1 \\
+-a \cdot t & 0
+\end{bmatrix}
+\begin{pmatrix}
+U_{1} \\
+U_{2}
+\end{pmatrix}
++
+\begin{pmatrix}
+0 \\
+b
+\end{pmatrix}
+\end{equation*}
+
+It is necessary to give an initial condition of position and velocity. In this example:
+
+\begin{equation*}
+\begin{pmatrix}
+U_{1}(0)\\
+U_{2}(0)
+\end{pmatrix}
+=
+\begin{pmatrix}
+5 \\
+0
+\end{pmatrix}
+\end{equation*}
+
+Where $U_{1}(t)$ is referred to the position and $U_{2}(t)$ is referred to the velocity.
+
+\newpage
+
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+\lstinputlisting[language=Fortran]{../sources/Cauchy_example.f90}
+\newpage
+
+\section{Cauchy\_problem module}
+
+\subsection*{Cauchy\_ProblemS}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Cauchy_ProblemS ( Time_Domain , Differential_operator , Scheme , Solution )   \end{lstlisting}   
+
+The subroutine \textbf{Cauchy\_ProblemS} calculates the solution to a Cauchy problem. Previously to using it, the initial conditions must be imposed. The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{2.5cm}| l | p{6cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				Time\_Domain & vector of reals & in &  Time domain where the solution wants to be calculated.  \\ \hline
+				
+				Differential\_operator &  vector function: $\mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}$  & in & It is the funcition $\vec{f}\ (\vec{U},\ t) $ described in the overview.  \\ \hline
+				
+				Scheme & temporal scheme  & in (optional) & Defines the scheme used to solve the problem. If it is not specified it uses a Runge Kutta of four steps by default.    \\ \hline
+				
+				Solution & vector of reals  & out &  Contains the solution $\vec{U}(t)$. The first index represents the time, the second index contains the components of the solution.  \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Cauchy\_ProblemS} arguments}
+\end{table}
+
+\newpage
+
+\subsection{Temporal schemes}
+
+The schemes that are available in the library are listed below. $h$ denotes the time step.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.5}
+			\begin{tabular}{| l | l | l |}
+				
+				\hline
+				
+				\bf Scheme & \bf Name (in the code) & \bf Formula  \\ \hline \hline
+				
+				Euler & Euler & $  U_{n+1} = U_{n}+ h f(t_{n}, U_{n})$ \\ \hline
+				
+				Runge Kutta 2  &  Runge\_Kutta2   &  
+				$ U_{n+1} = U_{n}+ h(\frac{k_{1}+k_{2}} {2} ) $ \\
+				& & $\quad k_{1}= f(t_{n},U_{n}) $ \\
+				& & $\quad k_{2}=f(t_{n}+h, U_{n}+hk_{1}) $ \\ \hline
+				
+				Runge Kutta 4 & Runge\_Kutta4 &  $ U_{n+1} = U_{n}+ \frac{1}{6}h (k_{1}+2k_{2}+2k_{3}+k_{4}) $ \\
+				& & $\quad k_{1}= f(t_{n},U_{n}) $ \\
+				& & $\quad k_{2}=f(t_{n}+\frac{1}{2}h, U_{n}+\frac{1}{2}hk_{1}) $ \\
+				& & $\quad k_{3}=f(t_{n}+\frac{1}{2}h, U_{n}+\frac{1}{2}hk_{2}) $\\
+				& & $\quad k_{4}= f(t_{n}+h,U_{n}+hk_{3}) $  \\ \hline
+				
+				Leap Frog & Leap\_Frog  & $ U_{n+2}=U_{n}+2f(x_{n+1},U_{n+1})$ \\ \hline
+				
+				Adams Bashforth 2 & Adams\_Bashforth  & $ U_{n+2}=U_{n+1}+ h \left( \frac{3}{2} f(t_{n+1},U_{n+1}) - \frac{1}{2} f(t_{n},U_{n}) \right) $  \\ \hline
+				
+				Adams Bashforth 3  & Adams\_Bashforth3  & $  U_{n+3} = U_{n+2}+ h \left( \frac{23}{12} f(t_{n+2},U_{n+2}) - \right.$ \\
+				& & $\qquad\left.-\frac{4}{3} f(t_{n+1},U_{n+1}) + \frac{5}{12} f(t_{n},U_{n}) \right) $ \\ \hline
+				
+				Predictor Corrector & Predictor\_Corrector1  & $ \bar{U}_{n+1}=U_{n}+hf(t_{n},U_{n}) $ \\
+				& & $ U_{n+1}=U_{n}+\frac{1}{2}h(f(t_{n+1},\bar{U}_{n+1})+f(t_{n},U_{n} )) $\\ \hline
+				
+				Euler Inverso & Inverse\_Euler & $ U_{n+1}=U_{n}+hf(t_{n+1},U_{n+1}) $\\ \hline
+				
+				Crank Nicolson & Crank\_Nicolson  & $  U_{n+1} = U_{n}+\frac{1}{2} h( f(t_{n+1}, U_{n+1})+f(t_{n},U_{n})) $ \\ \hline
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of the available schemes }
+\end{table}

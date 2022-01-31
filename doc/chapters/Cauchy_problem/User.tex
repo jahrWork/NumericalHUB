@@ -1,0 +1,540 @@
+
+    
+ %*************************************************************************
+ \chapter{Cauchy Problem  }
+ %*************************************************************************
+    \label{User:Cauchy_Problem}
+\section{Overview}
+
+In this chapter, some examples of the following Cauchy problem: 
+\begin{equation*}
+\frac{\text{d}\vect{U}}{\text{d}t}=\vect{f}\ (\vect{U},\ t), \quad  \vect{U}(0) =\vect{U}^0,  \ 
+\quad \vect{f}:\mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}
+\end{equation*}
+are presented. 
+
+It is started with a scalar    first-order ordinary differential equation $( N = 1) $ implemented in the
+\verb|First_order_ODE|. The second example is devoted to the oscillations of a mass attached to a spring. The movement is governed by a second-order scalar equation implemented in \verb|Linear_Spring|.
+The third example simulates the famous Lorenz attractor. 
+
+To alert of possible issues associated with numerical simulations, some other examples are shown. 
+Absolute stability regions for a second and fourth-order Runge-Kutta method are obtained in \verb|Stability_regions_RK2_RK4|. The absolute stability regions allow determining the stability of numerical simulations. 
+In the subroutine \verb|Error_solution|, the error associated to a numerical computation is discussed and finally, the convergence rate of the numerical solution to the exact solution is analyzed in the subroutine \verb|Convergence_rate_RK2_RK4|.  
+
+All functions and subroutines used in this chapter are gathered in a Fortran module called: \verb|Cauchy_problem|. To make use of these functions the statement: 
+\verb|use Cauchy_problem|
+should be included at the beginning of the program.
+       %
+       \vspace{0.5cm} 
+       \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+       {subroutine Cauchy_problem_examples}
+       {end subroutine}{API_Example_Cauchy_Problem.f90}
+       
+        
+       
+ %__________________________________________________________        
+ \section{First order ODE}
+ The following scalar first order ordinary differential equation  is considered:
+  \begin{equation*}
+    \frac{du}{dt} = - 2u(t),
+  \end{equation*}
+ with the initial condition $u(0)=1$. This Cauchy problem could describe the velocity along time of a punctual mass submitted to viscous damping.
+  This problem has the following analytical solution:
+ \begin{equation*}
+    u(t) = e^{-2t}.
+ \end{equation*}
+The implementation of the problem requires the definition of the differential operator $ \vect{f}\ (\vect{U},\ t) $ as a function.
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Cauchy_Problem.f90}
+{function F1}
+{end function}{API_Example_Cauchy_Problem.f90}
+
+This function is used by the subroutine  \verb|Cauchy_ProblemS| to compute the numerical solution. Additionally, the time domain and the initial condition are required. 
+\newpage
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Cauchy_Problem.f90}
+{subroutine First_order_ODE}
+{contains}{API_Example_Cauchy_Problem.f90}
+
+\twographs{ \FirstOrderODE{(a)} }{ \FirstOrderODEerror{(b)} }
+          { Numerical solution and error on the computation of the first order Cauchy problem. (a) Numerical solution of the first order Cauchy problem. (b) Error of the solution along time. }{fig:FirstOrderODE}
+
+The numerical solution obtained using this code can be seen in figure \ref{fig:FirstOrderODE}. In it can be seen that the qualitative behavior of the solution $u(t)$ is the same as the described by the analytical solution. However, quantitative behavior is not exactly equal as it is an approximated solution. In figure \ref{fig:FirstOrderODE}(b) it can be seen that the solution tends to zero slower than the analytical one.
+
+
+\FloatBarrier
+
+
+ %__________________________________________________________ 
+ \section{Linear spring}
+ The second example is a second-order differential equation. It could represent the oscillations a punctual mass suspended by a linear spring whose stiffness increases along time. The problem is integrated in a temporal domain: $\Omega \subset \mathbb{R} : $ $\{t\in  [0,4]\}.$ The displacement $u(t)$ of the mass  is governed by the equation:
+\begin{equation*}
+    \frac{\mbox{d}^2 u}{\mbox{d} t^2} + \ a \ t \ u(t) = 0.
+\end{equation*}
+ First of all, the problem must be formulated as a first order differential equation. 
+ This is done by means of the transformation:
+ \begin{equation*}
+    u(t) = U_1 (t), \qquad \frac{\mbox{d} u}{\mbox{d} t} = U_2(t),
+ \end{equation*}
+ which leads to the system: 
+ \begin{equation*}
+ \frac{\text{d}}{\text{d}t}\begin{pmatrix}
+ U_{1}\\
+ U_{2}
+ \end{pmatrix}
+ =
+ \begin{bmatrix}
+ 0 & 1 \\
+ -a \ t & 0
+ \end{bmatrix}
+ \begin{pmatrix}
+ U_{1} \\
+ U_{2}
+ \end{pmatrix}.
+ \end{equation*}
+ 
+ It is necessary to give an initial condition of position $ U_1 $  and velocity $ U_2$. In this example, the movement starts with the mass with zero velocity and with the elongated spring.
+ 
+ \begin{equation*}
+ \begin{pmatrix}
+ U_{1}(0)\\
+ U_{2}(0)
+ \end{pmatrix}
+ =
+ \begin{pmatrix}
+ 5 \\
+ 0
+ \end{pmatrix}.
+ \end{equation*}
+ 
+ 
+ The implementation of the problem requires the definition of the differential operator  $ \vect{f}\ (\vect{U},\ t) $ as a vector function:
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {function F_spring}
+ {end function}{API_Example_Cauchy_Problem.f90}
+
+This function is used as an input argument for the subroutine \verb|Cauchy_ProblemS|. In this example, the optional argument \verb|Scheme| is used to select the \verb|Crank_Nicolson| numerical scheme to integrate the problem. The solution \verb|U| has two indexes. The first stands for the different time steps along the integration and the second one stands for the two variables of the system: position and velocity. 
+
+
+  \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {subroutine Linear_Spring}
+ {contains}{API_Example_Cauchy_Problem.f90}
+
+  \twographs{ \LinearSpringU{(a)} }{ \LinearSpringVelocity{(b)} }
+  { Numerical solution of the Linear spring movement. (a) Position along time. (b) Velocity along time. }{fig:SecondOrderODE}
+  
+ 
+  The numerical solution of the problem is shown in figure \ref{fig:SecondOrderODE}. It can be seen how the initial condition for both $U_1$ and $U_2$ are satisfied and the oscillatory behavior of the solution.
+  
+ 
+  
+  
+  \FloatBarrier
+   %__________________________________________________________ 
+  \section{Lorenz Attractor}
+   Another interesting example is the differential equation system from which the strange Lorenz attractor was discovered. The Lorenz equations are a simplification of the Navier-Stokes fluid equations used to describe the weather behavior along time. The behavior of the solution is chaotic for certain values of the parameters involved in the equation. The equations are written:
+  
+  \begin{equation*}
+  \frac{\text{d}}{\text{d}t}\begin{pmatrix}
+  x\\
+  y \\
+  z
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+   & a \ (y-z)\\
+   & x \ (b - z)- y \\
+   & x \ y-c \ z
+  \end{pmatrix},
+  \end{equation*}
+  along with the initial conditions:
+ \begin{equation*}
+  \begin{pmatrix}
+  x(0) \\
+  y(0) \\
+  z(0)
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+  12\\
+  15\\
+  30
+  \end{pmatrix}.
+ \end{equation*}
+
+ The implementation of the problem requires the definition of the differential operator $ \vect{f}\ (\vect{U},\ t) $  as a vector function:
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {function F_L}
+ {end function}{API_Example_Cauchy_Problem.f90}
+ 
+ The previous function will be used as an input argument for the subroutine that solves the Cauchy Problem. 
+ In this case, a fourth order  Runge--Kutta scheme is used to integrate the problem. 
+
+ 
+ \newpage
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {subroutine Lorenz_Attractor}
+ {contains}{API_Example_Cauchy_Problem.f90}
+
+  The chaotic behaviour appears for the values $a =10$, $b=28 $ and $c=8/3$. When solved for these values, the phase planes of $(x(t),y(t))$ and $(x(t),z(t))$ show the famous shape of the Lorenz attractor. Both phase planes can be observed on figure \ref{fig:LorenzAttractor}.
+  \twographs{ \LorenzPhasePlaneXY{(a)} }{ \LorenzPhasePlaneXZ{(b)} }
+ {Solution of the Lorenz equations. (a) Phase plane $(x,y)$ of the Lorenz attractor. (b) Phase plane $(x,z)$ of the Lorenz attractor. }{fig:LorenzAttractor}
+ 
+
+
+
+ 
+ \FloatBarrier
+ 
+  %__________________________________________________________ 
+ \section{Stability regions}
+ 
+  One of the capabilities of the library is to compute the region of absolute stability of a given temporal scheme. 
+  In the following example, the stability regions of second-order and fourth-order  Runge-Kutta methods are determined. 
+ 
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {do j=1}
+ {end do}{API_Example_Cauchy_Problem.f90}
+ 
+ \twographs{\input{./doc/chapters/Cauchy_problem/figures/RK2a.tex}}
+           {\input{./doc/chapters/Cauchy_problem/figures/RK4b.tex}}
+           {Absolute stability regions. (a) Stability region of second order Runge-Kutta. (b) Stability region of fourth order  Runge-Kutta.}{fig:RK24}
+ 
+ 
+ \FloatBarrier
+ 
+ 
+   
+      
+           
+           
+           
+           
+ 
+ %__________________________________________________________ 
+ \newpage    
+ \section{Richardson extrapolation to calculate error}
+   
+  The library also computes the error of the obtained solution of a Cauchy problem using the Richardson extrapolation. 
+     The subroutine \verb|Error_Cauchy_Problem|
+      uses internally two different  step sizes  $\Delta t$ and $\Delta t/2$, respectively, and estimates the error as:
+     %
+     \begin{align*}
+     	    E = \frac{\norm{ \vect{u_1}^{n} - \vect{u_2}^{n} }}{1-1 /2^{q}},
+     \end{align*}
+     where $E$ is the estimated error, $u_1^n$ is the solution at the final time calculated with the given time step, $u_2^n$ is the solution at the final time calculated with $ \Delta t /2 $ and $q$ is the order of the temporal scheme used for calculating both solutions.
+     
+     This example estimates the error of a Van der Pol oscillator using a second-order Runge-Kutta.
+     
+     
+     \vspace{0.5cm} 
+      \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+      {call Error_Cauchy_Problem}
+      {Solution}{API_Example_Cauchy_Problem.f90}
+     
+      \twographs{\input{./doc/chapters/Cauchy_problem/figures/VanderPol_errora.tex}}
+                {\input{./doc/chapters/Cauchy_problem/figures/VanderPol_errorb.tex}}
+                {Integration of the Van der Pol oscillator.
+                 (a) Van der Pol solution,
+                 (b) Error of the solution. }
+                 {fig:VanderPolError} 
+   
+   
+   In figure \ref{fig:VanderPolError} the solution together with its error is plotted. Since the error varies significantly along  time, the variable  time step is required to maintain error under tolerance.
+  
+  %__________________________________________________________
+  \newpage                
+  \section{Convergence rate with time step}
+   A temporal scheme is said to be of order q when its global error with $\Delta t \rightarrow 0 $ goes to zero as $ O( \Delta t^q )$. 
+     It means that high order numerical methods allow bigger time steps to reach a precise error tolerance. 
+     The subroutine \verb|Temporal_convergence_rate| determines the error of the numerical solution as a function of the number of time steps $ N $. This subroutine internally integrates a sequence of refined $ \Delta t_i $ and, by means of the Richardson extrapolation, determines the error.  
+     
+     In the following example, the error or convergence rate  of a second and fourth-order  Runge-Kutta for the Van der Pol oscillator are obtained. 
+       \vspace{0.5cm} 
+        \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+        {call Temporal_convergence_rate}
+        {Runge_Kutta4}{API_Example_Cauchy_Problem.f90}
+       
+        \twographs{\input{./doc/chapters/Cauchy_problem/figures/Convergencea.tex}}
+                  {\input{./doc/chapters/Cauchy_problem/figures/Convergenceb.tex}}
+                  {Convergence rate of a second and fourth order Runge--Kutta schemes with time step.
+                     (a) Van der Pol solution.
+                     (b) Error versus time steps. }
+                     {fig:Convergence}   
+     
+      In the figure \ref{fig:Convergence}a the Van der Pol solution is shown. 
+      In figure \ref{fig:Convergence}b the errors versus the number of time steps $ N $ are plotted in logarithmic scale.  
+      It can be observed that the fourth-order Runge-Kutta has an approximate slope of 4, whereas the slope of the second-order Runge--Kutta scheme is close to two.    
+   
+   
+  
+ %_____________________________________________________________
+ \newpage                            
+ \section{Advanced high order numerical methods}
+ When high precision requirements are necessary, high order temporal schemes must be used. 
+ This is the case of orbits or satellite missions. These simulations require very small errors during their temporal integration. 
+ Generally, it is said that a numerical method is of order $ q $ when its global error is  $ O(\Delta t^q) $.
+ This means that high order numerical methods require greater time steps than low order schemes to accomplish the same error. 
+ Consequently, high order methods have lower computational effort than low order methods. 
+ The following subroutine shows the performance of  some advanced high order methods when simulating orbit problems:
+        \vspace{0.2cm} 
+        \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+        {subroutine Advanced_Cauchy_problem_examples}
+        {end subroutine}{API_Example_Cauchy_Problem.f90}
+ 
+ 
+ 
+  
+                
+  \newpage 
+  %_______________________________________________________
+   \section{Van der Pol oscillator}
+   The van der Pol oscillator is a non-conservative stable oscillator which is applied to physical and biological sciences. Its  second order differential equation is:
+  \begin{align*}
+      \ddot x - \mu \ ( 1 - x^2) \dot x + x = 0.
+  \end{align*}
+  This equation can be expressed as the following first order system: 
+  %
+  \begin{align*}
+      \dot{x} & = v, \\
+      \dot{v} & = - x + \mu \left(1-x^2\right) v.
+  \end{align*}
+  To implement this problem, the 
+  the differential operator $ \vect{f}\ (\vect{U},\ t) $ is created.
+  %
+  \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {function VanDerPol_equation}
+  {end function}{API_Example_Cauchy_Problem.f90}
+  
+  Again, the function is used as an input argument for the subroutine that computes the solution of the Cauchy Problem. In this case, advanced temporal methods for Cauchy problems are used, particularly embedded Runge-Kutta formulas. The methods used are \verb|"RK87"| and \verb|"Fehlberg87"| and require the use of an error tolerance, which is set as $\epsilon=10^{-8}$. Both of them are selected by the subroutine \verb|set_solver|.
+  % 
+  
+  Each method is given a different initial condition in order to illustrate the long time behavior of the solution. The asymptotic behavior of the solution tends to a limit cycle, that is, given sufficient time the solution becomes periodic. This can be observed from figure \ref{fig:VanderPol}(a) where the solution is obtained with the embedded Runge Kutta  scheme \verb|"RK87"| and from figure \ref{fig:VanderPol}(b) integrated with the \verb|"Fehlberg87"| scheme. Although both solutions tend to the same cycle,  a difference in their phases can be observed in figure \ref{fig:VanderPol}(b).
+  
+  \newpage
+  \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {subroutine Van_der_Pol}
+  {end subroutine}{API_Example_Cauchy_Problem.f90} 
+  
+  
+  
+  \twographs{\VanDerPooleERKFlow{(a)}}{\VanDerPooleERKx{(b)}}
+  {Solution of the Van der Pol oscillator. (a) Trajectory on the phase plane $(x,\dot{x})$. (b) Evolution along time of $x$.}{fig:VanderPol}
+  
+
+ 
+  
+  \newpage 
+  %_______________________________________________________
+  \section{Henon-Heiles system}
+  The non-linear motion of a star around a galactic center, with the motion restricted to a plane, can be modeled through Henon-Heiles system:
+  %
+  \begin{align*}
+      \dot{x}    &=p_{x} \\ 
+      \dot{y}    &=p_{y} \\  
+      \dot{p}_{x}&=-x-2 \lambda x y \\
+      \dot{p}_{y}&=-y-\lambda\left(x^{2}-y^{2}\right).
+  \end{align*}
+  
+  As usual, the differential operator is implemented as a function \verb|Henon_equation| that is used as an input argument by the subroutine \verb|Cauchy\_ProblemS|. The GBS temporal scheme is selected by the calling \verb|set_solver| and its tolerance is set by \verb|set_tolerance|. 
+  %
+  % \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {function Henon_equation}
+  {end function}{API_Example_Cauchy_Problem.f90}
+  
+  % \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {subroutine Henon_Heiles_system}
+  {end subroutine}{API_Example_Cauchy_Problem.f90} 
+  
+  Once the code is compiled and executed, the trajectories in the phase plane are shown in figure \ref{fig:HenonHeiles}. 
+  
+  \fourgraphs{\HenonHeilesGBSxy{}}{\HenonHeilesGBSxVx{}}
+  {\HenonHeilesGBSyVy{}}{\HenonHeilesGBSVxVy{}}
+  {Heinon-Heiles system solution. (a) Trajectory of the star $(x,y)$. (b) Projection $(x,\dot{x})$ of the solution in the phase plane. (c) Projection $(y,\dot{y})$ of the solution in the phase plane. (d) Projection $(\dot{x},\dot{y})$ of the solution in the phase plane.}{fig:HenonHeiles}
+  
+  This simple Hamiltonian system can exhibit chaotic behavior for certain values of the initial conditions which represent different values of energy. For example, the initial conditions
+  %
+  %
+  \begin{align*}
+      (x(0),y(0),p_x(0),p_y(0))
+      =
+      (0.5,0.5,0,0),
+  \end{align*}
+  give rise to  chaotic behavior.
+  
+  
+  
+ %__________________________________________________________  
+ \newpage     
+ \section{Constant time step and adaptive time step}
+  Generally, time-dependent problems evolve with different growth rates during its time-span. This behavior motivates to use of variable time steps to march faster when small gradients are encountered and march slower reducing the time step when high gradients appear. 
+ To adapt automatically the time step,  methods must estimate the error to reduce or to increase the time step to reach a specified tolerance.
+ 
+ In the following code, the Van der Pol problem is solved with a variable time step in an embedded Heun-Euler method. 
+ Since the imposed tolerance is set to $10^{10}$,  the embedded Heun--Euler method will not modify the time step because that tolerance is always reached.
+ 
+ The other simulation is carried out with a tolerance of $10^{-6}$. In this case, the embedded Heun-Euler will adapt the time step to reach this specific tolerance.   
+ 
+ 
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {HeunEuler21}
+ {,2}{API_Example_Cauchy_Problem.f90}
+ 
+ 
+ 
+ \twographs
+ {\input{./doc/chapters/Cauchy_problem/figures/ConstantDTa.tex}}
+ {\input{./doc/chapters/Cauchy_problem/figures/ConstantDTb.tex}}
+ {Comparison between constant and variable time step calculated by means of local estimation error. 
+     Integration of the Van der Pol oscillator with an embedded second order Runge--kutta HeunEuler21.
+     (a) $ x $ position along time.
+     (b) Phase diagram of the solutions. }
+ {fig:ConstantDT} 
+ 
+           
+   
+  %_____________________________________________________ 
+  \newpage        
+  \section{Convergence rate of Runge--Kutta wrappers}
+  A wrapper function is a subroutine whose main purpose is to call a second subroutine with little or no additional computation. Generally, wrapper functions are used to make writing computer programs easier to use by abstracting away the details of an old underlying implementation. In this way, old validated codes written in Fortran 77 can be used with a modern interface encapsulating the implementation details and making friendly interfaces.   
+ 
+ In the following code, the classical \verb|DOPRI5| and \verb|DOP853| embedded Runge Kutta methods are used by means of a module that wraps the old codes.  
+ 
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+ {weRK}
+ {,2}{API_Example_Cauchy_Problem.f90}
+ 
+ \twographs
+ {\input{./doc/chapters/Cauchy_problem/figures/ConvergenceWa.tex}}
+ {\input{./doc/chapters/Cauchy_problem/figures/ConvergenceWb.tex}}
+ {Convergence rate of Runge--Kutta wrappers based on DOPRI5 and DOP853 with number of steps.
+     (a) Van der Pol solution.
+     (b) Error versus time steps. }
+ {fig:ConvergenceW}  
+ 
+ 
+ In figure \ref{fig:ConvergenceW}b, the steeper slope of \verb|DOP853| in comparison with the  slope of \verb|DOPRI5| shows its superiority in terms of  its temporal error.
+ %___________________________________________________
+ \newpage                            
+ \section{Arenstorf orbit. Embedded Runge--Kutta}
+  The Arenstorf orbit is a stable periodic orbit between the Earth and the Moon which was used as the basis for the Apollo missions.
+  They are closed trajectories of the restricted three-body problem, where two bodies of masses $\mu$ and $1 - \mu$ are moving in a circular rotation, and the third body of negligible mass is moving in the same plane. The equations
+  that govern the movement of the third body in axis rotating about the center of gravity of the Earth and the Moon are: 
+  
+  
+  
+  \begin{align*}
+      \dot{x} & = v_{x}, \\
+      \dot{y} & = v_{y}, \\
+      \dot{v_x} & =  x + 2 v_{y} - \frac{\left(1 - \mu \right) \left(x+\mu\right)}{\sqrt{\left( \left( x+\mu\right) ^2 + y^2\right) ^3}} -\frac{\mu\left(x-\left(1-\mu\right)\right)}{\sqrt{\left( \left( x-\left( 1-\mu\right) \right) ^2+y^2\right) ^3}} \\
+      \dot{v_y} & = y - 2 v_{x} - \frac{\left(1 - \mu \right) y}{\sqrt{\left( \left( x+\mu\right) ^2 + y^2\right) ^3}} -\frac{\mu y}{\sqrt{\left( \left( x-\left( 1-\mu\right) \right) ^2+y^2\right) ^3}}  \\
+  \end{align*}
+  
+  \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {function Arenstorf_equations}
+  {end function}{API_Example_Cauchy_Problem.f90}                   
+  
+  \newpage 
+  The following code integrates the Arenstorf orbit by means of the classical wrapped \verb|DOPRI54| and a new implementation written in modern Fortran. 
+  Different tolerances are selected to show the influence on the calculated orbit. 
+  
+  
+  
+  \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {0015}
+  {end subroutine}{API_Example_Cauchy_Problem.f90}           
+  
+  
+  
+  
+  
+  \twographs{\input{./doc/chapters/Cauchy_problem/figures/ArenstorfWRKa.tex}}
+  {\input{./doc/chapters/Cauchy_problem/figures/ArenstorfRKb.tex}}
+  {Integration of the Arenstorf orbit by means of embedded Runge--Kutta methods with a specific tolerance $\epsilon$.
+      (a) Wrapper of the embedded Runge-Kutta WDOPRI5.
+      (b) New implementation of the embedded Runge-Kutta DOPRI54. }
+  {fig:ArenstorfRK}  
+  
+  As expected, the wrapped code and the new implementation show similar results. 
+  When the tolerance error is decreased,  the calculated orbit approaches to a closed trajectory. 
+  
+  %_____________________________________________
+  \newpage    
+  \section{Gragg-Bulirsch-Stoer Method}
+  The Gragg-Bulirsch-Stoer Method is also a common high order method for solving ordinary equations. This method combines the Richardson extrapolation and the modified midpoint method.
+  For this example, the new implementation of the  GBS algorithm and the old wrapped \verb|ODEX| have been used to simulate the Arenstorf orbit. 
+  \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+  {wGBS}
+  {end subroutine}{API_Example_Cauchy_Problem.f90}  
+  Figure \ref{fig:GBSab} show that GBS method is much less sensitive to the set tolerance and reach a trajectory closer to the solution than the eRK methods analyzed in the previous section.       
+  
+  \twographs{\input{./doc/chapters/Cauchy_problem/figures/GBSa.tex}}
+  {\input{./doc/chapters/Cauchy_problem/figures/GBSb.tex}}
+  {Integration of the Arenstorf orbit by means of the Gragg-Bulirsch-Stoer Method with a specific tolerance $\epsilon$.
+      (a) Wrapper of GMS method ODEX.
+      (b) New implementation of the GBS method. }
+  {fig:GBSab}  
+  
+  
+  
+  
+ %__________________________________________    
+ \newpage                                   
+ \section{Adams-Bashforth-Moulton Methods}
+  Adams--Bashforth--Moulton schemes are multi-step methods that require only two evaluations of the function of the Cauchy problem per time step. The local error estimation is based on a predictor-corrector scheme. The predictor is implemented as an Adams--Bashforth method and the corrector is an Adams--Moulton method.  
+  In the following code, the classical \verb|ODE113| (wrapped by  \verb|wABM|) is used in  comparison with the new implementation   \verb|ABM|.       
+ 
+       \vspace{0.5cm} 
+       \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+                {wABM}
+                {end  subroutine}{API_Example_Cauchy_Problem.f90}   
+         
+         
+                              
+     \twographs{\input{./doc/chapters/Cauchy_problem/figures/ABMa.tex}}
+               {\input{./doc/chapters/Cauchy_problem/figures/ABMb.tex}}
+               {Integration of the Arenstorf orbit by means of the Adams-Bashforth-Moulton Methods with a specific tolerance $\epsilon$.
+                                                (a) Wrapper of ABM method ODE113.
+                                                (b) New implementation of the ABM methods as a multi-value method. }
+                                                {fig:ABMab}     
+                               
+    
+               
+ 
+   
+ %__________________________________________________________
+ \newpage                            
+ \section{Computational effort of Runge--Kutta schemes}
+ When high order precision is required, it is important to select the best temporal scheme. The best scheme is the one that reaches the lowest error tolerance with the smallest CPU time. 
+In the following code, a new subroutine called  \verb|Temporal_effort_with_tolerance| is used to measure the computational effort. Once the temporal scheme is selected, this subroutine runs the  Cauchy problem with different error tolerance based on the input argument  \verb|log_mu|.  It measures internally the number of evaluations of the function of the Cauchy problem for every simulation. In this way, the number of evaluations of the function of the Cauchy problem can be represented versus the error for different time schemes. 
+
+      \vspace{0.5cm} 
+       \listings{\home/examples/API_Example_Cauchy_Problem.f90}
+                {log_mu =}
+                {end subroutine}{API_Example_Cauchy_Problem.f90}
+ 
+          
+     \twographs{\input{./doc/chapters/Cauchy_problem/figures/Tstepsa.tex}}
+               {\input{./doc/chapters/Cauchy_problem/figures/Tstepsb.tex}}
+               {Computational effort of embedded Runge--Kutta. Number of time steps $ M $ as a function of the specified tolerance 
+                $ \epsilon $ for the different member of the embedded Runge--Kutta family.
+                  (a) Embedded Runge-Kutta of second and third order.
+                  (b) Embedded Runge-Kutta from fourth to seventh order. }
+                  {fig:Tsteps}                       
+ 
+           
+           

@@ -1,0 +1,168 @@
+\chapter{Interpolation}
+
+\section{Overview}
+
+This library is intended to solve an interpolation problem. 
+It comprises:  Lagrangian interpolation, Chebyshev interpolation and Fourier interpolation. 
+To accomplish this purpose, \verb|Interpolation| module uses three modules as it is shown in the following code: 
+  
+\vspace{0.5cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+  \listings{\home/sources/Interpolation.f90}
+       {module Interpolation}
+       {contains}{Interpolation.f90}
+\vspace{-0.3cm}       
+The  function \verb|Interpolated_value| interpolates the value of a function at a certain point taking into account values of that function at other points. The function \verb|Integral| computes the integral of a function in a certain interval
+and, finally, the function \verb|Interpolant|  calculates the interpolated values at different points.
+
+
+
+\newpage
+%****************************************************
+\section{Interpolation module}
+
+
+
+%****************************************************
+\subsection*{Interpolated value}
+
+The function \verb|interpolated_value| is devoted to conduct a piecewise polynomial interpolation of the value of a certain function $y(x)$ in $x=x_p$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes.
+
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+yp = interpolated_value( x, y, xp, degree )
+\end{lstlisting}
+
+
+
+
+\btable
+				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				
+				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				
+				xp & real & in & Point in which the value of the function $y$ will be interpolated. \\ \hline
+				
+				degree & integer & optional, in & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
+\etable{Description of \texttt{interpolated\_value} arguments}
+
+
+
+
+
+
+\newpage
+
+%___________________________________________________________________
+\subsection*{Integral}
+\begin{lstlisting}[frame=trBL]
+I = Integral( x, y, degree )
+\end{lstlisting}
+
+
+The function \verb|Integral| is devoted to conduct a piecewise polynomial integration of a certain function $y(x)$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes. The limits of the integral correspond to the minimum and maximum values of the nodes.
+
+
+
+
+
+The arguments of the function are described in the following table.
+
+\btable	
+				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				
+				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				
+				degree & integer & in (optional) & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
+				
+\etable{Description of \texttt{Integral} arguments}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+%****************************************************
+\section{Lagrange interpolation module}
+
+The Lagrange  interpolation module is devoted to determine Lagrange interpolants as well as errors associated to the interpolation. 
+To accomplish this purpose, \verb|Lagrange_interpolation| module comprises the two following functions: 
+  
+\vspace{0.5cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+  \listings{\home/sources/Lagrange_interpolation.f90}
+       {module Lagrange_interpolation}
+       {contains}{Lagrange_interpolation.f90}
+      
+
+
+%****************************************************
+\subsection*{Lagrange polynomials}
+The  function \verb|Lagrange_interpolation| determines the value of the different Lagrange polynomials at some point \verb|xp|.
+Given a set of nodal or interpolation points \verb|x|, the following sentence determines the Lagrange polynomials: 
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+yp =  Lagrange_polynomials( x, xp ) 
+\end{lstlisting}
+The interface of the function is: 
+\vspace{0.5cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+  \listings{\home/sources/Lagrange_interpolation.f90}
+       {pure function Lagrange_polynomials}
+       {-1}{Lagrange_interpolation.f90}
+The result is a matrix containing all Lagrange polynomials
+$$
+    \ell_0(x),  \ \ell_1(x), \hdots \ell_N(x)  
+$$
+and their derivatives $\ell^{(i)}_j(x)$ (first index of the array) calculated at the scalar point \verb|xp|.       
+The integral of the Lagrange polynomials is taken into account by the first index of the array with value equal to -1. The index 0 means the value of the 
+Lagrange polynomials and an index $k$  greater than 0 represents the  "$k$-th" derivative of the Lagrange polynomial.   
+
+
+%****************************************************
+\subsection*{Lebesgue functions}
+The function \verb|Lebesgue_functions| computes the Lebesgue function and its derivatives at different points  \verb|xp|. 
+Given a set of nodal or interpolation points \verb|x|, 
+the following sentence determines the Lebesgue function: 
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+yp =  Lebesgue_functions( x, xp ) 
+\end{lstlisting}
+The interface of the function is: 
+\vspace{0.5cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+  \listings{\home/sources/Lagrange_interpolation.f90}
+       {pure function Lebesgue_functions}
+       {-1}{Lagrange_interpolation.f90}
+The result is a matrix containing the Lebesgue function: 
+$$
+    \lambda(x) = |\ell_0(x)|  + |\ell_1(x)| + \hdots+ |\ell_N(x)|  
+$$
+and their derivatives $\lambda^{(i)}(xp_j)$ (first index of the array) calculated at different points point $xp_j$.       
+The integral of the Lebesgue function is represented  by the first index with value equal to -1. The index 0 means the value of the 
+Lebesgue function and an index $k$  greater than 0 represents the  "$k$-th" derivative of the Lebesgue function. The second index of the array 
+takes into account different components of  \verb|xp|. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

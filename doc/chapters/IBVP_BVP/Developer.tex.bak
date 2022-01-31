@@ -1,0 +1,501 @@
+     
+       %*************************************************************************
+      \chapter{Mixed Boundary and Initial Value Problems   }\label{Dev:IVBP_BVP}
+       %*************************************************************************  
+       \section{Overview}
+       
+        In the present chapter, the numerical resolution and implementation of initial value boundary problem for an unknown variable $\vect{u}$ coupled with an elliptic problem for another unknown variable $\vect{v}$. Prior to the numerical resolution of the problem by means of an algorithm a brief mathematical presentation must be given. Hence, the chapter shall be structured in the following manner. First, the mathematical presentation and both spatial and temporal discretizations will be described. Then, an algorithm to solve the discretized algebraic problem is presented. Finally, how this algorithm is implemented and the code organized in Fortran language is explained. \\
+        
+        Thus, it is expected for the reader to comprehend how this generic problems are solved and conceptually understand how it is possible to take this to practice using Fortran language, although the concepts can be implemented in any desired language, however, probably not in such an intuitively manner.
+       
+
+       %*************************************************************************  
+       
+       \section{Mixed Problems}
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vect{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $. 
+       
+       The intention of this section is to state and solve a temporal evolution problem for two vectorial functions $\vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_u}$ of $N_u$ variables and $\vect{v}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, such as:
+       \begin{align*}
+       & \frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}}_u (\vect{x},t,\vect{u}(\vect{x},t),\vect{v}(\vect{x},t)) ,   & \forall & \ \vect{x} \in  \Omega, \\
+       & \vect{h}_u (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega, \\ 
+       & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}),  & \forall & \ \vect{x} \in  D, \\ \\
+       & \vect{\mathcal{L}}_v (\vect{x},t,\vect{v}(\vect{x},t),\vect{u}(\vect{x},t)) = 0 ,  & \forall & \ \vect{x} \in  \Omega, \\
+       & \vect{h}_v (\vect{x},t,\vect{v}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega,
+       \end{align*}
+       
+       where $\vect{\mathcal{L}}_u$ is the spatial dif{}ferential operator of the initial value problem of $N_u$ equations, $\vect{u}_0(\vect{x})$ is the initial value, $\vect{h}_u$ is the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$,  $\vect{\mathcal{L}}_v$ is the spatial dif{}ferential operator of the boundary value problem of $N_v$ equations and $\vect{h}_v$ is the boundary conditions operator for $\vect{v}$  at the boundary points $\vect{v} \big\rvert_{\partial \Omega}$. It can be seen that both problems are coupled as the dif{}ferential operators are defined for both variables. The order in which appear in the dif{}ferential operators $\vect{u}$ and $\vect{v}$ indicates its number of equations, for example: $\vect{\mathcal{L}}_v(\vect{x},t,\vect{v},\vect{u})$ and $\vect{v}$ are of the same size as it appears first in the list of variables from which the operator depends on.\\
+       
+       It can also be observed that the initial value for $\vect{u}$ appears explicitly, while there is no initial value expression for $\vect{v}$. This is so, as the problem must be interpreted in the following manner: for each instant of time $t$, $\vect{v}$ is such that verifies $\vect{\mathcal{L}}_v(\vect{x},t,\vect{v},\vect{u})=0$ in which $\vect{u}$ acts as a known vectorial field for each instant of time. This interpretation implies that the initial value $\vect{v}(\vect{x}, t_0) = \vect{v}_0(\vect{x}) $, is the solution of the problem $\vect{\mathcal{L}}_v(\vect{x},t_0,\vect{v}_0,\vect{u}_0)=0$. This means that the initial value for $\vect{v}$ is given implicitly in the problem. Hence, the solutions must verify both operators and boundary conditions at each instant of time, which forces the resolution of them to be simultaneous.   \\ 
+       
+       If the spatial domain $D$ is discretized in $N_D$ points, both problems extend from vectorial to tensorial, as a tensorial system of equations of order $p$ appears from each variable of $\vect{u}$ and $\vect{v}$. The order of the tensorial system for $\vect{u}$ and $\vect{v}$ is $p +1$. The number of elements for both are respectively: $N_{e,u}= {N_u} \times N_D$ and $N_{e,v}= {N_v} \times N_D$. The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of each tensorial system evaluated on the boundary points are $N_{C,u}= {N_u} \times N_{\partial\Omega}$ and $N_{C,v}= {N_v} \times N_{\partial\Omega}$. \\
+       
+       Once the spatial discretization is done, the initial value boundary problem and the boundary value problem transform. The dif{}ferential operator for $\vect{u}$ emerges as a tensorial Cauchy Problem of $N_{e,u}-N_{C,u}$ elements, and its boundary conditions as a difference operator of $N_{C,u}$ equations. The operator for $\vect{v}$ is transformed into a tensorial difference equation of $N_{e,v}-N_{C,v}$ elements and its boundary conditions in a difference operator of $N_{C,v}$ equations. Notice that even though they emerge as tensors is indifferent to treat them as vectors as the only difference is the arrange between of the elements which conform the systems of equations. Thus, the spatially discretized problem can be written:
+       
+       \begin{align*}
+       & \dv{{U}_{\Omega}}{t} = {F}_U({U},V;t),  & {H}_U({U};t)\big\rvert_{\partial \Omega}=0,
+       \\& {U}(t_0)={U}^0 , \\\\
+       & {F}_V({U},V;t)=0, & {H}_V({V};t)\big\rvert_{\partial \Omega}=0, 
+       \end{align*}
+       
+       where $U \in \mathbb{ R}^{N_{e,u}}$ and $V \in \mathbb{ R}^{N_{e,u}}$ are the solutions in all domain, $U_{\Omega}\in \mathbb{ R}^{N_{e,u}-N_{C,u}}$ is the solution on grid inner points, $U \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_{C,u}}$ and $V \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_{C,v}}$ are the solutions on the boundary points of the grid, $U^0 \in \mathbb{ R}^{N_{e,u}}$ is the discretized initial value, 
+       
+       \begin{align*}
+       	& {F}_U: \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{e,u}-N_{C,u}}, \\
+       	& {F}_V: \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{e,v}-N_{C,v}},
+       \end{align*}
+              
+       are the difference operators associated to both dif{}ferential operators and 
+       
+       $${H}_U: \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{C,u}}, $$ $${H}_V: \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{C,v}} ,$$ are the difference operators of the boundary conditions. \\
+       
+       Hence, the resolution of the problem requires solving a Cauchy problem and three systems of equations for the discretized variables $U$ and $V$.
+       To solve the Cauchy Problem, the time is discretized in $t=t_n \vect{e}_n$.
+       The term $n \in \mathbb{Z}$ is the index of every temporal step that runs over $[0,N_t]$, where $N_t$ is the number of temporal steps. Later will be seen that the algorithm can be resumed in five recursive steps that repeat for every $n$ of the temporal discretization.
+       As the solution is evaluated only in these discrete time points, from now on it will be used the notation for every temporal step $t_n$: $U_{\Omega}(t_n)=U^n_{\Omega}$, $U(t_n)=U^n$  and $V(t_n)=V^n$.
+       The Cauchy Problem transforms into a difference equation system introducing a $s$-steps temporal scheme:
+       \begin{align*}
+       G({U}_{\Omega}^{n+1}, \underbrace{ {U}^{n}, \ldots {U}^{n+1-s}}_{s \ steps};t_n, & \Delta t)=  {F}_U({U}^n,V^n;t_n),   
+       \\{U}(t_0)={U}^0 , \qquad & {H}_U({U}^n;t_n)\big\rvert_{\partial \Omega}=0,   \\
+       {F}_V({U}^n,V^n;t_n)=0, \qquad & {H}_V({V}^n;t_n)\big\rvert_{\partial \Omega}=0,
+       \end{align*}
+       
+       where 
+       \begin{equation*}
+       	{G}: \mathbb{ R}^{N_{e,u}-N_{C,u}} \times \underbrace{\mathbb{ R}^{N_{e,u}} \times  \ldots \times \mathbb{ R}^{N_{e,u}}}_{s \ steps} \times\mathbb{ R} \times \mathbb{ R}\rightarrow \mathbb{R}^{N_{e,u}-N_{C,u}},
+       \end{equation*} 
+       
+       is the difference operator associated to the temporal scheme and $\Delta t$ is the temporal step. Thus, at each temporal step four  systems of $N_{e,u}-N_{C,u}$, $N_{C,u}$,  $N_{e,v}-N_{C,v}$ and $N_{C,v}$ equations appear. In total a system of $N_{e,u}+N_{e,v}$ equations appear at each temporal step for all components of $U^n$ and $V^n$.
+       \newpage
+       
+       \IVBPandBVPmethodlines 
+       
+       \FloatBarrier
+       \subsection{Algorithm.}
+       The aim of the algorithm, is to solve numerically evolution problems for two functions $\vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_u}$ and $\vect{v}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$,  such as:
+       
+       \begin{align*}
+       & \frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}}_u (\vect{x},t,\vect{u}(\vect{x},t),\vect{v}(\vect{x},t)) ,   & \forall & \ \vect{x} \in  \Omega, \\
+       & \vect{h}_u (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega, \\ 
+       & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}),  & \forall & \ \vect{x} \in  D, \\ \\
+       & \vect{\mathcal{L}}_v (\vect{x},t,\vect{v}(\vect{x},t),\vect{u}(\vect{x},t)) = 0 ,  & \forall & \ \vect{x} \in  \Omega, \\
+       & \vect{h}_v (\vect{x},t,\vect{v}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega.
+       \end{align*}
+       
+       When the spatial domain $D$ is discretized the problem results:
+       \begin{align*}
+       & \dv{{U}_{\Omega}}{t} = {F}_U({U},V;t),  & {G}({U};t)\big\rvert_{\partial \Omega}=0,
+       \\& {U}(t_0)={U}^0 , \\
+       & {F}_V({V},U;t)=0, & {H}({V};t)\big\rvert_{\partial \Omega}=0.
+       \end{align*}
+       Finally, to start with the algorithm the time is discretized and the derivative approximated using a $s$-steps temporal scheme: 
+       \begin{align*}
+       G({U}_{\Omega}^{n+1}, \underbrace{ {U}^{n}, \ldots {U}^{n+1-s}}_{s \ steps};t_n, & \Delta t)=  {F}_U({U}^n,V^n;t_n),   
+       \\{U}(t_0)={U}^0 , \qquad & {H}_U({U}^n;t_n)\big\rvert_{\partial \Omega}=0,   \\
+       {F}_V({V}^n,U^n;t_n)=0, \qquad & {H}_V({V}^n;t_n)\big\rvert_{\partial \Omega}=0.
+       \end{align*}
+       The algorithm must solve this systems of equations. It will be done in a similar manner as in the section \ref{Dev:IVBP}, but with the addition of an intermediate Boundary Value Problem for $V^n$, which will be solved using the algorithm described in \ref{Dev:BVP}. The main idea of the algorithm is: starting from the initial value $U^0$, the initial value $V^0$ is calculated; using both values, the difference operator $F_U$ at that instant is constructed; with the difference operator, the temporal scheme is solved, giving back the solution at inner points at the next temporal step ${U}_{\Omega}^{1}$ for which the boundary conditions must be imposed to obtain the solution $U^1$. This solution will be used as the initial value to solve the next temporal step, closing the algorithm. Hence, the algorithm consists on several steps that are carried out recursively. Particularly, the algorithm can be resumed in five steps for a generic temporal step, $t_n$ in which the solutions are $(U^n,V^n)$:
+       
+       
+       \begin{enumerate}
+       	\item {\textbf{Boundary points from inner points for $U^n$.}}
+       \end{enumerate}	
+       In first place, the known initial value at the inner points, $U^n_{\Omega}$, is used to calculate the solution for the boundary conditions. That is, solving the system of equations:
+       \begin{equation*}
+       	{H_U}({U}^n;t_n)\big\rvert_{\partial \Omega}=0, 
+       \end{equation*}
+       which gives back the value of the solution at boundaries ${U}^{n}\big\rvert_{\partial \Omega}$. 
+       
+       Even though this might look redundant for the initial value $U^0$ (which is supposed to satisfy the boundary conditions), it is not for every other temporal step as the Cauchy Problem is defined only for the inner points $U^{n}_{\Omega}$. This means that to construct the solution $U^n$ its value at the boundaries ${U}^{n}\big\rvert_{\partial \Omega}$ must be calculated.
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Dif{}ference operator for $V^n$.}}
+       \end{enumerate}
+       Once the value in all domain $U^n$ is calculated, calculating its derivatives it is possible to construct the dif{f}erence operator ${F}_V({V}^n,U^n;t_n)$. The known value $U^n$ is introduced as a parameter in this operator. When $U^n$ and the time $t_n$ is introduced in such manner, the system of equations defined by the difference  operator is invertible, a required condition to be solvable. 
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Boundary Value Problem for $V^n$.}}
+       \end{enumerate}
+       The previous difference operator is used along with the boundary conditions operator $H({V}^n;t_n)\big\rvert_{\partial \Omega}$, to solve the boundary value problem for $V^n$ defined as:
+       $$ {F}_V({V}^n,U^n;t_n)=0, $$
+       $$ H_V({V}^n;t_n)\big\rvert_{\partial \Omega}= 0. $$
+       It can be seen that as $U^n$ and $t_n$ are known, the resolution of this problem can be done by similarly to the one detailed in the section \ref{Dev:BVP}. However, for this to be possible first the operator $F_V$ and the boundary conditions $H$ must be transformed into functions $$ {F}_{V,R}: \mathbb{ R}^{N_{e,v}} \rightarrow \mathbb{ R}^{N_{e,v}-N_{C,v}}, $$ 
+       $$ {H}_{V,R}: \mathbb{ R}^{N_{e,v}} \rightarrow \mathbb{ R}^{N_{C,v}}. $$ 
+       
+       
+       This is achieved restricting them by introducing $U^n$ and $t_n$ as parameters. Once this is done, the problem can be written as: 
+       $$ {F}_{V,R}({V}^n)=0, $$
+       $$ H_{V,R}({V}^n)\big\rvert_{\partial \Omega}= 0, $$
+       which is solvable in the same manner as explained in the chapter of Boundary Value Problems.
+       
+       In order to avoid redundancies, the explanation of this step will not be included in this section as it was explained previously. By the end of this step, both solutions $U^n$ and $V^n$ are known.
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Dif{}ference operator for $U^n$.}}
+       \end{enumerate}
+       With the values of $U^n$ and $V^n$ it is possible to calculate their derivatives by finite differences. Once calculated, it is possible to construct the difference operator for $U^n$, $ {F}_U({U}^n,V^n;t_n)$. Notice that the values of $F_U$ are known for all points as $U^n$ and $V^n$ are known, unlike in step 2, in which the value of $V^n$ was unknown.  
+       \begin{enumerate}[resume]
+       	\item {\textbf{Temporal step for $U^n$.}}
+       \end{enumerate}
+       Finally, the difference operator previously calculated, $F_U$, is used to calculate the solution at inner points at the next temporal step $U_{\Omega}^{n+1}$. This means solving the system: 
+       \begin{equation*}
+       G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)=  {F}_U({U}^n,V^n;t_n).
+       \end{equation*}
+       In this system, the values of the solution at the $s$ steps are known and therefore, the solution of the system is the solution at the next temporal step $U_{\Omega}^{n+1}$. However, the temporal scheme $G$ in general is a function that needs to be restricted in order to be invertible. In particular a restricted function $\tilde{G}$ must be obtained:
+       
+       $$\tilde{G}({U}_{\Omega}^{n+1}) = \eval{G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}_{({U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}$$
+       such that, 
+       
+       $$ \tilde{G}:\mathbb{ R}^{N_{e,u}-N_{C,u}} \rightarrow \mathbb{R}^{N_{e,u}-N_{C,u}}. $$
+       
+       Hence, the solution at the next temporal step for the inner points results:
+       
+       $$ U_{\Omega}^{n+1} = \tilde{G}^{-1}(F_U(U^n,V^n; t_n)) .$$
+       
+       % For example, if it is used an explicit Euler scheme over an equispace domain with temporal step $\Delta t$ the problem transforms into:
+       %
+       %$${ U^{n+1}_{\Omega} } = U^{n}_{\Omega} + {F}_U({U}^n,{V}^n;t_n){\Delta t},$$
+       %which gives the value of the solution at the next temporal step ${ U^{n+1}_{\Omega} }$. 
+       This value, will be used as an initial value for the next iteration, closing the loop of the algorithm. The philosophy for other temporal schemes is the same, the result is the solution at the next temporal step. \\
+       
+       The sequence of the algorithm is represented on figure \ref{fig:IVBPandBVPalgorithm}, with the inputs and outputs of each step.
+       
+       \IVBPandBVPalgorithm
+       
+       \FloatBarrier
+       
+       
+       \subsection{Algorithm implementation.}
+       The aim of the following pages is to give a description of how it is implemented the algorithm step by step. For this, the structure will be the same as in the algorithm explanation.
+       
+       Besides, the code will be based on the available codes exposed in the sections \ref{Dev:BVP} and \ref{Dev:IVBP}, re-using them as much as possible. The explanation will treat the case of a two dimensional problem that evolves along time.
+       
+       Before starting with the steps of the algorithm it is necessary a presentation of a new abstract interface defined to implement the differential operators that mix both $\vect{u}$ and $\vect{v}$. That is, for problems that use differential operators such as:
+       $$  \frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}}_u (\vect{x},t,\vect{u}(\vect{x},t),\vect{v}(\vect{x},t)) , 
+       $$
+       
+       \newpage
+       The interface is defined as follows:
+       
+       %\lstinputlisting[language=Fortran, firstline=17, lastline=23, caption=\mycap{IVBP_and_BVP.f90}]
+       %{\home/sources/IVBP_and_BVP.f90}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function DifferentialOperator2D_system_mixed}
+       {end function}{IVBP_and_BVP.f90}
+       
+       As it was mentioned before, it can be seen that the order of the input arguments is relevant, as the size of the differential operator is the same as the vectorial input $u$.\\
+       
+       Defined in such manner, the differential operator recognises the value and derivatives of both $u$ and $v$ as needed.\\
+       
+       This said, the implementation can be explained following the steps of the algorithm. 
+       
+       %\newpage
+       \begin{enumerate}
+       	\item {\textbf{Boundary points from inner points for $U^n$.}}
+       \end{enumerate}	
+       This step requires solving the system of equations ${G}({U}^n;t_n)\big\rvert_{\partial \Omega}=0 $, that in general is not linear. This step is essentially the same as the equivalent one from the section \ref{Dev:IVBP}. The subroutine that will solve the system will be the same as the one used in the mentioned section. Which means that the restriction imposed to this function shall be the same as the one explained there and its result is the same function $G_r$. In order to avoid redundancies the detailed explanation of this restriction will be omitted and the reader can consult it in the subsection Algorithm implementation from the section \ref{Dev:IVBP}.
+       
+       Nevertheless, the steps in order of execution will be exposed.\\
+       
+       First, the initial approximation for the iterative method is assigned, extracted from the initial value at the inner points $U_{\Omega}^n$.
+       %\lstinputlisting[language=Fortran, firstline=289, lastline=289]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {Uc = }
+       {Uc = }{IVBP_and_BVP.f90}
+       
+       In this call, it can be seen a breach on the TKR compatibility (Type, Kind, Rank) in the call of the subroutine. This breach in the rank compatibility is permitted as the vectors \texttt{U1}, \texttt{U2}, \texttt{U3} and \texttt{U4} are defined in explicit shape form.\\
+       
+       
+       Secondly, the values at the boundaries are calculated over \texttt{Uc} using the Newton subroutine. The inputs are \texttt{Uc} as initial approximation and \texttt{BCs} as the function.
+       %\lstinputlisting[language=Fortran, firstline=209, lastline=209]{\home/sources/IVBP_and_BVP.f90}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {call Newton}
+       {call Newton}{IVBP_and_BVP.f90}
+       
+       The function \texttt{BCs} results on a vector \texttt{G} that yields the values of the restricted difference operator for the boundary points $G_r$. For this, first uses the subroutine \texttt{Asign\_BVs} to define the boundary points of an array $Ut$ at each temporal step as the input of \texttt{BCs} starting from the initial value. The array \texttt{Ut}, defined above the contains command, contains the value of the final solution of the problem:  
+       $$ U  = {U}_{ijk}^n(\vect{e}_n \otimes \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k) ,$$ where the indices $(n,i,j,k) \in \mathbb{Z}^3$ go over the interval $[0,N_t] \times [0,N_x] \times [0,N_y] \times [1,N_u] $. 
+       
+       %\newpage
+       Thus, the function \texttt{BCs} is implemented as:
+       %\lstinputlisting[language=Fortran, firstline=265, lastline=281]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function BCs}
+       {end function}{IVBP_and_BVP.f90}
+       
+       The next step of the function \texttt{BCs} is constructing the result vector $G_r$. For this, it is used the subroutine \texttt{Asign\_BCs}. \\
+       
+       This subroutine stores the values of the boundary conditions (four edges) in four vectors \texttt{G1}, \texttt{G2}, \texttt{G3} and \texttt{G4} which compound \texttt{G}. These are constructed calculating the solution derivatives at boundaries from the initial value. These derivatives are calculated using an available subroutine. Its interface requires the solution $U^n$ to be expressed as a third order tensor to be consistent with the computational cell of the grid. This tensor can be expressed for a two dimensional problem as:
+       $$ U^n = {U}_{ijk}^n( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k) ,$$ where the indices $(i,j,k) \in \mathbb{Z}^3$ go over the interval $[0,N_x] \times [0,N_y] \times [1,N_u] $. The subroutine can calculate the derivatives if $k$ is fixed. From this expression it can be inferred the relation:
+       $$ U = \vect{e}_n \otimes {U}^n $$
+       
+       To store in the array \texttt{Ut} the solution at each instant of time it is used the subroutine \texttt{Binary\_search} in the same manner as in the section \ref{Dev:IVBP}.
+       
+       Hence, when the subroutine is called for \texttt{t\_BC}, the discrete time domain \texttt{Time\_Domain} and \texttt{it}, \texttt{t\_BC} stores the value of time at the temporal step \texttt{it}. The idea is use this index to implement the solution $U$ in Fortran as:
+       
+       \begin{lstlisting}
+       Ut(it,0:Nx,0:Ny,1:Nu)
+       \end{lstlisting}  
+       
+       For this to be possible, the integer \texttt{it} must have the same value in all of the subroutines and functions involved in the algorithm at each temporal step. That means that \texttt{it}, \texttt{t\_BC} and  \texttt{Time\_Domain} have to be defined above the contains command.
+       
+       The call for the subroutine \texttt{Binary\_search}, must be done below the contains command to store at every temporal step the value of the time \texttt{t\_BC}, before the Newton subroutine is called.
+       
+       %\lstinputlisting[language=Fortran, firstline=199, lastline=199]{\home/sources/IVBP_and_BVP.f90}
+       \vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {call Binary_search}
+       {call Binary_search}{IVBP_and_BVP.f90}
+       
+       \newpage
+       To implement the boundary conditions is necessary to define them as functions with the following interface:
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function BC2D_system}
+       {end function}{IVBP_and_BVP.f90}
+       
+       These interfaces must be stated above the contains command as procedures to be possible its call.\\
+       
+       \newpage
+       This said, it can be understood the functioning of the previously mentioned subroutine, \texttt{Asign\_BCs}, which is implemented as follows:
+       %\lstinputlisting[language=Fortran, firstline=317, lastline=348]{\home/sources/IVBP_and_BVP.f90}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {subroutine Asign_BCs}
+       {end subroutine}{IVBP_and_BVP.f90}
+       
+       As \texttt{Ut} varies with time, the values of the boundary conditions adapt to the pass of time, which in the future will permit to construct the difference operator for each instant of time, $F_U(U^n, V^n;t_n)$, over a single third order tensor.
+       
+       Thus, the function \texttt{BCs} gives back the restricted difference operator $G_r$ to be introduced in the Newton subroutine. \\
+       
+       At this point, the vector \texttt{Uc} yields the values of the solution at the boundary points calculated by the Newton subroutine.\\
+       
+       \newpage
+       Finally, the values of the boundary points $U^n \big\rvert_{\partial \Omega}$ are assigned to the solution at that temporal step $U^n$ using the subroutine \texttt{Asign\_BVs}.\\
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {asign boundary points Uc}
+       {, Uc}{IVBP_and_BVP.f90}
+       
+       %\lstinputlisting[language=Fortran, firstline=213, lastline=214]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       Thus, the boundary conditions are imposed to the solution $U^n$ from the initial value $U_{\Omega}^n$.
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Dif{}ference operator for $V^n$.}}
+       \end{enumerate}
+   
+       In this step the goal is to construct the differential operator $F_V(V^n,U^n;t_n)$, in which the known solution $U^n$ and the time $t_n$ act as a mere parameter. First of all, the derivatives of $U^n$  must be calculated. For this task, it is used the available subroutine that calculates derivatives using finite differences. This is implemented as:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=218, lastline=224]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {Derivatives of U for inner grid points}
+       {end do}{IVBP_and_BVP.f90}
+       
+       The derivatives of $U^n$ are stored on arrays defined over the contains command. The location of their definition, will permit to re-use them in all the subroutines and functions involved.
+       The idea is to re-use the subroutine Non Linear Boundary Value Problems presented in the section Boundary Value Problem. To fit its interface it is necessary to restrict the operator and transform it into $F_{V,R}$. The philosophy is the same as all the restrictions in functions done in Fortran. \\
+       
+       \newpage
+       A function is defined for this purpose:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=355, lastline=370]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function Differential_operator_v_R}
+       {end function}{IVBP_and_BVP.f90}
+       
+       The interface of this function fits the requirements of the subroutine that solves boundary value problems. First, the values of the difference operator $F_{V}$ are stored on \texttt{F\_v} which is also the result of the function. When \texttt{F\_v} is given back, it holds the difference operator $F_{V,R}$. The arrays containing the derivatives of $U^n$ are defined over the contains command and therefore, the use of \texttt{Binary\_search} is needed for each spatial dimension. The integer variables which keep track of each spatial point are \texttt{ix} and \texttt{iy}. Its use will relate the values of the arrays that contain the derivatives of \texttt{Ut} with the differential operator.
+       
+       This function is ready to be introduced in the subroutine that calculates the value of $V^n$ as the differential operator.
+       
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Boundary Value Problem for $V^n$.}}
+       \end{enumerate}
+       In this step the objective is to obtain the value $V^n$ as the solution of the problem:
+       $$ {F}_{V,R}({V}^n)=0, $$
+       $$ H_R({V}^n)\big\rvert_{\partial \Omega}= 0. $$
+       In first place, to fit the interface of the subroutine that solves this problem, an additional restriction to $H$ must be done, as the temporal step $t_n$ is only involved as a parameter, transforming it into $H_R$. For this, the procedure is the same as before, defining a function:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=375, lastline=382]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function Boundary_conditions_v_R}
+       {end function}{IVBP_and_BVP.f90}
+       
+       The interface of this function is suitable for the subroutine that will solve the boundary conditions.\\
+       
+       Once this is done, the resolution of the boundary value problem for $\vect{v}$ is achieved with a simple call:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=227, lastline=231]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {call Boundary_Value_Problem}
+       {Solution}{IVBP_and_BVP.f90}
+       
+       This subroutine gives back the solution $V^n$ stored over the array \texttt{Vt}, defined above the contains command. The description of its functioning can be consulted in the section \ref{Dev:BVP} from this part.
+       
+       \newpage
+       \begin{enumerate}[resume]
+       	\item {\textbf{Dif{}ference operator for $U^n$.}}
+       \end{enumerate}
+       
+       Whenever both $U^n$ and $V^n$ are known, and stored respectively on the arrays \texttt{Ut} and \texttt{Vt}, the difference operator $F_U$ can be constructed. The derivatives of \texttt{Ut} are already calculated and known as they are defined over the contains command. Hence, the derivatives of $V^n$ must be calculated from the array \texttt{Vt}. As before, it is used the available subroutine to perform the calculation: \\
+       
+       %\lstinputlisting[language=Fortran, firstline=236, lastline=242]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {Derivatives for V}
+       {end do}{IVBP_and_BVP.f90}
+       
+       Once all the derivatives involved are known, the differential operator can be stored over an array \texttt{F\_u} in the following manner:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=247, lastline=257]{\home/sources/IVBP_and_BVP.f90}
+       %\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {Differential operator L_u}
+       {end do}{IVBP_and_BVP.f90}
+       
+       Thus, the difference operator calculated will have the shape:
+       $$ F_{U}^n = {F}_{U,ijk}^n( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k) .$$ 
+       
+       This differential operator will be used to obtain the solution at the next temporal step.
+      
+       \begin{enumerate}[resume]			
+       	\item {\textbf{Temporal step.}}	
+       \end{enumerate}	
+       The difference operator now has to be used to calculate the solution at the next temporal step $U^{n+1}$. For this task there is a subroutine that solves Cauchy Problems systems. The interface of this subroutine requires the difference operator to be ordered as before. With it we intend to construct the solution at all time as a fourth order tensor: $$ U=\vect{e}_n \otimes U^n = {U}_{ijk}^n(\vect{e}_n \otimes  \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$$, where $n\in \mathbb{Z}$ goes over the interval $[0,N_t]$ and $N_t $ is the number of temporal steps.
+       
+       However, the interface of the Cauchy Problems tool takes an array in which yield the solution at all time in the form:
+       $$ U= {U}_{r}^n(\vect{e}_n \otimes  \vect{e}_r ),$$ where $r\in \mathbb{Z}$ goes over the interval $[1,M]$. Hence, to introduce the solution it must be in this form for $M=(N_x+1)(N_y+1)N_u$.
+       
+       Thus, introducing the solution into the subroutine at a certain time step $U^n$ in the form: $$ U^n= {U}_{r}^n \vect{e}_r ,$$ gives back its value at the next temporal step $$ U^{n+1}= {U}_{r}^{n+1} \vect{e}_r .$$ To construct the fourth order tensor solution it is necessary a rearrangement or linking between it and the solution expressed as a second order tensor. 
+       
+       In order to link both tensors without waste of memory is defined in Fortran a pointer data structure:  $$ P= {P}_{r}^n(\vect{e}_n \otimes  \vect{e}_r ), $$
+       
+       which targets the solution: $U= {U}_{ijk}^n(\vect{e}_n \otimes  \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$. Doing this, links the values of both arrays in the Fortran environment as they share the memory spaces in which their components are yielded. Mathematically, this means that a bijective application between $P$ and $U$ is defined in such a manner that assigns to each component of $P$ a component of $U$.
+       
+       \newpage
+       This is done in the same manner as in the section \ref{Dev:IVBP}, using the subroutine \texttt{Data\_Pointer}. This subroutine  reads two integer values \texttt{N1,N2} and an array \texttt{U(N1,N2)} and assigns a pointer array \texttt{pU(N1,N2)} that targets every element on the array \texttt{U}.\\
+       
+       %\lstinputlisting[language=Fortran, firstline=49, lastline=56]{\home/sources/IVBP_and_BVP.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{../libraries/Numerical_Methods/Utilities/sources/utilities.f90}
+       {subroutine Data_pointer}
+       {end subroutine}{Utilities.f90}
+       
+       This subroutine will be used to target the solution $U$ with a pointer $P$. Observing the interface of \texttt{Data\_pointer} it can be seen that both pointer and target must be second order tensors. However $U$ is a fourth order tensor, and the assignation seems to be impossible. To solve this issue, a breach on Type, Kind, Rank compatibility will be used. \\
+       
+       Fortran language permits a breach on the Rank compatibility for variables defined in explicit shape. In the subroutine \texttt{Data\_Pointer} the input variable \texttt{U(N1,N2)} is defined with explicit shape. The TKR rule breach permits the subroutine to treat the target as a data structure without taking in account its defined rank:\\
+       
+       %\lstinputlisting[language=Fortran, firstline=158, lastline=159]{\home/sources/IVBP_and_BVP.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {call Data_pointer}
+       {pUt}{IVBP_and_BVP.f90}
+       
+       In this call, \texttt{Ut}, which yields $U$, is targeted by the pointer data structure \texttt{pUt} that yields $P$. This call is equivalent to say that there is a bijective application $A$ that relates every element of $$U= {U}_{ijk}^n(\vect{e}_n \otimes  \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k),$$ with each component of $$ P= {P}_{r}^n(\vect{e}_n \otimes  \vect{e}_r ) $$, by the identity function. The ordenation of the elements in $P$ is done by the subroutine and does not influence on the resolution.\\
+       
+       When stored in such manner, the pointer is in the rank needed for the subroutine \texttt{Cauchy\_Problems}, permitting us to re-use it easily. Hence, the subroutine can be called as follows:
+       
+       %\lstinputlisting[language=Fortran, firstline=162, lastline=163]{\home/sources/IVBP_and_BVP.f90}\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {call Cauchy_ProblemS}
+       {pUt}{IVBP_and_BVP.f90}
+       
+       The inputs are: a vector for the time \texttt{Time\_Domain} that yields the values $t_n$, the pointer data structure \texttt{pUt} which yields the solution $P$ and a function \texttt{Space\_Discretization} whose result is the difference operator $F_{U}^n$ in vectorial form. It constructs recursively for each $t_n$ the solution $P$ using the dif{}ferential operator at that time $F_{U}^n$. The number of iterations equals to the number of temporal steps $N_t$.\\
+       
+       This function is constructed only to fit $ F_U^n = {F}_{U,ijk}^n( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$ to the interface of the subroutine \texttt{Cauchy\_ProblemS}. It rearranges the elements of $U^n$ and $F_U^n$ defining them in assume shape form as vectors and calls the subroutine that constructs the difference operator as a third order tensor.
+       
+       %\lstinputlisting[language=Fortran, firstline=172, lastline=182]{\home/sources/IVBP_and_BVP.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {function Space_discretization}
+       {end function}{IVBP_and_BVP.f90}
+       
+       The function calls the subroutine \texttt{Space\_Discretization\_2D\_system} using the time \texttt{t} and the vectorial argument \texttt{U} as input and the vector \texttt{F} as output. As it will seen later, this call entails a breach on TKR compatibility, permitted as the arguments in the subroutine are defined explicitly. \\
+       
+       \newpage
+       The subroutine in charge of constructing the difference operator $F_U^n= {F}_{U,ijk}^n( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$ is \texttt{Space\_Discretization\_2D\_system}. The inputs for it are the solution at the temporal step $U^n= {U}_{ijk}^n( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$, the time $t_n$ and the difference operator $F_U^n$.
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {subroutine Space_discretization_2D_system}
+       {Solution = Vt}{IVBP_and_BVP.f90}
+       
+       \newpage
+       %\vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {Derivatives for V}
+       {end subroutine}{IVBP_and_BVP.f90}
+       %\lstinputlisting[language=Fortran, firstline=185, lastline=232]{\home/sources/IVBP_and_BVP.f90}
+       
+       %\newpage
+       
+       %\lstinputlisting[language=Fortran, firstline=233, lastline=260, caption = \mycap{IVBP_and_BVP.f90}]{\home/sources/IVBP_and_BVP.f90}\vspace{0.5cm}
+       
+       As was mentioned before, the inputs $U^n$ and $F^n$ are third order tensors, and when called in the function \texttt{Space\_Discretization} they were treated as vectors. This is possible as they are defined in explicit shape form and a breach in rank compatibility is permitted. \\
+       
+       This subroutine includes the steps from 1 to 3 of the algorithm, as they are necessary to construct the difference operator. \\
+              
+       To sum up, calling the subroutine \texttt{Cauchy\_ProblemS} at each temporal step gives us the solution at the next temporal step $ P^{n+1}= {P}_{r}^{n+1} \vect{e}_r $ and therefore gives also $U^{n+1}= {U}_{ijk}^{n+1}( \vect{e}_i \otimes \vect{e}_j\otimes \vect{e}_k)$. However, only the inner points of these tensors have the definitive values. The values of the boundary points have to be calculated introducing $U^{n+1}$ as the new initial value for the algorithm, closing the loop that conforms it.
+       
+       \newpage
+       \subsection{Code structure.}
+       In order to carry out the algorithm implementation, three subroutines inside the module \texttt{IVBP\_and\_BVP} have been defined. The first two are the tools previously explained \texttt{Data\_Pointer} and \texttt{Binary\_Search}. The third is the subroutine that will perform the five steps of the algorithm using the other two subroutines. This latter subroutine, called \texttt{IVBP2D\_system\_mixed}, is structured in two parts: the interface and the contained functions and subroutines. The contained subroutine have been presented previously in the Algorithm Implementation section. In this pages, how the interface works and uses the contained subroutines will be explained.
+       
+       The main idea is to contain in the interface the functions and subroutines used to implement the five steps of the algorithm. For this, a sequence on calls of these functions and subroutines is implemented. In this sequence there will be involved variables known in the whole subroutine and local ones of each contained subroutine or function as well.
+       
+       The interface takes as input arguments: the vectors \texttt{Time\_Domain}, \texttt{x\_nodes} and \texttt{y\_nodes}; the integers \texttt{Order}, \texttt{N\_u} and \texttt{N\_v}; the functions \texttt{Differential\_operator\_u}, \texttt{Differential\_operator\_v}, \\ \texttt{Boundary\_conditions\_u}, \texttt{Boundary\_conditions\_v} and \texttt{Scheme}; and the arrays \texttt{Ut} and \texttt{Vt}. The output arguments are the arrays \texttt{Ut} and \texttt{Vt} which will contain the solutions of the problem. Hence, the complete subroutine acts as a black box in which, introduced the input arguments gives back the numerical solutions $U$ and $V$ stored on the arrays \texttt{Ut} and \texttt{Vt}.
+       
+       \newpage
+       The interface is implemented as follows:
+       %\lstinputlisting[language=Fortran, firstline=97, lastline=147]{\home/sources/IVBP_and_BVP.f90}
+       %\newpage
+       %\lstinputlisting[language=Fortran, firstline=148, lastline=169, caption = \mycap{IVBP_and_BVP.f90}]{\home/sources/IVBP_and_BVP.f90} \vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {subroutine IVBP2D_system_mixed}
+       {M1 =}{IVBP_and_BVP.f90}
+       
+       \newpage
+       \listings{\home/sources/IVBP_and_BVP.f90}
+       {allocate}
+       {contains}{IVBP_and_BVP.f90}
+       
+       It can be seen that the solution variables \texttt{Ut}, \texttt{Vt}, \texttt{pUt} and the derivatives of \texttt{Ut} at each instant of time are necessarily defined at this level.
+       Also, as the variables \texttt{Time\_Domain}, \texttt{t\_BC} and \texttt{it} are defined in the interface, its value is the same in all the functions and subroutines involved in the algorithm. Which permits the relation between \texttt{Ut} and the third order tensor that yields the solution at each temporal step $U^n$, as explained in the Algorithm Implementation section. The integers that define the size of the edges \texttt{M1}, \texttt{M2}, \texttt{M3} and \texttt{M4}, are also stated in the interface. \\
+       
+       The call for the function \texttt{Data\_pointer} is done at this level, necessarily before the call for \texttt{Cauchy\_ProblemS} subroutine. \\
+       
+       Finally, the call for \texttt{Cauchy\_ProblemS} subroutine is done. This call involves the function \texttt{Space\_Discretization}, which at the same time calls the subroutine that carries out steps from 1 to 4 of the algorithm, \texttt{Space\_Discretization\_2D\_system}. The ef{}fect of this is recursively execute the algorithm for every temporal step. Once the sequence on calls is performed for all temporal steps, the problem is solved. \\
+       
+       
+       
+       Summarizing, the code that solves IVBP and BVP is structured in an interface called \texttt{IVBP2D\_system\_mixed} which contains the functions and subroutines described during the Algorithm Implementation of the present section. The interface is framed in a module called \texttt{IVBP\_and\_BVP} which also contains the subroutines \texttt{Binary\_Search} and \texttt{Data\_Pointer}.
+       

@@ -1,0 +1,114 @@
+
+
+\documentclass[10pt,a4paper]{book}
+
+
+\include{./format/packages}
+\include{./format/listings}
+\include{./format/trees}
+\include{./format/sizes}
+
+
+\graphicspath{ {images/} }
+\newcommand{\folder}{./libraries}
+
+%_______________________________________________________________________________
+\usepackage{titling} % Allows custom title configuration
+
+
+\definecolor{DarkGoldenrod}{rgb}{0.8,0.6,0.1}
+\definecolor{DarkRed}{rgb}{0.5,0.1,0.1}
+\definecolor{DarkRedPart}{rgb}{0.3,0.1,0.2}
+
+% Defines the gold horizontal rule around the title
+\newcommand{\HorRule}{\color{DarkGoldenrod} \rule{\linewidth}{1pt}}
+
+% Horizontal rule before the title
+\pretitle{\vspace{-150pt} \begin{flushleft} \HorRule \fontsize{45}{45}
+		\usefont{OT1}{phv}{b}{n} \color{DarkRed} \selectfont}
+	% Your article title	
+	\title{How to learn Applied Mathematics through modern FORTRAN} 
+	
+	% Whitespace under the title	
+	\posttitle{\par\end{flushleft}\vskip 0.5em} 
+
+% Author font configuration
+\preauthor{\begin{flushleft}\large \lineskip 0.5em \usefont{OT1}{phv}{b}{sl} \color{DarkRed}} 
+	
+	%\author{John Smith, } % Your name
+	
+	% Configuration for the institution name
+	\postauthor{\footnotesize \usefont{OT1}{phv}{m}{sl} \color{Black}
+		Department of Applied Mathematics \\
+		School of Aeronautical and Space Engineering \\
+		Technical University of Madrid (UPM)
+		
+		% Horizontal rule after the title		
+		\par\end{flushleft}\HorRule}
+
+\date{} % Add a date here if you would like one to appear underneath the title block
+
+%__________________________________________________________________________________________
+
+
+
+%\newcommand{\docpath}{../../../libraries/Numerical_Methods/System_of_Equations/examples}
+
+
+
+
+%\makeindex
+
+\begin{document}
+	
+	\maketitle
+	\tableofcontents
+	
+	
+	
+	\part{User Manual}
+%    \input{1.BatchFiles/BatchFiles.tex}
+     \newcommand{\route}{../../../libraries/Numerical_Methods/System_of_Equations}
+  	 \input{\route/doc/Users.tex}
+	
+	
+	 \renewcommand{\route}{../../../libraries/Numerical_Methods/Lagrange_Interpolation}
+	 \input{\route/doc/Users.tex}
+	 
+     \renewcommand{\route}{../../../libraries/Numerical_Methods/System_of_Equations}
+	 \input{\route/doc/Users.tex}
+	 
+	 
+	 \renewcommand{\route}{../../../libraries/Numerical_Methods/System_of_Equations}
+	 \input{\route/doc/Users.tex}
+	 
+	 
+	 
+%	\input{3.Interpolation/Interpolation.tex}
+%	\input{4.PDEs/PDEs.tex}
+%	\input{5.HOFD/HOFD.tex}       
+	
+
+	
+	\part{Developer guidelines}
+%	\include{Benchmark}
+
+	
+	
+	\part{Application Program Interface (API Manual)}
+%	\include{Developer} 
+
+   % \input{bibliografia.tex}
+   % \pagestyle{headings}
+
+   % \addcontentsline{toc}{chapter}{Índice}
+   % \cleardoublepage
+   % \printindex
+	
+	
+	
+	
+	
+\end{document}
+
+

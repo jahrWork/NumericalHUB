@@ -1,0 +1,11 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ width = \textwidth,
+        title style={at={(0.5,-0.45)},anchor=south}, title={(a)},
+        xlabel={ $x$ },
+        ylabel={ $y$ },
+        {}, legend style={font=\small},  {mark repeat = 25, cycle list name = black white, legend columns = 1 }, legend pos = north east  ]
+        \foreach \x/\y in { 0/1}
+        \addplot table [skip first n=2, x index=\x, y index=\y]{./doc/chapters/Cauchy_problem/figures/ConvergenceWa.plt   };
+        \legend{  }
+     \end{axis}
+  \end{tikzpicture}

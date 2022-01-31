@@ -1,0 +1,75 @@
+% ************** Programcion estructurada y multicapa *****************
+%                NOV 2000
+%\documentclass[12pt,A4]{book}
+\documentclass[twoside]{book}
+\usepackage[pctex32]{graphics}
+%\usepackage[dvips]{graphics} % el scalebox no funciona
+\usepackage{bezier}
+\usepackage[spanish]{babel}
+\usepackage{makeidx}
+\usepackage{latexsym}
+\usepackage[latin1]{inputenc}
+
+
+\makeindex
+% *** Macros
+        %  \input{definiciones.tex}
+
+% *** text dimensions
+        % \input{formato.tex}
+       \input{f:/tex/etsia/portadas/f17x24.tex}
+       \input{definiciones.tex}
+       \input{f:/tex/etsia/portadas/titulo.tex}
+
+%  *** begin document
+       \pagestyle{empty}
+       \begin{document}
+
+% *** Title page
+%      \input{titulo.tex}
+      \titulo{FORTRAN 95 :  \\
+              Programación Multicapa  \\ \vspace{0.1cm}
+              para   la \\ \vspace{0.3cm}
+              Simulación de Sistemas Físicos
+             }
+             {Juan A. Hernández}
+             {Mario A. Zamecnik}{,}
+
+
+
+
+% *** table of contents
+      \newpage
+      \pagenumbering{roman}
+      \tableofcontents
+%     \listoffigures
+%     \listoftables
+
+% *** preface
+     \input{prologo.tex}
+
+% *** chapters
+      \newpage
+      \pagenumbering{arabic}
+     \parskip = \baselineskip
+      \input{f:/tex/etsia/portadas/cabecera}
+
+%     ** Todos los capitulos
+         \input{chapter.tex}
+
+
+% *** appendices
+%     \appendix
+%     \input{samples.tex}
+
+% *** bibliography
+      \input{bibliografia.tex}
+
+% *** index
+\pagestyle{headings}
+
+     \addcontentsline{toc}{chapter}{Índice}
+     \cleardoublepage
+     \printindex
+
+   \end{document}

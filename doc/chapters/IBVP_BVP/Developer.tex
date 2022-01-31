@@ -1,0 +1,282 @@
+     
+%*************************************************************************
+\chapter{Mixed Boundary and Initial Value Problems   }\label{Dev:IBVP_BVP}
+%*************************************************************************  
+\section{Overview}
+       
+In the present chapter, the numerical resolution and implementation of the initial boundary value problem for an unknown variable $\vect{u}$ coupled with an elliptic problem for another unknown variable $\vect{v}$ are considered. Prior to the numerical resolution of the problem by means of an algorithm, a brief mathematical presentation must be given. 
+        
+        
+Evolution problems coupled with elliptic problems are common in applied physics. for example, when considering an incompressible flow, the information travels in the fluid at infinite velocity. This means that the pressure adapts instantaneously to the change of velocities. From the mathematical point of view, it means that the pressure is governed by an elliptic equation. Hence, the velocity and the temperature of fluid evolve subjected to the pressure field which adapts instantaneously to velocity changes. 
+        
+The chapter shall be structured in the following manner. First, the mathematical presentation and both spatial and temporal discretizations will be described. Then, an algorithm to solve the discretized algebraic problem is presented. Finally, the implementation of this algorithm is explained. 
+Thus, the intention of this chapter is to show how these generic problems can be implemented and solved form an elegant and mathematical point of view using modern Fortran.
+       
+       \newpage 
+Let $\Omega \subset \mathbb{ R}^p$ be  an open and connected set, and $\partial \Omega$ its boundary. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vect{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $. 
+              
+The intention of this section is to state an evolution problem coupled with a boundary value. The unknowns of the  problem are  two following vector functions:  
+              $$ 
+              \vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_u}
+              $$ 
+of $N_u$ variables and 
+              $$ 
+              \vect{v}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}
+              $$
+of $N_v$ variables. These  functions are governed by the following set of equations: 
+              \begin{align}
+              & \frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}}_u (\vect{x},t,\vect{u}(\vect{x},t),\vect{v}(\vect{x},t)) ,   & \forall & \ \vect{x} \in  \Omega, \label{ibvp_bvp1} \\
+              & \vect{h}_u (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega, \\ 
+              & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}),  & \forall & \ \vect{x} \in  D, \\ \\
+              & \vect{\mathcal{L}}_v (\vect{x},t,\vect{v}(\vect{x},t),\vect{u}(\vect{x},t)) = 0 ,  & \forall & \ \vect{x} \in  \Omega, \\
+              & \vect{h}_v (\vect{x},t,\vect{v}(\vect{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vect{x} \in \partial \Omega,\label{ibvp_bvp2}
+              \end{align}
+where $\vect{\mathcal{L}}_u$ is the spatial differential operator of the initial boundary  value problem of $N_u$ equations, $\vect{u}_0(\vect{x})$ is the initial value, $\vect{h}_u$ is the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$,  $\vect{\mathcal{L}}_v$ is the spatial differential operator of the boundary value problem of $N_v$ equations and $\vect{h}_v$ is the boundary conditions operator for $\vect{v}$  at the boundary points $\vect{v} \big\rvert_{\partial \Omega}$. 
+              
+It can be seen that both problems are coupled by the differential operators since these operators depend on both variables. The order in which appear in the differential operators $\vect{u}$ and $\vect{v}$ indicates its number of equations, for example: $\vect{\mathcal{L}}_v(\vect{x},t,\vect{v},\vect{u})$ and $\vect{v}$ are of the same size as it appears first in the list of variables from which the operator depends on.
+              
+It can also be observed that the initial value for $\vect{u}$ appears explicitly, while there is no initial value expression for $\vect{v}$. This is so, as the problem must be interpreted in the following manner: for each instant of time $t$, $\vect{v}$ is such that verifies $\vect{\mathcal{L}}_v(\vect{x},t,\vect{v},\vect{u})=0$ in which $\vect{u}$ acts as a known vector field for each instant of time. This interpretation implies that the initial value $\vect{v}(\vect{x}, t_0) = \vect{v}_0(\vect{x}) $, is the solution of the problem $\vect{\mathcal{L}}_v(\vect{x},t_0,\vect{v}_0,\vect{u}_0)=0$. This means that the initial value for $\vect{v}$ is given implicitly in the problem. Hence, the solutions must verify both operators and boundary conditions at each instant of time, which forces the resolution of them to be simultaneous. 
+       
+
+\newpage
+%***********************************************
+\section{Algorithm to solve a coupled IBVP-BVP}
+%***********************************************
+If the spatial domain $D$ is discretized in $N_D$ points, both problems extend from vectors to tensors, as a tensor system of equations of order $p$ appears from each variable of $\vect{u}$ and $\vect{v}$. The order of the tensor system for $\vect{u}$ and $\vect{v}$ is $p+1 $. 
+       
+The number of elements for both are respectively: $N_{e,u}= {N_u} \times N_D$ and $N_{e,v}= {N_v} \times N_D$. 
+The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of each tensor system evaluated on the boundary points are $N_{C,u}= {N_u} \times N_{\partial\Omega}$ and $N_{C,v}= {N_v} \times N_{\partial\Omega}$. \\
+       
+Once the spatial discretization is done, the initial  boundary value problem and the boundary value problem transform. The differential operator for $\vect{u}$ emerges as a tensor Cauchy Problem of $N_{e,u}-N_{C,u}$ elements, and its boundary conditions as a difference operator of $N_{C,u}$ equations. The operator for $\vect{v}$ is transformed into a tensor difference equation of $N_{e,v}-N_{C,v}$ elements and its boundary conditions in a difference operator of $N_{C,v}$ equations. Notice that even though they emerge as tensors is indifferent to treat them as vectors as the only difference is the arrange between of the elements which conform the systems of equations. Thus, the spatially discretized problem can be written:
+       
+       \begin{align*}
+       & \dv{{U}_{\Omega}}{t} = {F}_U({U},V;t),  & {H}_U({U};t)\big\rvert_{\partial \Omega}=0,\\ \\
+       & {U}(t_0)={U}^0 , \\  \\
+       & {F}_V({U},V;t)=0, & {H}_V({V};t)\big\rvert_{\partial \Omega}=0, 
+       \end{align*}
+where $U \in \mathbb{ R}^{N_{e,u}}$ and $V \in \mathbb{ R}^{N_{e,u}}$ are the solutions comprising inner and boundary points, $U_{\Omega}\in \mathbb{ R}^{N_{e,u}-N_{C,u}}$ is the solution of inner points, $U \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_{C,u}}$ and $V \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_{C,v}}$ are the solutions at the  boundary points, $U^0 \in \mathbb{ R}^{N_{e,u}}$ is the discretized initial value, the difference operators associated to both differential operators are, 
+       \begin{align*}
+       	& {F}_U: \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{e,u}-N_{C,u}}, \\ \\
+       	& {F}_V: \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{e,v}-N_{C,v}},
+       \end{align*}
+and   
+       \begin{align*}
+       {H}_U: \mathbb{ R}^{N_{e,u}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{C,u}}, \\ \\
+        {H}_V: \mathbb{ R}^{N_{e,v}} \times \mathbb{ R}\rightarrow \mathbb{ R}^{N_{C,v}} ,
+       \end{align*}
+are the difference operators of the boundary conditions.       
+ 
+ 
+  Hence, the resolution of the problem requires solving a Cauchy problem and algebraic systems of equations for the discretized variables $U$ and $V$.
+ To solve the Cauchy Problem, the time is discretized in $t=t_n \vect{e}_n$.
+ The term $n \in \mathbb{Z}$ is the index of every temporal step that runs over $[0,N_t]$, where $N_t$ is the number of temporal steps.
+ The algorithm will be divided into three steps that will be repeated for every $n$ of the temporal discretization.
+ As the solution is evaluated only in these discrete time points, from now on it will be used the notation for every temporal step $t_n$: $U_{\Omega}(t_n)=U^n_{\Omega}$, $U(t_n)=U^n$  and $V(t_n)=V^n$.
+ 
+ The Cauchy Problem transforms a system of ordinary differential equations  into a system of difference equations system by means of a  a $s$-steps temporal scheme:
+        \begin{align*}
+        G({U}_{\Omega}^{n+1}, \underbrace{ {U}^{n}, \ldots {U}^{n+1-s}}_{s \ steps};t_n, & \Delta t)=  {F}_U({U}^n,V^n;t_n),   \\ \\
+        {U}(t_0)={U}^0 , \qquad & {H}_U({U}^n;t_n)\big\rvert_{\partial \Omega}=0,   \\ \\
+        {F}_V({U}^n,V^n;t_n)=0, \qquad & {H}_V({V}^n;t_n)\big\rvert_{\partial \Omega}=0,
+        \end{align*}
+ where 
+        \begin{equation*}
+        	{G}: \mathbb{ R}^{N_{e,u}-N_{C,u}} \times \underbrace{\mathbb{ R}^{N_{e,u}} \times  \ldots \times \mathbb{ R}^{N_{e,u}}}_{s \ steps} \times\mathbb{ R} \times \mathbb{ R}\rightarrow \mathbb{R}^{N_{e,u}-N_{C,u}},
+        \end{equation*} 
+ is the difference operator associated to the temporal scheme and $\Delta t$ is the temporal step. Thus, at each temporal step four  systems of $N_{e,u}-N_{C,u}$, $N_{C,u}$,  $N_{e,v}-N_{C,v}$ and $N_{C,v}$ equations appear. In total a system of $N_{e,u}+N_{e,v}$ equations appear at each temporal step for all components of $U^n$ and $V^n$.
+        
+ Once the spatial discretizations are done, it is proceeded to integrate in time. This method is called the method of lines and it is represented in figure \ref{fig:IBVPPandBVPmethodlines}.
+        
+        \newpage
+        
+        \IBVPandBVPmethodlines 
+        
+ Starting from the initial value $U^0$, the initial value $V^0$ is calculated by means of the BVP that governs the variable $ V $. 
+ Using both values $U^0$ and $V^0$, the difference operator $F_U$ at that instant is constructed.  With this difference operator, the temporal scheme yields the next temporal step ${U}_{\Omega}^{1}$. Then, the boundary conditions of the IBVP  are imposed to obtain the solution $U^1$. This solution will be used as the initial value to solve the next temporal step. In this way, the algorithm consists of a sequence of four steps that are carried out iteratively.
+ 
+ 
+         
+ \begin{enumerate}      
+    \item[\textbf{Step 1.}]   Determination of boundary points $U^n_{ \partial \Omega}$  from inner points $U^n_{\Omega}$.
+       
+        In the first place, the known initial value at the inner points $U^n_{\Omega}$ is used to impose the boundary conditions determining the boundary points $U^n_{ \partial \Omega}$. That is, solving the system of equations:
+        \begin{equation*}
+        	{H_U}({U}^n;t_n)\big\rvert_{\partial \Omega}=0. 
+        \end{equation*}
+      %  which gives back the value of the solution at boundaries ${U}^{n}\big\rvert_{\partial \Omega}$. 
+         Even though this might look redundant for the initial value $U^0$ (which is supposed to satisfy the boundary conditions), it is not for every other temporal step as the Cauchy Problem is defined only for the inner points $U^{n}_{\Omega}$. This means that to construct the solution $U^n$ its value at the boundaries ${U}^{n}\big\rvert_{\partial \Omega}$ must be calculated satisfying the boundary constraints. 
+        
+    \item[\textbf{Step 2.}] Boundary Value Problem for $V^n$.
+    
+        Once the value  $U^n$ is updated, the difference operator ${F}_V({V}^n,U^n;t_n)$ is calculated by means of its derivatives. The known value $U^n$ is introduced as a parameter in this operator. When $U^n$ and the time $t_n$ is introduced in such manner, the system of equations defined by the difference operator is invertible, a required condition to be solvable. 
+        The  difference operator  $ F_V $ is used along with the boundary conditions operator $H_V$, to solve the boundary value problem for $V^n$. It is precisely defined by:
+        $$ {F}_V({V}^n,U^n;t_n)=0, $$
+        $$ H_V({V}^n;t_n)\big\rvert_{\partial \Omega}= 0. $$
+        Since  $U^n$ and $t_n$ act as a parameter, this problem can be solved by using the subroutines to solve a classical  boundary value problem. However, to reuse the same interface than  the classical BVP uses,  the operator $F_V$ and the boundary conditions $H$ must be transformed into functions 
+        \begin{align*}
+             & {F}_{V,R}: \mathbb{ R}^{N_{e,v}} \rightarrow \mathbb{ R}^{N_{e,v}-N_{C,v}}, \\ \\
+             & {H}_{V,R}: \mathbb{ R}^{N_{e,v}} \rightarrow \mathbb{ R}^{N_{C,v}}.
+        \end{align*}  
+        This is achieved by restricting these functions considering  $U^n$ and $t_n$ as external parameters. 
+        
+        Once this is done, the problem can be written as: 
+        $$ {F}_{V,R}({V}^n)=0, $$
+        $$ H_{V,R}({V}^n)\big\rvert_{\partial \Omega}= 0, $$
+        which is solvable in the same manner as explained in the chapter of Boundary Value Problems.
+        Since this algorithm reuses the BVP software layer which has been explained previously, the details of this step will not be included. By the end of this step, both solutions $U^n$ and $V^n$ are known.
+        
+    
+   	\item[\textbf{Step 3.}] Spatial discretization of the IBVP. 
+   	
+     Once $U^n$ and $V^n$ are known,  their derivatives are calculated by the selected finite differences formulas. Once calculated, the difference operator  $ {F}_U({U}^n,V^n;t_n)$ is built.   
+    
+    	\item[\textbf{Step4.}] Temporal step for $U^n$.
+    
+        Finally, the difference operator previously calculated $F_U$ acts as the evolution function of a Cauchy problem. Once the following step is evaluated,  the solution $U_{\Omega}^{n+1}$ at inner points is yielded. This means solving the system: 
+        \begin{equation*}
+        G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)=  {F}_U({U}^n,V^n;t_n).
+        \end{equation*}
+        In this system, the values of the solution at the $s$ steps are known and therefore, the solution of the system is the solution at the next temporal step $U_{\Omega}^{n+1}$. However, the temporal scheme $G$ in general is a function that needs to be restricted in order to be invertible. In particular a restricted function $\tilde{G}$ must be obtained:
+        
+        $$\tilde{G}({U}_{\Omega}^{n+1}) = \eval{G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}_{({U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}$$
+        such that, 
+        $$ \tilde{G}:\mathbb{ R}^{N_{e,u}-N_{C,u}} \rightarrow \mathbb{R}^{N_{e,u}-N_{C,u}}. $$
+        
+        Hence, the solution at the next temporal step for the inner points results:
+        
+        $$ U_{\Omega}^{n+1} = \tilde{G}^{-1}(F_U(U^n,V^n; t_n)) .$$
+        
+        
+        This value will be used as an initial value for the next iteration. The philosophy for other temporal schemes is the same, the result is the solution at the next temporal step.
+  
+ \end{enumerate}  
+        
+ 
+ 
+       
+
+%    \IBVPandBVPalgorithm
+       
+
+ 
+\newpage
+%*****************************************************
+\section{Implementation: the upper abstraction layer}
+%*****************************************************
+
+Once the algorithm is set with a precise notation, it is very easy to implement following rigorously the steps provided by the algorithm. 
+The ingredients that are used to solve the IBVP coupled with an BVP are given by the equations (\ref{ibvp_bvp1})-(\ref{ibvp_bvp2}). Hence, the arguments of the subroutine \verb|IBVP_BVP| to solve this problem is implemented in the following way: 
+ 
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{subroutine IBVP_and_BVP}
+{contains}{IBVP_and_BVPs.f90}
+These arguments comprise two differential operators \verb|L_u| and \verb|L_v| for the IBVP and the BVP respectively. The boundary conditions operators or functions of these two problems are called  \verb|BC_u| and \verb|BC_v|. There are two output arguments \verb|Ut| and \verb|Vt| which the solution of the IBVP and the BVP respectively. 
+The first three steps of the algorithm are carried out in the function \verb|BVP_and_IBVP_discretization| and the four step is carried out in the subroutine \verb|Cauchy-ProblemS|.
+
+%*****************************************************
+\section{\texttt{BVP\_and\_IBVP\_discretization}}
+%*****************************************************
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{subroutine BVP}
+{end subroutine}{IBVP_and_BVPs.f90}
+
+
+%*****************************************************
+\section{Step 1. Boundary values of the IBVP}
+%*****************************************************
+As it was mentioned, the subroutine \verb|BVP_and_IBVP_discretization| is the core subroutine of the algorithm. As it can be seen written in the code, it comprises the three first step of the algorithm. 
+Step 1 is devoted to solve a system of equations for the boundary points \verb|Uc| by means of Newton solver. The system is equations is constructed in the function \verb|BCs| 
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{function BCs}
+{end function}{IBVP_and_BVPs.f90}
+
+This subroutine prepares the functions \verb|G| to be solved by Newton solver by packing equations of different edges of the spatial domain. The unknowns are gathered in the subroutine \verb|Asign_BVs| and the equations are imposed in the subroutine \verb|Asign_BCs|
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{subroutine Asign_BVs}
+{end subroutine}{IBVP_and_BVPs.f90}
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{subroutine Asign_BCs}
+{end subroutine}{IBVP_and_BVPs.f90}
+  
+
+As it was mentioned, the function \verb|BC_u| is the boundary conditions operator that is imposed to the IBVP and it is one of the  input arguments of
+subroutine \verb|IBVP_an_BVP|. To sum up, step 1 allows by gathering the unknowns of the boundary points and by building an algebraic  system of equations to obtain the boundary values. This system of equations is solved by means of a Newton method.  
+
+
+\newpage 
+%*****************************************************
+\section{Step 2. Solution of the BVP}
+%*****************************************************
+As it can be seen in the subroutine  \verb|BVP_and_IBVP_discretization|, step 2 is carried out by the using the  subroutine  
+ \verb|Boundary_Value_Problem| which was developed in chapter devoted to the Boundary Value Problem.  
+Since the interface of the differential operator argument  \verb|L_v| is not as the interface of the  argument that uses
+\verb|Boundary_Value_Problem|, some restrictions must be done. 
+This restrictions for \verb|L_v| and \verb|BC_v| are done by menas of the functions \verb|L_v_R| and \verb|BC_v_R|.
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{function L_v_R}
+{end function}{IBVP_and_BVPs.f90}
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{function BC_v_R}
+{end function}{IBVP_and_BVPs.f90}
+
+As it can be observed, the interface of \verb|L_v_R| and \verb|BC_v_R| comply  the requirements of the subroutine \verb|Boundary_Value_Problem|. The extra arguments that \verb|L_v| and \verb|BC_v| require are accessed as external variables using the lexical scoping of subroutines inside another by means of the instruction \verb|contains|.
+ 
+%*****************************************************
+\section{Step 3. Spatial discretization of the IBVP}
+%*****************************************************
+The spatial discretization of the IBVP is done in the last part of the subroutine \verb|BVP_and_IBVP_discretization|  by means of the differential operator \verb|L_u| which is an input argument of the subroutine \verb|BVP_and_IBVP|. Once derivatives of \verb|U| and \verb|V| are calculated in all grid points, the subroutine calculates the discrete or difference operator in each point of the domain.  
+It is copied code snippet of the subroutine \verb|BVP_and_IBVP_discretization| to follow easily these explanations.  
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{Step 3.}
+{end subroutine}{IBVP_and_BVPs.f90}
+As it observed, two loops run through all inner grid points of \verb|U| variable. In step 1, the boundary values of \verb|U| are obtained by imposing the boundary conditions. It is important also to notice that the evolution of the inner grid points \verb|U| depends on the values of \verb|U|,  \verb|V| and  their derivatives that are calculated previously
+
+\vspace{0.1cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{Derivatives of U}
+{Step 3}{IBVP_and_BVPs.f90}
+
+ 
+
+%*****************************************************
+\section{Step 4. Temporal evolution of the IBVP}
+%*****************************************************
+Finally, the state of the system in the next temporal step $ n+1$ is calculated by using the classical subroutine
+\verb|Cauchy_ProblemS|. A code snippet of the subroutine \verb|BVP_and_IBVP| is copied here to follow the explanations. 
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{Cauchy_ProblemS}
+{contains}{IBVP_and_BVPs.f90}
+To reuse the subroutine \verb|Cauchy_ProblemS| and since the interface of the function \verb|BVP_and_IBVP_discretization| does not comply the requirements of the subroutine \verb|Cauchy_ProblemS|, a restriction is used by means of the subroutine \verb|BVP_and_IBVP_discretization_2D|
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{function BVP_and_IBVP_discretization}
+{end function}{IBVP_and_BVPs.f90}
+
+
+\vspace{0.5cm} 
+\listings{\home/sources/IBVP_and_BVPs.f90}
+{subroutine BVP_and_IBVP_discretization_2D}
+{Vyy}{IBVP_and_BVPs.f90}
+
+
+As it can be observed, whereas \verb|U| is a vector of rank one for the subroutine \verb|Cauchy_ProblemS|, the rank of \verb|U| for the 
+subroutine  \verb|BVP_and_IBVP_discretization_2D| is three. 
+This association between dummy argument and actual argument violates the TKR (Type-Kind-Rank) rule  but allows pointing to the same memory space without duplicating or reshaping variables.   
+

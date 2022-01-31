@@ -1,0 +1,205 @@
+
+% ________________________CODE LENGUAGE________________________________________
+\usepackage{listings}
+
+\lstdefinelanguage{JavaScript}{
+	keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, undefined},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywords={class, export, boolean, throw, implements, import, this},
+	ndkeywordstyle=\color{darkgray}\bfseries,
+	identifierstyle=\color{black},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{red}\ttfamily,
+	stringstyle=\color{orange}\ttfamily,
+	morestring=[b]',
+	morestring=[b]"
+}
+
+
+
+%\lstset{literate=%
+%	{0}{{{\color{Green}0}}}1
+%	{1}{{{\color{Green}1}}}1
+%	{2}{{{\color{Green}2}}}1
+%	{3}{{{\color{Green}3}}}1
+%	{4}{{{\color{Green}4}}}1
+%	{5}{{{\color{Green}5}}}1
+%	{6}{{{\color{Green}6}}}1
+%	{7}{{{\color{Green}7}}}1
+%	{8}{{{\color{Green}8}}}1
+%	{9}{{{\color{Green}9}}}1
+%}
+
+
+\newcommand{\lsthtml}{
+	\lstset{
+		language=html,
+		basicstyle=\ttfamily\small,
+		frame=single,
+		showspaces=false,
+		showstringspaces=false,
+		backgroundcolor=\color{white},
+		keywordstyle=\color{blue},
+		deletekeywords={type},
+		commentstyle=\color{mygreen},
+		stringstyle=\color{violet},
+		breaklines=true,
+		alsoletter={.},morekeywords={nav,/nav}
+	}
+}
+\newcommand{\lstbash}{
+	\lstset{
+		language=bash,
+		basicstyle=\ttfamily\small,
+		frame=single,
+		showspaces=false,
+		showstringspaces=false,
+		backgroundcolor=\color{white},
+		keywordstyle=\color{blue},
+		deletekeywords={type},
+		commentstyle=\color{mygreen},
+		stringstyle=\color{violet},
+		breaklines=true,
+		alsoletter={.},
+		morekeywords={ssh,scp,server.py,runserver.sh,killserver.sh,killemail.sh,runemail.sh}
+	}
+}
+\newcommand{\lstpython}{
+	\lstset{
+		language=python,
+		basicstyle=\ttfamily\small,
+		frame=single,
+		showspaces=false,
+		showstringspaces=false,
+		backgroundcolor=\color{white},
+		keywordstyle=\color{blue},
+		deletekeywords={type},
+		commentstyle=\color{mygreen},
+		stringstyle=\color{violet},
+		breaklines=true,
+		alsoletter={.,...},
+		morekeywords={}
+	}
+}
+
+
+
+\newcommand{\lstjs}{
+	\lstset{
+		language=JavaScript,
+		extendedchars=true,
+		basicstyle=\ttfamily\footnotesize,
+		frame=single,
+		showstringspaces=false,
+		showspaces=false,
+		numberstyle=\footnotesize,
+		numbersep=9pt,
+		tabsize=4,
+		breaklines=true,
+		showtabs=false,
+		captionpos=b
+	}
+}
+
+
+
+
+%
+%
+%\lstset{ %
+%	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+%	basicstyle=\footnotesize,%%        % the size of the fonts that are used for the code
+%	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+%	breaklines=true,                 % sets automatic line breaking
+%	captionpos=b,                    % sets the caption-position to bottom
+%	commentstyle=\color{mygreen},    % comment style
+%	deletekeywords={...},            % if you want to delete keywords from the given language
+%	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+%	frame=single,                    % adds a frame around the code
+%	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+%	keywordstyle=\color{blue}\textbf,       % keyword style
+%	language=Fortran,                 % the language of the code
+%	otherkeywords={*,source},            % if you want to add more keywords to the
+%	% set
+%	numbers=none,                    % where to put the line-numbers; possible
+%	% values are (none, left, right)
+%	numbersep=5pt,                   % how far the line-numbers are from the code
+%	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+%	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+%	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+%	showstringspaces=false,          % underline spaces within strings only
+%	showtabs=false,                  % show tabs within strings adding particular underscores
+%	stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+%	stringstyle=\color{mymauve},     % string literal style
+%	tabsize=2,                       % sets default tabsize to 2 spaces
+%	title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+%}
+%
+%
+%
+
+
+%\lstset{ %
+%	backgroundcolor=\color{Goldenrod!10},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+%	basicstyle=\footnotesize\ttfamily,%%\small,               % the size of the fonts that are used for the code
+%	breakatwhitespace=false,                % sets if automatic breaks should only happen at whitespace
+%	breaklines=true,                 % sets automatic line breaking
+%	captionpos=b,                    % sets the caption-position to bottom
+%	commentstyle=\color{mygreen},    % comment style
+%	deletekeywords={...},            % if you want to delete keywords from the given language
+%	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+%	frame=single,                    % adds a frame around the code
+%	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+%	keywordstyle=\color{blue}\textbf,       % keyword style
+%	language=Fortran,                 % the language of the code
+%	otherkeywords={*,source},            % if you want to add more keywords to the
+%	% set
+%	numbers=none,                    % where to put the line-numbers; possible
+%	% values are (none, left, right)
+%	numbersep=5pt,                   % how far the line-numbers are from the code
+%	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+%	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+%	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+%	showstringspaces=false,          % underline spaces within strings only
+%	showtabs=false,                  % show tabs within strings adding particular underscores
+%	stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+%	stringstyle=\color{mymauve},     % string literal style
+%	tabsize=2,                       % sets default tabsize to 2 spaces
+%%	title=\texttt{\detokenize{\lstname}}     % show the filename of files included with \lstinputlisting; also try caption instead of title
+%%	title= \texttt{\lstname}
+%%    caption =\texttt{\detokenize{\lstname}}
+%%    caption =\detokenize{\lstname}
+%}
+
+ \lstset{ 
+     language=Fortran, % choose the language of the code
+    % basicstyle=\footnotesize\ttfamily,
+    % keywordstyle=\color{black}\textit, % style for keywords
+     basicstyle=\footnotesize\ttfamily,
+     keywordstyle=\normalsize\bfseries,%\textit, %%
+     numbers=none, % where to put the line-numbers
+     numberstyle=\tiny, % the size of the fonts that are used for the line-numbers     
+     backgroundcolor=\color{gray!2},
+     showspaces=false, % show spaces adding particular underscores
+     showstringspaces=false, % underline spaces within strings
+     showtabs=false, % show tabs within strings adding particular underscores
+     frame=single, % adds a frame around the code
+     tabsize=2, % sets default tabsize to 2 spaces
+     rulesepcolor=\color{gray},
+     stringstyle=\color{gray},     % string literal style
+     captionpos=b, % sets the caption-position to bottom
+     breaklines=true, % sets automatic line breaking
+     breakatwhitespace=false, 
+     commentstyle=\color{gray!50},
+     numberstyle = \color{black},
+     frame=trBL,
+     morekeywords={procedure, findloc}
+ }
+\newcommand\mycap[1]{ \texttt{ \detokenize{#1} }  }
+
+
+\definecolor{mymauve}{rgb}{0.58,0,0.82}

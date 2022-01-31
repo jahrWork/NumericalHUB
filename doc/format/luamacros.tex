@@ -1,0 +1,46 @@
+%%%% LUA MACRO FOR EXTRACTING A PIECE 
+
+\directlua{
+
+function create_file(file, label1, label2)
+
+    local write =  false; 
+    local temp = io.open("temp.f90", "w"); 
+
+    for line in io.lines(file) do 
+
+          if string.match( line, label1) then
+                                              write = true; 
+          end
+
+          if write then 
+
+             if string.match( line, label2) then
+                    write = false; 
+                    temp:write(line, "\string\n"); 
+                    temp:close(); 
+                    return; 
+             else 
+                    temp:write(line, "\string\n"); 
+             end 
+                  
+          end
+     end  
+
+end
+} 
+
+
+\newcommand{\ExtractCode}[3]{
+	\directlua
+	{ 
+		create_file(#1, #2, #3)
+	}
+}%
+
+
+\newcommand{\listings}[4]{
+	\ExtractCode{"#1"}{"#2"}{"#3"}
+	\lstinputlisting[language=Fortran, firstline = 1, lastline = 500, caption = \mycap{#4}]{temp.f90}	
+}
+

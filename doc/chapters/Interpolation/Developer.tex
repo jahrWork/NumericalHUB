@@ -1,0 +1,352 @@
+
+    
+    %*************************************************************************
+    \chapter{Lagrange Interpolation } \label{dev:Interpolation}
+    %************************************************************************* 
+    \section{Overview}
+    One of the core topics in theory of approximation is the interpolation of functions. The main idea of interpolation is to approximate a function $f(x)$ in an interval $[x_0,x_f]$ by means of a set of known functions $\{g_j(x)\}$ which are intended to be simpler than $f(x)$. The set $\{g_j(x)\}$ can be polynomials, monomials or trigonometric functions. In this chapter we will restrict ourselves to the case of polynomial interpolation, and in particular when Lagrange polynomials are used. 
+    
+    
+    
+    \section{Lagrange interpolation}
+    
+    In this section, polynomial interpolation using Lagrange polynomials will be presented. For this a general view on how to use Lagrange polynomials is explained, considering different scenarios. First how to calculate recursively Lagrange polynomials, their derivatives and integral will be explained. After that, once we have available the derivatives and integral of these polynomials, how to use them to approximate this quantities for a function $f(x)$. At the same time, an implementation of the discussed procedures shall be presented. To end the chapter, we present briefly how to extend the notion of Lagrange interpolation to functions of more than one variable considering the case of a function of two variables. 
+    
+    \subsection{Lagrange polynomials}
+    
+    The Lagrange polynomials $\ell_j(x)$ of grade $N$ for a set of points $\{x_j\}$ for $j=0,1,2\ldots,N$ are defined as:
+    
+    \begin{equation}
+    	\ell_j(x) =  \prod_{\substack{i=0 \\ i\neq j}}^{N} \dfrac{x - x_i}{x_j - x_i},
+    \end{equation}
+    
+    which satisfy: 
+    
+    \begin{equation}
+    	\ell_j(x_i) = \delta_{ij}, \label{eq:Lagrange_kronecker}
+    \end{equation}
+    where $\delta_{ij}$ is the delta Kronecker function. This property is fundamental because as we will see it permits to obtain the Lagrange interpolant very easily once the Lagrange polynomials are determined.
+    
+    Another interesting property specially for recursively determining Lagrange polynomials appears when considering   $\ell_{jk}$ as the Lagrange polynomial of grade $k$ at $x_j$ for the set of nodes $\{x_0,x_1\ldots,x_k\}$ and $0 \leq j\leq k$, that is:
+    
+    \begin{equation}
+     \ell_{jk}(x) = \prod_{\substack{i=0 \\ i\neq j}}^{k} \dfrac{x - x_i}{x_j - x_i} = \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right) \prod_{\substack{i=0 \\ i\neq j}}^{k-1} \dfrac{x - x_i}{x_j - x_i},
+    \end{equation}
+     which results in the property:
+     
+     \begin{equation}
+     \ell_{jk}(x) = \ell_{jk-1}(x) \, \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right),
+     \label{eq:Lagrange_recursion}
+     \end{equation}
+     where $1\leq k \leq N$. This property permits to obtain the Lagrange interpolant of grade $k$ for the set of points $\{x_0,x_1\ldots,x_k\}$ if its known the interpolant of grade $k-1$ for the set of points $\{x_0,x_1\ldots,x_{k-1}\}$. Besides, for $k=0$ is satisfied:
+     
+     \begin{equation}
+     	\ell_{j0}(x) = 1.
+     \end{equation}
+     
+     Hence, it can be obtained recursively the interpolant at $x_j$ for each grade as:
+     
+     \begin{align*}
+     	\ell_{j1}(x) & = \left(\dfrac{x - x_{0}}{x_j - x_{0}}\right), \\
+     	\ell_{j2}(x) & = \left(\dfrac{x - x_{0}}{x_j - x_{0}}\right) \left(\dfrac{x - x_{1}}{x_j - x_{1}}\right), \\ 
+     	& \vdots \\
+     	\ell_{jk}(x) & = \underbrace{\left(\dfrac{x - x_{0}}{x_j - x_{0}}\right)  \ldots 
+     	\left(\dfrac{x - x_{j-1}}{x_j - x_{j-1}}\right) \left(\dfrac{x - x_{j+1}}{x_j - x_{j+1}}\right) \ldots 
+     	\left(\dfrac{x - x_{k-2}}{x_j - x_{k-2}}\right)}_{\ell_{jk-1}(x)} \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right) . 
+     \end{align*}
+    
+    From equation (\ref{eq:Lagrange_recursion}). a recursion to calculate the $k$ first derivatives of $l_{jk}(x)$ is obtained.
+    %
+    \begin{align}
+    	\ell_{jk}'(x) 
+    	&
+    	= 
+    	\ell_{jk-1}'(x)  
+    	\left(
+    	\dfrac{x - x_{k-1}}{x_j - x_{k-1}}
+    	\right)
+    	+
+    	\left(
+    	\dfrac{\ell_{jk-1}(x)}{x_j - x_{k-1}}
+    	\right),
+    	\nonumber
+    	\\
+    	\ell_{jk}''(x) 
+    	&
+    	= 
+    	\ell_{jk-1}''(x)  
+    	\left(
+    	\dfrac{x - x_{k-1}}{x_j - x_{k-1}}
+    	\right)
+    	+
+    	\left(
+    	\dfrac{2\ell_{jk-1}'(x)}{x_j - x_{k-1}}
+    	\right),
+    	\nonumber
+    	\\& \vdots \nonumber
+    	\\
+    	\ell_{jk}^{(m)}(x) 
+    	&
+    	= 
+    	\ell_{jk-1}^{(m)}(x)  
+    	\left(
+    	\dfrac{x - x_{k-1}}{x_j - x_{k-1}}
+    	\right)
+    	+
+    	\left(
+    	\dfrac{m\ell_{jk-1}^{(m-1)}(x)}{x_j - x_{k-1}}
+    	\right),
+    	\label{eq:Lagrange_derivatives}
+    	\\& \vdots \nonumber
+    	\\
+    	\ell_{jk}^{(k)}(x) 
+    	&
+    	= 
+    	\cancelto{0}{\ell_{jk-1}^{(k)}}(x)
+    	\left(
+    	\dfrac{x - x_{k-1}}{x_j - x_{k-1}}
+    	\right)
+    	+
+    	\left(
+    	\dfrac{k\ell_{jk-1}^{(k-1)}(x)}{x_j - x_{k-1}}
+    	\right).
+    	\nonumber
+    \end{align}
+    Note that equation (\ref{eq:Lagrange_derivatives}) is also valid for $m=0$, value for which it reduces to (\ref{eq:Lagrange_recursion}). Hence, starting from the value $\ell_{j0}=1$ we can compute the polynomial $\ell_{jk}$ and its first $k$ derivatives using recursion (\ref{eq:Lagrange_derivatives}). The idea is known the first $k-1$ derivatives of $\ell_{jk-1}$ we start computing $\ell_{jk}^{k)}$, then $\ell_{jk}^{k-1)}$ until we calculate $\ell_{jk}^{0)}=\ell_{jk}$. For example, supposing $j\neq 0$ we calculate $\ell_{j1}'$ and $\ell_{j1}$ from $\ell_{j0}=1$ as
+    %
+    \begin{align*}
+    	\ell_{j1}' 
+    	& 
+    	= \dfrac{\ell_{j0}}{x_j - x_0} = \dfrac{1}{x_j - x_0},
+    	\\
+    	\ell_{j1} 
+    	& 
+    	=\ell_{j0}\dfrac{x-x_0}{x_j - x_0}
+    	= \dfrac{x-x_0}{x_j - x_0}.
+    \end{align*}
+    
+    The reason to sweep $m$ in descending order through the interval $[0,k]$ is because computing the recursion in this manner permits to implement the calculation of the derivatives storing the values of $\ell_{jk}^{(m)}$ over the value of $\ell_{jk-1}^{(m)}$. 
+    
+    Once $\ell_{jk}$ and its $k$ first derivatives are calculated we can compute the integral of $\ell_{jk}$ in the interval $[x_0,x]$ from its truncated Taylor series of grade $k$. Hence, we can express the integral as:
+    %
+    \begin{align}
+    	\int_{x_0}^{x}
+    	\ell_{jk}(x)
+    	\dd x
+    	=
+    	\ell_{jk}(x_0)(x-x_0)
+    	+
+    	\ell_{jk}'(x_0)\frac{(x-x_0)^2}{2}
+    	+\dots
+    	+
+    	\ell_{jk}^{(k)}(x_0)\frac{(x-x_0)^{k+1}}{(k+1)!}.
+    \end{align}
+    
+    
+    The computation of the first $k$ derivatives and the integral  for a grid of $k+1$ nodes, is carried out by the function \verb|Lagrange_polynomials|. The derivatives and integrals at a point \verb|xp| are stored on a vector \verb|d| whose dimension is the number of set nodes. For a fixed point of the grid (that is, for fixed $j$) the following loop computes the derivatives and the image of the Lagrange polynomial $\ell_j$, evaluated at \verb|xp|. 
+    
+    \listings
+    {\home/sources/Lagrange_interpolation.f90}
+    {k derivative of lagrange}
+    {endif}{Lagrange_interpolation.f90}
+    
+    The integral is computed in a different loop once the derivatives are calculated
+    \listings
+    {\home/sources/Lagrange_interpolation.f90}
+    {integral of lagrange}
+    {enddo}{Lagrange_interpolation.f90}
+    
+    Both processes are carried out in the pure function \verb|Lagrange_polynomials|, once both derivatives and integral are computed at a nodal point labeled by $j$ the values stored at \verb|d| are assigned to the output of the function. Then the same procedure is carried out for the next grid point $j+1$.
+    
+    \newpage
+    \listings{\home/sources/Lagrange_interpolation.f90}
+    {function Lagrange_polynomials}
+    {end function}{Lagrange_interpolation.f90}
+    
+    
+    \subsection{Single variable functions}
+    
+    Whenever is considered a single variable scalar function $f:\mathbb{R}\rightarrow\mathbb{R}$, whose value $f(x_j)$ at the nodes $x_j$ for $j=0,1,2\ldots,N$ is known,
+     the Lagrange interpolant $I(x)$ that approximates the function in the interval $[x_0,x_N]$ takes the form:
+     
+     \begin{equation}
+     	I(x) = \sum_{j=0}^{N}   b_j\ell_j (x).
+     \end{equation}
+    
+    This interpolant is used to approximate the function $f(x)$ within the interval $[x_0,x_N]$. For this, the constants of the linear combination $b_j$ must be determined. The interpolant must satisfy to intersect the exact function $f(x)$ on the nodal points $x_i$ for $i=0,1,2\ldots,N$, that is:
+    
+    \begin{equation}
+    	I(x_i) = f(x_i).
+    \end{equation}
+    
+    Taking into account the property (\ref{eq:Lagrange_kronecker}) leads to:
+    %
+    \begin{equation}
+    I(x_i) = f(x_i) = \sum_{j=0}^{N}   b_j\ell_j (x_i) =\sum_{j=0}^{N}   b_j \delta_{ij}, \quad \Rightarrow \quad f(x_j) = b_j.
+    \end{equation}
+    
+    Hence, the interpolant for $f(x)$ on the nodal points $x_j$ for $j=0,1,2\ldots,N$ is written:
+    %
+    \begin{equation}
+    I(x) = \sum_{j=0}^{N}  f(x_j) \ell_j (x).
+    \end{equation}
+    
+    Note that in the equation above the degree of $\ell_j$ does not necessarily need to be $N$ and in general its degree $q$ satisfies $q\leq N$.
+    
+    A very common use of interpolation is to compute an approximation of $f$ in a non-nodal point $x_p$. The implementation of the interpolation of $f$ evaluated at $x_p$ is carried out by the function \verb|Interpolated_value| which given a set of nodes \verb|x| and the image of the function at those points \verb|y|, computes the interpolated value of $f$ in
+    \verb|xp| using Lagrange interpolation of a certain degree. First, it checks whether the degree of the polynomial \verb|degree| is even or odd as depending on this, the starting point of the set of nodes used by the Lagrange polynomials varies. Once the stencil is determined is necessary to compute the coefficients that multiply the images $f(x_j)$ which are the Lagrange polynomials evaluated at $x_p$. For this task, it calls the function \verb|Lagrange_polynomials| and stores its output in the array \verb|Weights|. Finally, we just need to sum the values of the Lagrange polynomials stored on \verb|Weights| at each point, scaled by the nodal images \verb|y|.
+    
+    
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Interpolation.f90}
+    {function Interpolated_value}
+    {end function}{Interpolation.f90}
+    
+    
+    
+    A different application of interpolation is to estimate the derivatives of the function $f$ by calculating the derivatives of the interpolant $I$. Mathematically, the solution to the problem is straightforward once the interpolant has been constructed. The $k$-th derivative of the interpolant is written as:
+    
+    \begin{equation}
+    I^{(k)}(x) = \sum_{j=0}^{N}  f(x_j) \ell_j^{(k)} (x).
+    \end{equation}
+    
+    In many situations is required to compute the first $k$ derivatives and image of the interpolant in a set of points $x_{p,i}$, $ i = 0,\ldots M$ contained in the interval $[x_0,x_N]$. Given the equation above, we just have to evaluate it in the set of nodes $x_{p,i}$, that is, we calculate them as:
+    % 
+    \begin{equation}
+    I^{(k)}(x_{p,i}) = \sum_{j=0}^{N}  f(x_j) \ell_j^{(k)} (x_{p,i}), \qquad i = 0,\ldots M .
+    \end{equation}
+    
+    The implementation of this calculation is obtained in a similar manner as it was done to obtain the interpolated value in a single point. In fact, the function \verb|Interpolant| is an extension of the function \verb|Interpolated_value|. Note that in this new function, the degree of the interpolant used is also checked as the stencil used to compute the derivatives of the interpolant varies whenever the degree is odd or even. For each point $x_{p,i}$ we have to calculate the derivatives of the Lagrange polynomials. In other words, we have to summon the function \verb|Lagrange_polynomials| to compute these derivatives at each point $x_{p,i}$. From the implementation point of view this requires embedding the process in a loop that goes from $i=0$ to $i=M$. The derivatives $\ell_j^{(k)} (x_{p,i})$ are stored in the array \verb|Weights| for a posterior usage. Once the Lagrange polynomials derivatives are computed, we just have to linearly combine the images $f(x_j)$ using the elements of the array \verb|Weights| as coefficients. 
+    
+    The implementation of the function \verb|Interpolant| is shown in the following listing:
+    
+    \newpage
+    \vspace{0.5cm} 
+    \listings{\home/sources/Interpolation.f90}
+    {function Interpolant}
+    {end function}{Interpolation.f90}
+    %
+    \vspace{-0.4cm}
+   Interpolation serves also to approximate integrals in an interval $[x_0,x_N]$. Mathematically, the integral is computed from the interpolant as:
+    %
+    \begin{align}
+    \int_{x_0}^{x_N}I(x) \dd x
+    = 
+    \sum_{j=0}^{N}  f(x_j) \int_{x_0}^{x_N} \ell_j (x) \dd x.
+    \end{align} 
+    
+    The implementation is done in a function called \verb|Integral| given the set of nodes $x_i$, the images $y_i$, $i=0,\ldots N$ and optionally the degree of the polynomials used.
+    \vspace{0.5cm} 
+    \listings{\home/sources/Interpolation.f90}
+    {function Integral}
+    {end function}{Interpolation.f90}
+    
+    \newpage
+
+    Finally, an additional function which is important for the next chapter is defined. This function determines the stencil or information that a $q$ order interpolation requires.
+    \vspace{0.5cm} 
+    \listings{\home/sources/Lagrange_interpolation.f90}
+    {function Stencilv}
+    {end function}{Lagrange_interpolation.f90}
+    
+    
+    
+    \subsection{Two variables functions}
+    
+    Whenever the approximated function for the set of nodes $\{(x_i,y_j)\}$ for $i=0,1\ldots , N_x$ and $j=0,1\ldots , N_y$ is $f:\mathbb{R}^2\rightarrow\mathbb{R}$, the interpolant $I(x,y)$ can be calculated as a two dimensional extension of the interpolant for the single variable function. In such case, a way in which the interpolant $I(x,y)$ can be expressed is:
+    
+    \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+    \end{equation}
+    
+    Again, using the property of Lagrange polynomials (\ref{eq:Lagrange_kronecker}), the coefficients $b_{ij}$ are determined as:
+    
+    \begin{equation}
+    	b_{ij}  = f(x_i,y_j),
+    \end{equation}
+     
+     leading to the final expression for the interpolant:
+     
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} f(x_i,y_j) \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     Notice that when the interpolant is evaluated at a particular coordinate line $x=x_m$ or alternatively at $y=y_n$, it is obtained:
+     
+     \begin{equation}
+     	{I}(x_m,y) = \sum_{j=0}^{N_y} f(x_m,y_j)  \ell_j(y) , 
+     	\qquad {I}(x,y_n) = \sum_{i=0}^{N_x}  f(x_i,y_n) \ell_i(x)  ,
+     	\label{eq:Interpolant_2D}
+     \end{equation}
+     which permits writing the interpolant as
+     
+     \begin{align}
+     	I(x,y) & = \sum_{i=0}^{N_x} {I}(x_i,y) \ell_i(x) \nonumber \\
+     	       & = \sum_{j=0}^{N_y} {I}(x,y_j) \ell_j(y). \label{eq:Interpolant_2D_recursive}
+     \end{align}
+ 
+     The form in which the interpolant is written in (\ref{eq:Interpolant_2D_recursive}) suggests a procedure to obtain the interpolant recursively.\\
+     
+     Another manner to interpret the equation (\ref{eq:Interpolant_2D}) is  as a bi-linear form. If the vectors $\vect{\ell}_x = \ell_i(x) \vect{e}_i$, $\vect{\ell}_y = \ell_j(y) \vect{e}_j$ and the second order tensor $\mathcal{F} = f(x_i,y_j) \vect{e}_i  \otimes \vect{e}_j$ are defined, where the index $(i,j)$ go through $[0,N_x]\times[0,N_y]$. This manner, the equation (\ref{eq:Interpolant_2D}) can be written:
+     
+     \begin{equation}
+     	I(x,y) =  \vect{\ell}_x \cdot \mathcal{F} \cdot \vect{\ell}_y .
+     \end{equation}
+     
+     
+     Another perspective to interpret the interpolation is obtained by considering the process geometrically. In first place, it is calculated a single variable Lagrange interpolant
+     for the function restricted at $y=s$:
+     
+     \begin{equation}
+     \eval{f(x,y)}_{y=s} = \tilde{f}(x;s)  \simeq \tilde{I}(x;s) = \sum_{i=0}^{N_x} b_i(s) \ell_i(x),
+     \end{equation}
+     where $\tilde{f}(x;s)$ is the restricted function, $\tilde{I}(x;s)$ its interpolant, $b_i(s) = \tilde{f}(x_i;s)$ are the coefficients of the interpolation and $\ell_i(x)$ are Lagrange polynomials. 
+     
+     The coefficients $b_i(s)$ can also be interpolated as:
+     
+     \begin{equation}
+     b_i(s) = \sum_{j=0}^{N_y} b_{ij} \ell_j(s) .
+     \end{equation}
+     
+     Hence, the restricted interpolant can be written:
+     
+     \begin{equation}
+     \tilde{I}(x;s) = \eval{I(x,y)}_{y=s} =\sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(s) ,
+     \end{equation}
+     and therefore the interpolant $I(x,y)$ can be expressed:
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     In the same manner, the interpolated value $I(x,y)$ can be achieved restricting the value in $x=s$:
+     
+     \begin{equation}
+     \eval{f(x,y)}_{x=s} = \tilde{f}(y;s)  \simeq \tilde{I}(y;s) = \sum_{j=0}^{N_y} b_j(s) \ell_j(y),
+     \end{equation}
+     
+     in which the coefficients $b_j(s)$ can be interpolated as well:
+     
+     \begin{equation}
+     b_j(s) = \sum_{i=0}^{N_x} b_{ij} \ell_i(s) .
+     \end{equation}
+     
+     This time, the restricted interpolant is expressed as:
+     
+     \begin{equation}
+     \tilde{I}(y;s) = \eval{I(x,y)}_{x=s} =\sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(s) \ell_j(y) ,
+     \end{equation}
+     
+     which leads to the interpolated value:
+     
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     The interpolation procedure and its geometric interpretation can be observed on figure \ref{fig:Geometric_interpolation}. In blue are represented the values $b_{ij}=f(x_i,y_j)$, in red the desired value $f(x,y)\simeq I(x,y)$ and in black the restricted interpolants.
+     
+     \twographs{\InterpolX{(a)}}{\InterpolY{(b)}}{Geometric interpretation of the interpolation of a 2D function. (a) Geometric interpretation when restricted along $y$.  (b) Geometric interpretation when restricted along $x$}{fig:Geometric_interpolation}
+     
+     
+     
+     

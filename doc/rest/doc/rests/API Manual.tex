@@ -1,0 +1,181 @@
+\documentclass{report}
+
+\usepackage{float}
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{epsfig}
+\usepackage{pst-grad} % For gradients
+\usepackage{pst-plot} % For axes
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+%\usepackage[svgnames]{xcolor} % Enabling colors by their 'svgnames'
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{array}
+
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom
+% captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{fix-cm}	 % Custom font sizes - used for the initial letter in the document
+\usepackage{color}
+\usepackage{sectsty} % Enables custom section titles
+\allsectionsfont{\usefont{OT1}{phv}{b}{n}} % Change the font of all section commands
+\usepackage{titling} % Allows custom title configuration
+
+\usepackage{fancyhdr} % Needed to define custom headers/footers
+\pagestyle{fancyplain} % Enables the custom headers/footers
+\usepackage{lastpage} % Used to determine the number of pages in the document (for "Page X of Total")
+
+\graphicspath{ {images/} }
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+
+\setlength{\parskip}{2mm} 
+\usepackage{mathrsfs}
+
+\lstset{ %
+	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+	basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	captionpos=b,                    % sets the caption-position to bottom
+	commentstyle=\color{mygreen},    % comment style
+	deletekeywords={...},            % if you want to delete keywords from the given language
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	frame=single,                    % adds a frame around the code
+	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue}\textbf,       % keyword style
+	language=Fortran,                 % the language of the code
+	otherkeywords={*,source},            % if you want to add more keywords to the
+	% set
+	numbers=none,                    % where to put the line-numbers; possible
+	% values are (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,          % underline spaces within strings only
+	showtabs=false,                  % show tabs within strings adding particular underscores
+	stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+	stringstyle=\color{mymauve},     % string literal style
+	tabsize=2,                       % sets default tabsize to 2 spaces
+	title=\lstname,                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+	linewidth=17cm,
+	xleftmargin=-0.5cm
+}
+
+%Allow us to make the rules larger
+\newlength\FHoffset
+\setlength\FHoffset{1cm}
+
+
+\fancyheadoffset{\FHoffset}
+\renewcommand{\headrulewidth}{0.5pt} % No header rule
+\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+% Headers - all currently empty
+\lhead{}
+\chead{}
+\rhead{}
+% Footers
+\lfoot{}
+\cfoot{}
+\rfoot{\footnotesize Page \thepage\ of \pageref{LastPage}} % "Page 1 of 2"
+
+
+\definecolor{DarkGoldenrod}{rgb}{0.8,0.6,0.1}
+\definecolor{DarkRed}{rgb}{0.5,0.1,0.1}
+\definecolor{DarkRedPart}{rgb}{0.3,0.1,0.2}
+
+\usepackage{lettrine} % Package to accentuate the first letter of the text
+\newcommand{\initialgold}[1]{ % Defines the command and style for the first
+	% letter
+	\lettrine[lines=3,lhang=0.3,nindent=0em]{
+		\color{DarkGoldenrod}
+		{\textsf{#1}}}{}}
+\newcommand{\initialred}[1]{ % Defines the command and style for the first
+	% letter
+	\lettrine[lines=3,lhang=0.3,nindent=0em]{
+		\color{DarkRed}
+		{\textsf{#1}}}{}}
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+\usepackage{titling} % Allows custom title configuration
+
+\newcommand{\HorRule}{\color{DarkGoldenrod} \rule{\linewidth}{1pt}} % Defines the gold horizontal rule around the title
+
+\pretitle{\vspace{-150pt} \begin{flushleft} \HorRule \fontsize{50}{50}
+		\usefont{OT1}{phv}{b}{n} \color{DarkRed} \selectfont} % Horizontal rule before the title
+	
+	\title{How to learn Applied Mathematics trough modern Fortran} % Your article title
+	
+	\posttitle{\par\end{flushleft}\vskip 0.5em} % Whitespace under the title
+
+\preauthor{\begin{flushleft}\large \lineskip 0.5em \usefont{OT1}{phv}{b}{sl} \color{DarkRed}} % Author font configuration
+	
+	
+	%\author{John Smith, } % Your name
+\postauthor{\footnotesize \usefont{OT1}{phv}{m}{sl} \color{Black} % Configuration for the institution name
+	Department of Applied Mathematics \\
+	School of Aeronautical and Space Engineering \\
+	Technical University of Madrid (UPM)
+	\par\end{flushleft}\HorRule} % Horizontal rule after the title
+
+\date{} % Add a date here if you would like one to appear underneath the title block
+
+%----------------------------------------------------------------------------------------
+
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+ 
+ 
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+
+
+\chapter{Some basic programs}
+\input{first_course}
+
+
+\chapter{System of Equations}
+\input{System_of_Equations}
+
+\chapter{Lagrange Interpolation}
+\input{Lagrange_Interpolation}
+
+\chapter{Finite Differences}
+\input{Finite_Differences}
+
+
+
+\chapter{Boundary Value Problem}
+\input{Boundary_Value_Problem}
+
+\chapter{Cauchy Problem}
+\input{Cauchy_Problem}
+
+\chapter{Initial Value Boundary Problem}
+\input{Boundary_Initial_Value_Problem}
+
+\end{document}
+
+

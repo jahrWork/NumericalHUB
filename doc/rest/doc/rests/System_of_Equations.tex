@@ -1,0 +1,180 @@
+\section{Overview}
+
+This is a library designed to solve systems of equations.
+
+It has three modules: \textbf{Linear\_systems}, \textbf{Non\_Linear\_Systems} and \textbf{Jacobian\_module}. In spite of this, the API is contained only in the \textbf{Linear\_systems} and in the \textbf{Non\_Linear\_Systems} modules. With the \textbf{Linear\_systems} module the user must be able to solve a linear system of equations. With the \textbf{Non\_Linear\_Systems} module the user must be able to solve a linear system of equations. 
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{API\_Example\_Systems\_of\_Equations.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Linear\_systems} and \textbf{use Non\_Linear\_Systems}.
+
+The first example consists of a linear system of equations of four unknowns with four equations. First of all, it is defined the matrix which contains the terms of the equation, and after the solution. In this example:
+
+ \begin{equation*} 
+    \left[ \begin{array}{cccc}
+    4 & 3 & 6 & 9 \\
+    2 & 5 & 4 & 2 \\
+    1 & 3 & 2 & 7 \\
+    2 & 4 & 3 & 8
+    \end{array}\right]  
+     \left( \begin{array}{c}
+    x  \\
+    y  \\
+    z  \\
+    w 
+    \end{array}\right) 
+    = 
+    \left( \begin{array}{c}
+    3  \\
+    1  \\
+    5  \\
+    2 
+    \end{array}\right) 
+ \end{equation*}
+ 
+ The second example consists in the solution of a nonlinear system of equations defined as follows:
+ 
+  \begin{equation*}
+  F_{1}=x^{2}-y{3}-2
+  \end{equation*}
+  \begin{equation*}
+  F_{2}=3xy-z
+  \end{equation*}
+ \begin{equation*}
+ F_{3}=z^{2}-x
+ \end{equation*}
+ 
+ \newpage
+ 
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+
+
+\lstinputlisting[language=Fortran]{../sources/Systems_of_equations_example.f90}
+\newpage
+
+
+\section{Linear\_systems module}
+
+
+\subsection*{LU\_factorization}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call LU_factorization( A )
+\end{lstlisting}
+
+The subroutine \textbf{LU\_factorization} returns the inlet matrix which has been factored by the LU method. The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+	\begin{spacing}{1.2}
+		\begin{tabular}{| l | l | l | p{5cm} |}
+			
+\hline
+			
+\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+			
+A & two-dimensional array of reals & inout & Square matrix to be factored by the LU method.\\ \hline
+			
+		\end{tabular}
+	\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{LU\_factorization} arguments}
+\end{table}
+
+\subsection*{Solve\_LU}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+x = Solve_LU( A, b )
+\end{lstlisting}
+
+The function \textbf{Solve\_LU} finds the solution to the linear system of equations:
+
+\begin{equation*}
+	\textbf{A}\cdot\vec{x}=\vec{b}
+\end{equation*}
+
+$\textbf{A}$ and $\vec{b}$ are the given values. The result of the function is:
+
+\begin{table}[H]
+	\begin{center}
+	\begin{spacing}{1.2}
+		\begin{tabular}{| l | l | p{6cm} |}
+			
+			\hline
+			
+			\bf Function result & \bf Type & \bf Description \\ \hline \hline
+			
+			x & vector of reals & Solution ($\vec{x}$) of the linear system of equations.\\ \hline
+			
+		\end{tabular}
+	\end{spacing}
+	\end{center}
+	\caption{Output of \textbf{Solve\_LU}}
+\end{table}
+
+The arguments of the function are described in the following table.
+
+\begin{table}[H]
+	\begin{center}		
+	\begin{spacing}{1.2}
+		\begin{tabular}{| l | l | l | p{6cm} |}
+			
+\hline
+			
+\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+			
+A & two-dimensional array of reals & inout & Square matrix $\textbf{A}$ in the previous equation, but it must be facotred \underline{before} using the LU method.\\ \hline
+			
+b & vector of reals & in & Vector $\vec{b}$ in the previous equation. \\ \hline
+			
+		\end{tabular}		
+	\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Solve\_LU} arguments}
+\end{table}
+
+The dimensions of $\textbf{A}$ and $\vec{b}$ must match.
+
+\section{Non\_Linear\_Systems module}
+
+\subsection*{Newton}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Newton( F, x0 )
+\end{lstlisting}
+
+The subroutine \textbf{Newton} returns the solution of a non-linear system of equations. The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+	\begin{spacing}{1.2}
+		\begin{tabular}{| l | l | l | p{7cm} |}
+			
+			\hline
+			
+			\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+			
+			F & vector function: $\mathbb{R}^{N} \rightarrow \mathbb{R}^{N}$ & in & System of equations that wants to be solved. \\ \hline
+			
+			x0 & vector of reals & inout & Initial point to start the iteration. Besides, this vector will contain the solution of the problem after the call. Its dimension must be $N$. \\ \hline
+			
+		\end{tabular}		
+	\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Newton} arguments}
+\end{table}

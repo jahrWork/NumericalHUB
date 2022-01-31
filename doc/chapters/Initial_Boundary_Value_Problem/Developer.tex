@@ -1,0 +1,214 @@
+     
+%*************************************************************************
+\chapter{Initial Boundary Value Problems}\label{Dev:IBVP}
+%*************************************************************************  
+
+\section{Overview}
+    
+In this chapter, an algorithm and the implementation of initial boundary value problems will be presented. From the physical point of view, an initial boundary value problem represents an evolution problem in a spatial domain in which some constraints associated to the boundaries of the domain must be verified. 
+
+
+From the mathematical point of view, it can be defined as follows.        
+Let $\Omega \subset \mathbb{ R}^p$ be  an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vect{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $.
+       
+An Initial Boundary Value Problem for a vector function $\vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables is defined as:
+       
+       \begin{align*}
+         &\frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}} (\vect{x},t,\vect{u}(\vect{x},t)) , & \forall \ \ \vect{x} \in  \Omega, \\
+         &\vect{h} (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vect{x} \in \partial \Omega,\\
+         & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}), 
+       \end{align*}
+where $\vect{\mathcal{L}}$ is the spatial differential operator, $\vect{u}_0(\vect{x})$ is the initial value and $\vect{h}$ is the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$.
+
+ 
+       
+\newpage       
+%************************************************* 
+\section{Algorithm to solve IBVPs}
+%*************************************************
+   
+       
+If the spatial domain $D$ is discretized in $N_D$ points, the problem extends from vector to tensor, as a tensor system of equations of order $p$ appears from each variable of $\vect{u}$. The order of the complete tensor system is $p +1$ and its number of elements $N$ is $N= {N_v} \times N_D$. The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of the tensor system evaluated on the boundary points is $N_C= {N_v} \times N_{\partial\Omega}$. Once the spatial discretization is done, even though the system emerges as a tensor Cauchy Problem, it can be rearranged into a vector system of $N$ equations. 
+Particularly,  two systems of equations appear: one of $N-N_C$ ordinary differential equations and $N_C$ algebraic equations related to the boundary conditions. These equations can be expressed in the following way:  
+       $$\dv{{U}_{\Omega}}{t} = {F}({U};t) , \qquad {H}({U};t)\big\rvert_{\partial \Omega}=0, $$ 
+       $$ {U}(t_0)={U}^0,$$
+where $U \in \mathbb{ R}^{N}$ is at inner and boundary points, $U_{\Omega}\in \mathbb{ R}^{N-N_C}$ is the solution at inner point, $U \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_C}$ is the solution at boundary points, $U^0 \in \mathbb{ R}^{N}$ is the discretized initial value, ${F}: \mathbb{ R}^{N} \times \mathbb{ R}\rightarrow \mathbb{R}^{N-N_C} $ is the difference operator associated to the differential operator and ${H}: \mathbb{ R}^{N} \times \mathbb{ R}\rightarrow \mathbb{R}^{N_C}$ is the difference operator of the boundary conditions. 
+       
+Hence, once the spatial discretization is carried out, the resulting problem comprises a system of $ N-N_C$ first order ordinary differential equations and $ N_C $ algebraic equations. 
+This  differential-algebraic system of equations (DAEs)  contains differential equations (ODEs) and algebraic equations are generally more difficult to solve than ODEs. Since the algebraic equations must be verified for all time, the algorithm to solve an initial boundary value problem 
+comprises the following three steps: 
+\begin{enumerate} 
+\item Determination of the solution at boundaries.
+
+      If the initial condition or the values $ U_{\Omega} $ at a given $ t_n $ are given, boundary conditions can be discretized  at 
+      boundaries. The number of the discretized equations must be the number of the unknowns $ U_{\partial \Omega} $ at boundaries. In these equations the inner points act as  forcing term or a parameter. 
+
+\item Spatial discretization of the differential operator at inner points.
+
+      Once inner and boundary values $ U_{D} $  are known, the spatial discretization at inner points allows building a system of ODEs for the valuesof the inner points.  
+
+  
+\item Temporal step to update the evolving solution. 
+       
+       Once the vector function is known, a validated temporal scheme is used to determine the next time step.  
+
+\end{enumerate}  
+
+The sequence of the algorithm is represented in figure 	\ref{fig:IBVPmethodlines}. This algorithm is called method of lines. 
+       
+       \IBVPmethodlines
+       
+       \FloatBarrier
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ \newpage         
+ %*************************************************
+ \section{From classical to modern approaches}
+ %*************************************************     
+ This section is intended to show to advantages of implementing with a high level of abstraction avoiding tedious implementations, sources
+ of errors  and misleading results. 
+ To explain the algorithm and the different levels of abstraction when implementing a programming code, a one-dimensional initial boundary value problem is considered. The 1D heat equation with the following initial and boundary conditions in the domain \ensuremath{x \ \in [-1,1]} is chosen:
+            \begin{align*}
+             &  \frac{\partial u}{\partial t} = \frac{\partial ^2 u}{\partial x^2}, \\
+             & u(x, 0) = 0, \\
+             & u(-1,t) = 1, \qquad \frac{ \partial u}{\partial x}(1, t)= 0.
+            \end{align*}
+The algorithm to solve this problem, based on second order finite differences formulas, consists on defining a equispaced mesh with $ \Delta x $ spatial size 
+            $$
+             \{ x_i, \ \ i=0, \ldots, N \}. 
+           $$ 
+If $ u_i(t) $ denotes the approximate value of the function $u(x,t) $ at the nodal point $ x_i $, the partial differential equation  is imposed in these points by expressing their spatial derivatives with finite difference formulas
+            $$
+                \frac{d u_i}{d t} = \frac{ u_{i+1} - 2 u_i + u_{i-1} }{ \Delta x^2 }, \quad i=1, \ldots,  N-1.
+            $$
+The discretized boundary conditions are also imposed by:  
+            \begin{align*}
+                     & u_0(t) = 1, \\
+                     & \frac{1}{ 2 \Delta x} ( 3 \ u_N - 4 \ u_{N-1} + u_{N-2} )  = 0. 
+            \end{align*}
+These  equations constitute a differential-algebraic set of equations (DAEs). There are two algebraic associated to the boundary conditions and $ N-1 $ evolution equations governing the temperature of the inner points $ i=1, \ldots, N-1.$
+Finally, a temporal scheme such as the Euler method should be used to determine the evolution in time. If $ u^n_j $ denotes the approximate
+value of $ u(x,t) $ at the point $ x_i $ and the instant $ t_n $, the following difference set of equations governs the evolution of the temperature 
+ \begin{align*}
+                   &    u^n_0 = 1, \\ \\
+                   &    u^n _N  = \frac{4}{3} \ u^n_{N-1} - \frac{1}{3} \ u^n_{N-2} \\ \\
+                   & u^n_i = u^n_i + \frac{\Delta t} { \Delta x^2} \left( u^n_{i+1} - 2 u^n _i + u^n_{i-1} \right), \quad i=1, \ldots, N-1. 
+ \end{align*}
+
+
+
+
+\newpage 
+The above approach is tedious and requires extra analytical work if we change the equation, the temporal scheme or the order of the finite differences formulas. 
+One of the main objectives of our \verb|NumericalHUB| is to allow such a level of abstraction that these numerical details are hidden, focusing on more important issues related to the physical behavior or the numerical scheme error. 
+This abstraction level allows integrating any initial boundary value problem with different finite-difference orders or with different temporal schemes by making a very low effort from the algorithm and implementation point of view.  
+
+
+The following abstraction levels will be considered when implementing the solution of the discretized initial boundary value problem:
+\begin{enumerate}
+\item Since  Fortran is vector language, the solution can be obtained by performing vector operations. That is,  $ U^n $ is a vector whose components are the scalar values $ u^n_i$. 
+$$ 
+    U^{n+1} =  U^{n} + A \ U^n, \quad n=0, \ldots 
+$$
+
+\item To decouple the spatial discretization form the temporal discretization and to allow reusing the spatial discretizations effort with different temporal schemes, a vector function can be defined to hold the spatial discretization. That is, 
+$ F : \mathbb{R}^{N+1}\rightarrow \mathbb{R}^{N+1} $ whose components are the equations resulting of the spatial semi-discretization.
+$$ 
+    U^{n+1} =  U^n + \Delta t \ F(U^n), \quad n=0, \ldots 
+$$
+ 
+\item To reuse the implementation of a complex and validated temporal scheme, a common interface of temporal schemes can be defined to deal with a first order Cauchy problem. That is, a temporal scheme can be a subroutine which gives the next time step of the vector  \verb|U2| 
+from the initial vector \verb|U1| and the vector function $ F(U)$
+\begin{verbatim}
+       call Temporal_scheme( F, U1, U2 ) 
+\end{verbatim}
+
+\item To reuse the implementation of a complex and validated spatial discretization, a common interface of spatial derivatives can be defined to deal with a partial differential equations written as a second order systems in space.  That is, a derivative subroutine can be defined to give the first or second order derivative from a set of nodal points  \verb|U|.  The results can be held  in the vector \verb|Ux|. 
+For example, to calculate the first order derivative of \verb|U| in the \verb|"x"| direction
+\begin{verbatim}
+       call Derivative( "x", 1, U, Ux ) 
+\end{verbatim}
+With these different levels of abstraction, modern Fortran programming becomes reliable, reusable and easy to maintain.    
+
+  
+\end{enumerate}
+
+
+      
+ 
+ \newpage         
+ %*************************************************
+ \section{Overloading the IBVP}
+ %*************************************************  
+ Initial boundary value problems can be expressed in spatial domains   $\Omega \subset \mathbb{ R}^p$ with $ d=1, 2, 3 $. 
+ From the conceptual point of view, there is no difference in the algorithm explained before. However, from the implementation point of view, 
+ tensor variables are of order $p+1$ which makes the implementation slightly different. To make a user friendly interface for the user, the initial boundary value problem has been overloaded. It means that the subroutine to solve the boundary value problem is named \verb|Initial_Boundary_Value_Problem| for all values of $ d $ and for different number of variables of $ \vect{u} $.  
+ The overloading is implemented in the following code, 
+ 
+  \vspace{0.5cm} 
+        \listings{\home/sources/Initial_Boundary_Value_problems.f90}
+        {module Initial_Boundary_Value_Problems}
+        {end interface}{Initial_Boundary_value_problems.f90}
+        
+        
+ For example, if a scalar 2D problem is solved, the software recognizes automatically associated to the interface  of $  \vect{\mathcal{L}} (\vect{x}, t, \vect{u}(\vect{x})) $ and $  \vect{h} (\vect{x},t, \vect{u}(\vect{x})) $. If the given interface of $ \vect{\mathcal{L}} $ and $ \vect{h}$ does not match the implemented existing interfaces, the compiler will complain saying that this problem is not implemented. 
+ As an example, the following code shows the interface of 1D and 2D differential operators $ \vect{\mathcal{L}} $
+  \vspace{0.5cm} 
+        \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+        {real function DifferentialOperator1D}
+        {end function}{Initial_Boundary_Value_Problem1D.f90}
+  
+        \listings{\home/sources/Initial_Boundary_value_problem2D.f90}
+        {real function DifferentialOperator2D}
+        {end function}{Initial_Boundary_value_problem2D.f90}
+ 
+ 
+  
+       
+   
+       
+     
+\newpage 
+%***************************************************     
+\section{Initial Boundary Value Problem in 1D}
+%***************************************************
+       
+      
+For the sake of simplicity,  only the 1D problem is shown.
+      %  \vspace{0.5cm} 
+        \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+        {subroutine IBVP1D}{end function}{Initial_Boundary_Value_Problem1D.f90} 
+        
+   
+   \vspace{-0.5cm}
+The function   \verb|Spatial_discretization1D|  calculates the spatial discretization: 
+         \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+         {Check if}{enddo}{Initial_Boundary_Value_Problem1D.f90}      
+        
+\newpage  
+ In order to speed up the calculation, the subroutine \verb|Dependencies_IBVP_1D| checks if the differential operator
+ $ \mathcal{L} $ depends on 
+ first or second derivative of $ u(x) $. If the differential operator does not depend on the first derivative, only second derivative  will be calculated to build the difference operator. The same applies if no dependency on the second derivative is encountered. 
+ 
+ 
+ 
+ The treatment of boundary points  is done by the subroutine \verb|Boundary_points| 
+ and it is implemented in the following code: 
+% \newpage 
+         \vspace{0.1cm} 
+                 \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+                 {subroutine Boundary_points}
+                 {contains}{Initial_Boundary_Value_Problem1D.f90}
+ As it was mentioned, the algorithm to solve a IBVP has to deal with differential-algebraic equations. Hence, any time the vector function is evaluated by the temporal scheme, boundary values are determined by solving a linear or nonlinear system of equations involving the unknowns at the boundaries. Once these values are known, the inner components of $ F (U) $ are evaluated. 
+ 
+ 
+ 

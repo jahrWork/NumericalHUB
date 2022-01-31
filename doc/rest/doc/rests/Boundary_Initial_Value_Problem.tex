@@ -1,0 +1,225 @@
+\section{Overview}
+
+This library is designed to solve a boundary initial value problem. 
+The initial value boundary problem is composed by equations in partial derivatives which change with time. 
+Then, the complexity of this problem mixes the resolution scheme of a Cauchy problem (in order to solve the temporal evolution) with the procedure for solving a boundary value problem whose unknowns
+change in every time iteration.
+The library has a module:  \textbf{Initial\_Value\_Boundary\_Problem}, where the API is contained. 
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{Test\_advection\_diffusion\_equation.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Initial\_Value\_Boundary\_Problem}. 
+
+This example consists of two boundary initial value problems: a 1D problem and a 2D problem. The advection diffusion equation is being solved in both cases. The advection diffusion equation for a 1D grid is:
+
+\begin{equation*}      	
+\frac{\partial u}{\partial t} = - u \frac{\partial u}{\partial x} + \nu \frac{\partial^2 U}{\partial x^2}
+\end{equation*}
+
+The value given for $\nu$ is $0.01$. The boundary conditions choosen are: $u(-1)=1$ and $\frac{\partial u}{\partial x}(1)=0$ and the initial condition: $u(x,t=0)=0$. For a 2D grid:
+
+
+\begin{equation*}
+\frac{\partial U}{\partial t} =  - u \frac{\partial u}{\partial x} + \nu \left( \frac{\partial^2 U}{\partial x^2} + \frac{\partial^2 U}{\partial y^2} \right)
+\end{equation*}
+
+Where $\nu=0.02$, the initial condition is $u(x,y,t=0)=\exp(-25x^2-25y^2)$ and the boundary conditions are:
+
+\begin{equation*}      	
+u(-1,y) = 0 \quad ; \quad 
+u(1,y) = 0  \quad ; \quad 
+u(x,-1) = 0 \quad ; \quad 
+u(x,1) = 0  
+\end{equation*}
+
+
+\newpage
+
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+\lstinputlisting[lastline=123]{../sources/IVBP_example.f90}
+\newpage
+
+\lstinputlisting[firstline=125]{../sources/IVBP_example.f90}
+
+%Note: The part of the code concerning the graphics has been removed.
+
+
+
+
+\section{Initial\_Value\_Boundary\_Problem  module}
+
+\subsection*{Initial\_Value\_Boundary\_ProblemS for 1D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Initial_Value_Boundary_ProblemS( Time_Domain, x_nodes, Order, 
+                                      Differential_operator, Boundary_conditions,  
+                                      Solution )  
+                                        \end{lstlisting}   
+
+The subroutine \textbf{Initial\_Value\_Boundary\_ProblemS} calculates the solution to a boudary initial value problem such as:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ t,\ U, \ \frac{\partial U}{\partial x}, \ \frac{\partial^2 U}{\partial x^2} \right) = \frac{\partial U}{\partial t}
+\end{equation*}
+\begin{equation*}
+f_a\left(U,\ t,\ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=a
+\end{equation*}
+\begin{equation*}
+f_b\left(U, \ t, \ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=b
+\end{equation*}
+
+
+Besides, an initial condition must be established: $U(x,t = t_0) = U_0 (x)$.
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{3cm}| l | p{5.5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				Time\_Domain & vector of reals & in &  Time domain where the solution wants to be calculated.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, t, U,  U_x,  U_{xx} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, t, U,  U_x \right)$  & in &  In this function, the boundary conditions are fixed. The user must include a conditional sentence which sets $f\left(a, \ t, \ U, \ U_x \right) = f_a$ and $f\left(b,\ t, \ U, \ U_x \right) = f_b$.  \\ \hline
+				
+				Scheme & temporal scheme  & in (optional) & Defines the scheme used to solve the problem. If it is not specified it uses a Runge Kutta of four steps by default.    \\ \hline
+				
+				Solution & two-dimensional array of reals  & out &  Contains the solution, $U = U(x,t)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Initial\_Value\_Boundary\_ProblemS} arguments for 1D problems}
+\end{table}
+
+
+
+\subsection*{Initial\_Value\_Boundary\_ProblemS for 2D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Initial_Value_Boundary_ProblemS( Time_Domain, x_nodes, y_nodes, Order,       & 
+                                      Differential_operator, Boundary_conditions, & 
+                                      Solution ) 
+\end{lstlisting}   
+
+The subroutine \textbf{Initial\_Value\_Boundary\_ProblemS} calculates the solution to a boundary initial value problem in a rectangular domain $[a,b] \times [c,d]$:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ y,\ t,\  U, \ \frac{\partial U}{\partial x}, \ \frac{\partial U}{\partial y}, \ \frac{\partial^2 U}{\partial x^2}, \ \frac{\partial^2 U}{\partial y^2}, \ \frac{\partial^2 U}{\partial x \partial y} \right) = \frac{\partial U}{\partial t}
+\end{equation*}
+\begin{equation*}
+f_{x=a}\left(U, \  t, \  \frac{\partial U}{\partial x}\right)=0  \quad ; \quad f_{x=b}\left(U, \ t, \ \frac{\partial U}{\partial x}\right)=0  
+\end{equation*}
+\begin{equation*}
+f_{y=c}\left(U, \ t, \ \frac{\partial U}{\partial y}\right)=0  \quad ; \quad f_{y=d}\left(U, \ t, \ \frac{\partial U}{\partial y}\right)=0  
+\end{equation*}
+
+
+Besides, an initial condition must be established: $U(x, y ,t = t_0) = U_0 (x,y)$.
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{5cm}| l | p{4cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				Time\_Domain & vector of reals & in &  Time domain where the solution wants to be calculated.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes in the first direction of the mesh.  \\ \hline
+				
+				y\_nodes & vector of reals & inout &  Contains the mesh nodes in the second direction of the mesh.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, y, t, U,  U_x,  U_y,  U_{xx},  U_{yy},  U_{xy} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, y, t, U,  U_x,  U_y \right)$  & in &  In this function, the boudary conditions are fixed. The user must use a conditional sentence to do it.  \\ \hline
+				
+				Scheme & temporal scheme  & in (optional) & Defines the scheme used to solve the problem. If it is not specified it uses a Runge Kutta of four steps by default.    \\ \hline
+				
+				Solution & three-dimensional array of reals  & out &  Contains the solution, $U = U(x, y, t)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Initial\_Value\_Boundary\_ProblemS} arguments for 2D problems}
+\end{table}
+
+
+
+\newpage
+
+\subsection{Temporal schemes}
+
+The schemes that are available in the library for both, 1D and 2D problems, are listed below. $h$ denotes the time step.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.5}
+			\begin{tabular}{| l | l | l |}
+				
+				\hline
+				
+				\bf Scheme & \bf Name (in the code) & \bf Formula  \\ \hline \hline
+				
+				Euler & Euler & $  U_{n+1} = U_{n}+ h f(t_{n}, U_{n})$ \\ \hline
+				
+				Runge Kutta 2  &  Runge\_Kutta2   &  
+				$ U_{n+1} = U_{n}+ h(\frac{k_{1}+k_{2}} {2} ) $ \\
+				& & $\quad k_{1}= f(t_{n},U_{n}) $ \\
+				& & $\quad k_{2}=f(t_{n}+h, U_{n}+hk_{1}) $ \\ \hline
+				
+				Runge Kutta 4 & Runge\_Kutta4 &  $ U_{n+1} = U_{n}+ \frac{1}{6}h (k_{1}+2k_{2}+2k_{3}+k_{4}) $ \\
+				& & $\quad k_{1}= f(t_{n},U_{n}) $ \\
+				& & $\quad k_{2}=f(t_{n}+\frac{1}{2}h, U_{n}+\frac{1}{2}hk_{1}) $ \\
+				& & $\quad k_{3}=f(t_{n}+\frac{1}{2}h, U_{n}+\frac{1}{2}hk_{2}) $\\
+				& & $\quad k_{4}= f(t_{n}+h,U_{n}+hk_{3}) $  \\ \hline
+				
+				Leap Frog & Leap\_Frog  & $ U_{n+2}=U_{n}+2f(x_{n+1},U_{n+1})$ \\ \hline
+				
+				Adams Bashforth 2 & Adams\_Bashforth  & $ U_{n+2}=U_{n+1}+ h \left( \frac{3}{2} f(t_{n+1},U_{n+1}) - \frac{1}{2} f(t_{n},U_{n}) \right) $  \\ \hline
+				
+				Adams Bashforth 3  & Adams\_Bashforth3  & $  U_{n+3} = U_{n+2}+ h \left( \frac{23}{12} f(t_{n+2},U_{n+2}) - \right.$ \\
+				& & $\qquad\left.-\frac{4}{3} f(t_{n+1},U_{n+1}) + \frac{5}{12} f(t_{n},U_{n}) \right) $ \\ \hline
+				
+				Predictor Corrector & Predictor\_Corrector1  & $ \bar{U}_{n+1}=U_{n}+hf(t_{n},U_{n}) $ \\
+				& & $ U_{n+1}=U_{n}+\frac{1}{2}h(f(t_{n+1},\bar{U}_{n+1})+f(t_{n},U_{n} )) $\\ \hline
+				
+				Euler Inverso & Inverse\_Euler & $ U_{n+1}=U_{n}+hf(t_{n+1},U_{n+1}) $\\ \hline
+				
+				Crank Nicolson & Crank\_Nicolson  & $  U_{n+1} = U_{n}+\frac{1}{2} h( f(t_{n+1}, U_{n+1})+f(t_{n},U_{n})) $ \\ \hline
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of the available schemes }
+\end{table}
+
+

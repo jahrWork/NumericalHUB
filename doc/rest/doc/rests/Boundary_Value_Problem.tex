@@ -1,0 +1,271 @@
+\section{Overview}
+
+This library is designed to solve both linear and non linear boundary value problems. 
+A boundary value problem appears when a equation  in partial derivatives is to be solved inside a region (space domain) according to some constraints which applies to the frontier of this domain (boundary conditions).
+The library has a module:  \textbf{Boundary\_value\_problems}, where the API is contained. 
+The API consists of 2 subroutines: one to solve linear problems and the other to solve non linear problems. Finally, depending on the inputs of the subroutines, a 1D problem or a  2D problem is solved.
+
+\section{Example using the API}
+
+For the sake of clarity, a file called \textbf{API\_Example\_Boundary\_Value\_Problem.f90} contains an example of how to use this library. For using the API it is necessary to write the sentence \textbf{use Boundary\_value\_problems}. 
+
+This example consists of two boundary value problems: a 1D linear problem and a 2D non linear problem. The 1D linear problem is the Legendre differential equation:
+
+\begin{equation*}      	
+(1 - x^2) \frac{\text{d}^2 y}{\text{d} x^2} - 2x \frac{\text{d} y}{\text{d} x} + n (n + 1) y = 0
+\end{equation*}
+
+Where $n = 3$ and the boundary conditions are: $y(-1) = - 1$ and $y(1) = 1$. The 2D non linear problem is:
+
+\begin{equation*}      	
+\left( \frac{\partial^2 u}{\partial x^2} +  \frac{\partial^2 u}{\partial y^2} \right) u = 0
+\end{equation*}
+
+Where the boundary conditions are:
+
+\begin{equation*}      	
+u(0,y) = 0 \quad ; \quad 
+u(1,y) = y  \quad ; \quad 
+\frac{\partial u}{\partial y}(x,0) = 0 \quad ; \quad 
+u(x,1) = x  
+\end{equation*}
+
+
+\newpage
+
+\par\vspace{\baselineskip}
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+
+\lstset{
+	numbers=left,            
+	numbersep=5pt,                 
+	numberstyle=\tiny\color{mygray}
+}
+
+
+
+\lstinputlisting[lastline=118]{../sources/BVP_example.f90}
+
+\newpage
+\lstinputlisting[firstline=120]{../sources/BVP_example.f90}
+
+
+\section{Boundary\_value\_problems  module}
+
+\subsection*{Linear\_Boundary\_Value\_Problem for 1D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Linear_Boundary_Value_Problem( x_nodes, Order, Differential_operator, & 
+                                    Boundary_conditions, Solution )  
+ \end{lstlisting}   
+
+The subroutine \textbf{Linear\_Boundary\_Value\_Problem} calculates the solution to a linear boudary value problem such as:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ U, \ \frac{\partial U}{\partial x}, \ \frac{\partial^2 U}{\partial x^2} \right) = 0
+\end{equation*}
+\begin{equation*}
+f_a\left(U, \ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=a
+\end{equation*}
+\begin{equation*}
+f_b\left(U, \ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=b
+\end{equation*}
+
+
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{3cm}| l | p{5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, U,  U_x,  U_{xx} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, U,  U_x \right)$  & in &  In this function, the boudary conditions are fixed. The user must include a conditional sentence which sets $f\left(a,\ U, \ U_x \right) = f_a$ and $f\left(b,\ U, \ U_x \right) = f_b$.  \\ \hline
+				
+				Solution & vector of reals  & out &  Contains the solution, $U = U(x)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Linear\_Boundary\_Value\_Problem} arguments for 1D problems}
+\end{table}
+
+\newpage
+
+\subsection*{Linear\_Boundary\_Value\_Problem for 2D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Linear_Boundary_Value_Problem( x_nodes, y_nodes, Order, Differential_operator,  &
+                                    Boundary_conditions, Solution ) 
+\end{lstlisting}   
+
+The subroutine \textbf{Linear\_Boundary\_Value\_Problem} calculates the solution to a linear boudary value problem in a rectangular domain $[a,b] \times [c,d]$:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ y,\ U, \ \frac{\partial U}{\partial x}, \ \frac{\partial U}{\partial y}, \ \frac{\partial^2 U}{\partial x^2}, \ \frac{\partial^2 U}{\partial y^2}, \ \frac{\partial^2 U}{\partial x \partial y} \right) = 0
+\end{equation*}
+\begin{equation*}
+f_{x=a}\left(U, \ \frac{\partial U}{\partial x}\right)=0  \quad ; \quad f_{x=b}\left(U, \ \frac{\partial U}{\partial x}\right)=0  
+\end{equation*}
+\begin{equation*}
+f_{y=c}\left(U, \ \frac{\partial U}{\partial y}\right)=0  \quad ; \quad f_{y=d}\left(U, \ \frac{\partial U}{\partial y}\right)=0  
+\end{equation*}
+
+
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{5cm}| l | p{4.5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes in the first direction of the mesh.  \\ \hline
+				
+				y\_nodes & vector of reals & inout &  Contains the mesh nodes in the second direction of the mesh.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, y, U,  U_x,  U_y,  U_{xx},  U_{yy},  U_{xy} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, y, U,  U_x,  U_y \right)$  & in &  In this function, the boudary conditions are fixed. The user must use a conditional sentence to do it.  \\ \hline
+				
+				Solution & two-dimensional array of reals  & out &  Contains the solution, $U = U(x,  y)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Linear\_Boundary\_Value\_Problem} arguments for 2D problems}
+\end{table}
+
+
+\newpage
+
+
+\subsection*{Non\_Linear\_Boundary\_Value\_Problem for 1D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Non_Linear_Boundary_Value_Problem( x_nodes, Order, Differential_operator,  & 
+                                        Boundary_conditions, Solver, Solution )   
+\end{lstlisting}   
+
+The subroutine \textbf{Non\_Linear\_Boundary\_Value\_Problem} calculates the solution to a non linear boudary value problem  in a rectangular domain $[a,b] \times [c,d]$:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ U, \ \frac{\partial U}{\partial x}, \ \frac{\partial^2 U}{\partial x^2} \right) = 0
+\end{equation*}
+\begin{equation*}
+f_a\left(U, \ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=a
+\end{equation*}
+\begin{equation*}
+f_b\left(U, \ \frac{\partial U}{\partial x}\right)=0 \hspace{1cm} x=b
+\end{equation*}
+
+
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{3cm}| l | p{5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, U,  U_x,  U_{xx} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, U,  U_x \right)$  & in &  In this function, the boudary conditions are fixed. The user must include a conditional sentence which sets $f\left(a,\ U, \ U_x \right) = f_a$ and $f\left(b,\ U, \ U_x \right) = f_b$.  \\ \hline
+				
+				Solution & vector of reals  & out &  Contains the solution, $U = U(x)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Non\_Linear\_Boundary\_Value\_Problem} arguments for 1D problems}
+\end{table}
+
+
+\newpage
+
+\subsection*{Non\_Linear\_Boundary\_Value\_Problem for 2D problems}
+
+\lstset{backgroundcolor=\color{Goldenrod!10}}
+\lstset{language=Fortran}
+\begin{lstlisting}[frame=trBL]
+call Non_Linear_Boundary_Value_Problem( x_nodes, y_nodes, Order, Differential_operator,  
+                                        Boundary_conditions, Solver, Solution )
+ \end{lstlisting}   
+
+The subroutine \textbf{Non\_Linear\_Boundary\_Value\_Problem} calculates the solution to a non linear boudary value problem such as:
+
+\begin{equation*}
+\mathscr{L}\left(x,\ y,\ U, \ \frac{\partial U}{\partial x}, \ \frac{\partial U}{\partial y}, \ \frac{\partial^2 U}{\partial x^2}, \ \frac{\partial^2 U}{\partial y^2}, \ \frac{\partial^2 U}{\partial x \partial y} \right) = 0
+\end{equation*}
+\begin{equation*}
+f_{x=a}\left(U, \ \frac{\partial U}{\partial x}\right)=0  \quad ; \quad f_{x=b}\left(U, \ \frac{\partial U}{\partial x}\right)=0  
+\end{equation*}
+\begin{equation*}
+f_{y=c}\left(U, \ \frac{\partial U}{\partial y}\right)=0  \quad ; \quad f_{y=d}\left(U, \ \frac{\partial U}{\partial y}\right)=0  
+\end{equation*}
+
+
+
+The arguments of the subroutine are described in the following table.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{spacing}{1.2}
+			\begin{tabular}{| l | p{5cm}| l | p{4.5cm} |}
+				
+				\hline
+				
+				\bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes in the first direction of the mesh.  \\ \hline
+				
+				y\_nodes & vector of reals & inout &  Contains the mesh nodes in the second direction of the mesh.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: $\mathscr{L}\left(x, y, U,  U_x,  U_y,  U_{xx},  U_{yy},  U_{xy} \right)$ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $f\left(x, y, U,  U_x,  U_y \right)$  & in &  In this function, the boudary conditions are fixed. The user must use a conditional sentence to do it.  \\ \hline
+				
+				Solution & two-dimensional array of reals  & out &  Contains the solution, $U = U(x,  y)$, of the boundary value problem. \\ \hline
+				
+				
+			\end{tabular}
+		\end{spacing}
+	\end{center}
+	\caption{Description of \textbf{Non\_Linear\_Boundary\_Value\_Problem} arguments for 2D problems}
+\end{table}

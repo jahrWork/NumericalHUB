@@ -1,0 +1,11 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ width = \textwidth,
+        title style={at={(0.5,-0.45)},anchor=south}, title={(a)},
+        xlabel={ $x$ },
+        ylabel={ $u(x,t)$ },
+        {}, legend style={font=\small},  {mark repeat =  1, cycle list name = black white, legend columns = 1 }, legend pos = north east  ]
+        \foreach \x/\y in { 0/1,2/3,4/5}
+        \addplot table [skip first n=2, x index=\x, y index=\y]{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat1Da.plt   };
+        \legend{ t=  0.0, t=  0.2, t=  0.4 }
+     \end{axis}
+  \end{tikzpicture}

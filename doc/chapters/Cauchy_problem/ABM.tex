@@ -1,0 +1,848 @@
+\section{Linear multistep methods}\label{sec:ABM}
+Linear multistep methods approximate the solution $\application{\vect{u}}{\R{}}{\R{N_v}}$ to the Cauchy problem
+%
+\begin{align}
+	\dv{\vect{u}}{t}
+	=
+	\vect{F}(\vect{u}(t),t)
+	\label{eq:Cauchy_Problem_ABM}
+\end{align}
+in the interval $[t_n,t_{n+1}]$ of length $\Delta t_n$, with the initial condition $\vect{u}(t_n)=\vect{u}^n$, by means of an interpolant for the differential operator and/or the solution. In Adams methods a polynomial interpolation is carried out, and instead of solving (\ref{eq:Cauchy_Problem_ABM}) it is solved
+%
+\begin{align}
+	\dv{\vect{u}}{t}
+	=
+	\vect{I}(t),
+	\label{eq:Approximate_Cauchy_Problem_ABM}
+\end{align}
+where $\vect{I}(t)$ is the Lagrange interpolant
+%
+\begin{align}
+	\vect{I}(t)
+	=
+	\sum_{j=j_0}^{s}
+	\ell_{n+1-j}(t)\ \vect{F}^{n+1-j},
+	\qquad s > 1
+	\label{eq:ABM_Interpolant}
+\end{align}
+and $\ell_{n+1-j}(t)$ are the Lagrange polynomials of degree $s-j_0$ constructed with the set of nodes $\{t_{n+1-j}\}_{j=j_0}^{s}$
+%
+\begin{align}
+	\ell_{n+1-j}(t)
+	=
+	\prod_{\substack{k=j_0\\k\ne j}}^{s}
+	\frac{t-t_{n+1-k}}{t_{n+1-j}-t_{n+1-k}}.
+\end{align}
+
+The notation $\vect{F}^{n+1-j}=\vect{F}(\vect{u}(t_{n+1-j}),t_{n+1-j})$ is used, and the index $j_0$ serves to write in a compact manner both explicit (or Adams-Bashforth) and implicit (or Adams-Moulton) methods
+%
+\begin{align}
+	j_0
+	=
+	\begin{dcases}
+		1\qquad \mbox{for Adams-Bashforth},
+		\\
+		0\qquad \mbox{for Adams-Moulton}.
+	\end{dcases}
+\end{align}
+
+The number $s$ of previous temporal steps to $t_{n+1}$ which are required to construct $\vect{I}(t)$ is called the number of steps of the method. Note that expression (\ref{eq:ABM_Interpolant}) is restricted to methods with more than one step. For $s=j_0$, setting $\vect{I}(t)=\vect{F}^{n+1-j_0}$ provides either the explicit or implicit Euler scheme. There is also another one step Adams-Moulton, the so called trapezoidal rule, which is obtained by aproximating $\vect{F}$ as a straight line in the interval $[t_n,t_{n+1}]$. Nevertheless, for this section, unless explicitly expressed otherwise, we will restrict ourselves to methods with $s>1$. On figure \ref{fig:ABM_Stencil}, the stencil used to approximate the differential operator $\vect{F}$ in Adams methods is represented schematically. Note that for a fixed number of steps $s$, the interpolant used in Adams-Moulton method is one degree higher than the one used in Adams-Bashforth methods. Therefore, it is expected that implicit methods approximate the differential operator with one extra order of accuracy. 
+\FloatBarrier
+\begin{figure}[h]
+	\ABMStencil{}
+	\caption{Stencil for linear multistep methods of $s$ steps.}
+	\label{fig:ABM_Stencil}
+\end{figure}
+
+
+\FloatBarrier
+To fix ideas, an Adams methods of $s$ steps approximates the solution at an instant $t$ if the solution in the instants $\{t_{n+1-j}\}_{j=1}^{s}$ is known. To do so, instead of solving (\ref{eq:Cauchy_Problem_ABM}) it is solved its approximate version (\ref{eq:Approximate_Cauchy_Problem_ABM}), which is easily integrated to yield
+%
+\begin{align}
+	\vect{u}(t) 
+	=
+	\vect{u}^n
+	+
+	\int_{t_n}^{t}
+	\vect{I}(t')\dd{ t'},
+	\qquad
+	t\in [t_{n+1-s},t_{n+1}].
+	\label{eq:ABM_quadrature}
+\end{align}
+
+Of course, the interest of these methods is to approximate the solution at the next temporal step $t=t_{n+1}$. By evaluating (\ref{eq:ABM_quadrature}) at this instant we obtain the typical expression for Adams formulas
+%
+\begin{align}
+	\vect{u}^{n+1} =
+	\vect{u}^n
+	+
+	\Delta t_n
+	\sum_{j=j_0}^{s}
+	\beta_{j}\ \vect{F}^{n+1-j}
+	,
+	\label{eq:ABM_methods}
+\end{align}
+where the coefficients are just
+%
+\begin{align}
+	\beta_{j} 
+	=
+	\frac{1}{\Delta t_n}
+	\int_{t_n}^{t_{n+1}}\ell_{n+1-j}(t) \dd{t}.
+	\label{eq:ABM_beta}
+\end{align}
+
+Note from (\ref{eq:ABM_methods}) that Adams-Bashforth methods approximate $\vect{u}^{n+1}$ by means of polynomial extrapolation. On the other hand, in Adams-Moulton methods the differential operator is interpolated using the solution at an instant which a priori we do not know. In this case, (\ref{eq:ABM_methods}) defines an implicit equation which is to be solved for $\vect{u}^{n+1}$.
+
+
+
+\subsection{Linear multistep methods as an approximate Taylor expansion}
+It is obvious from quadrature (\ref{eq:ABM_quadrature}) that the approximation $\vect{u}(t)$ is a polynomial of grade $s+1-j_0$. Therefore, $\vect{u}(t)$ is equal to its Taylor polynomial. Indeed
+%
+\begin{align}
+	\vect{u}(t)
+	& =
+	\vect{u}^n
+	+
+	\sum_{k = 1}^{s+1-j_0}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{(t-t_n)^k}{k!}
+	\nonumber 
+	\\
+	& =
+	\vect{u}^n
+	+
+	\sum_{k = 1}^{s+1-j_0}
+	\eval{ \dv[k-1]{\vect{I}}{t} }_{t_n}
+	\frac{(t-t_n)^k}{k!}
+	\nonumber 
+	\\
+	& =
+	\vect{u}^n
+	+
+	\int_{t_n}^{t}
+	\left(
+	\sum_{k = 1}^{s+1-j_0}
+	\eval{ \dv[k-1]{\vect{I}}{t} }_{t_n}
+	\frac{(t'-t_n)^{k-1}}{(k-1)!}
+	\right)
+	\dd{t'}
+	\nonumber 
+	\\
+	& =
+	\vect{u}^n
+	+
+	\int_{t_n}^{t}
+	\vect{I}(t')
+	\dd{t'},
+	\label{eq:ABM_Taylor_equivalence}
+\end{align}
+where it has been used (\ref{eq:Approximate_Cauchy_Problem_ABM}) (with the notation $\dv*[0]{\vect{I}}{t}=\vect{I}$) and that $\vect{I}(t)$ also matches exactly its Taylor expansion. Identity (\ref{eq:ABM_Taylor_equivalence}) reflects the fact that if $\vect{I}(t)$ approximates sufficiently well $\vect{F}(\vect{u}(t),t)$ and its derivatives (i.e. if $\vect{F}$ and $\vect{u}$ are sufficiently regular), for fixed $s$, Adams-Moulton methods ($j_0=0$) overcome Adams-Bashforth methods ($j_0=1$) in one extra order of accuracy as the Taylor expansion includes one extra term. Besides, it shows that Adams methods are an approximation of the truncated Taylor polynomial of the solution of the exact Cauchy problem (\ref{eq:Cauchy_Problem_ABM}).
+
+Thus, for linear multistep methods it is equivalent to obtain $\vect{u}^{n+1}$ from the $s$ previous values to produce $\{\vect{F}^{n+1-j}\}_{j=1}^{s}$ than to obtain it using the $s$ first derivatives 
+$\{ \Eval{ \dv*[k]{\vect{u}}{t} }_{t_n} \}_{k=1}^{s}$. In fact, this is what motivates the next section in which we will speak about a reformulation of Adams methods which is very useful for implementing algorithms that vary the step size and the order of accuracy of the solution.
+
+%
+%\subsection{Relation between implicit and explicit schemes}
+%The coefficients (\ref{eq:ABM_beta}) completely determine the Adams method used. Using that Lagrange polynomials (of degree $q$) constitute a basis of the vector space of polynomials of degree $q$ we can relate the coefficients of a $q$ steps Adams-Bashforth and a $q-1$ steps Adams-Moulton. If we denote by
+%%
+%\begin{align}
+%	\widetilde{\ell}_{n+1-j}(t)
+%	=
+%	\prod_{\substack{k=1\\k\ne j}}^{q+1}
+%	\frac{t-t_{n+1-k}}{t_{n+1-j}-t_{n+1-k}}
+%\end{align}
+%the Lagrange polynomials used to construct the interpolant for the differential operator in an $q$ steps Adams-Bashforth method and
+%%
+%\begin{align}
+%	{\ell}_{n+1-j}(t)
+%	=
+%	\prod_{\substack{k=0\\k\ne j}}^{q}
+%	\frac{t-t_{n+1-k}}{t_{n+1-j}-t_{n+1-k}}
+%\end{align}
+%the correspondent Lagrange polynomials for the $q-1$ steps Adams-Moulton we can relate them via exact interpolation
+%%
+%\begin{align}
+%	\widetilde{\ell}_{n+1-j}(t)
+%	& =
+%	\sum_{k = 0}^{q}
+%	\widetilde{\ell}_{n+1-j}(t_{n+1-k})
+%	{\ell}_{n+1-k}(t),
+%	\qquad
+%	j=1,\ldots,q+1,
+%	\label{eq:Multistep_Lagrange_AB_AM}
+%\\
+%	{\ell}_{n+1-j}(t)
+%	& =
+%	\sum_{k = 1}^{q+1}
+%	{\ell}_{n+1-j}(t_{n+1-k})
+%	\widetilde{\ell}_{n+1-k}(t),
+%	\qquad
+%	j=0,\ldots,q,
+%	\label{eq:Multistep_Lagrange_AM_AB}
+%\end{align} 
+%and note that (\ref{eq:Multistep_Lagrange_AB_AM}) and (\ref{eq:Multistep_Lagrange_AM_AB}) are inverse to each other. For $j=1,\ldots,q$ relationships (\ref{eq:Multistep_Lagrange_AB_AM}) and (\ref{eq:Multistep_Lagrange_AM_AB}) become
+%respectively 
+%%
+%\begin{align}
+%	\widetilde{\ell}_{n+1-j}(t)
+%	& =
+%	\widetilde{\ell}_{n+1-j}(t_{n+1})	
+%	{\ell}_{n+1}(t)
+%	+
+%	{\ell}_{n+1-j}(t),
+%	\qquad
+%	j=1,\ldots,q
+%	\label{eq:Multistep_Lagrange_AB_AM_j_1_q}
+%\\
+%	{\ell}_{n+1-j}(t)
+%	& =
+%	{\ell}_{n+1-j}(t_{n-q})	
+%	\widetilde{\ell}_{n-q}(t)
+%	+
+%	\widetilde{\ell}_{n+1-j}(t),
+%	\qquad
+%	j=1,\ldots,q
+%	\label{eq:Multistep_Lagrange_AM_AB_j_1_q}
+%\end{align}
+%where it has been used properties $\widetilde{\ell}_{n+1-j}(t_{n+1-k}) = \delta_{jk}$ for $k=1,\ldots,q+1$ and ${\ell}_{n+1-j}(t_{n+1-k}) = \delta_{jk}$ for $k=0,\ldots,q$. The relationship between $\widetilde{\ell}_{n-q}(t)$ and ${\ell}_{n+1}(t)$ is simply obtained from relationships (\ref{eq:Multistep_Lagrange_AB_AM}) for $j=q+1$ and (\ref{eq:Multistep_Lagrange_AM_AB}) for $j=0$ as
+%
+%\begin{align}
+%	\widetilde{\ell}_{n-q}(t)
+%	& =
+%	\widetilde{\ell}_{n-q}(t_{n+1})
+%	{\ell}_{n+1}(t),
+%	\label{eq:Multistep_Lagrange_AB_AM_j_q+1}
+%	\\	
+%	{\ell}_{n+1}(t)
+%	& =
+%	{\ell}_{n+1}(t_{n-q})
+%	\widetilde{\ell}_{n-q}(t).
+%	\label{eq:Multistep_Lagrange_AM_AB_j_0}
+%\end{align}
+%Note that as $\widetilde{\ell}_{n-q}(t)$ and ${\ell}_{n+1}(t)$ annul at the same points  their relationship is just a rescaling so that ${\ell}_{n+1}(t_{n+1})=	\widetilde{\ell}_{n-q} (t_{n-q})= 1$.
+%
+%Hence, denoting by $\widetilde{\beta}_j$ the
+%coefficients of the Adams-Bashforth method and by $\beta_j$ the
+%coefficients of the Adams-Moulton method, applying formula (\ref{eq:ABM_beta}) using (\ref{eq:Multistep_Lagrange_AB_AM_j_1_q}), (\ref{eq:Multistep_Lagrange_AB_AM_j_q+1}) yields the linear map between coefficients
+%%
+%\begin{align}
+%	\widetilde{\beta}_j
+%	=
+%	\begin{dcases}
+%		{\beta}_j 
+%		+
+%    	\widetilde{\ell}_{n+1-j}(t_{n+1})	{\beta}_0,
+%    	\qquad & j = 1,\ldots, q
+%    	\\
+%    	\widetilde{\ell}_{n-q}(t_{n+1})
+%    	{\beta}_0 
+%    	\qquad & j = q+1
+%	\end{dcases}
+%    \label{eq:Beta_AB_AM}
+%\end{align}
+% and applying formula (\ref{eq:ABM_beta}) using (\ref{eq:Multistep_Lagrange_AM_AB_j_1_q}), (\ref{eq:Multistep_Lagrange_AM_AB_j_0}) provides its inverse 
+%%
+%\begin{align}
+%	{\beta}_j
+%	=
+%	\begin{dcases}
+%		{\ell}_{n+1}(t_{n-q})
+%    	\widetilde{\beta}_{n-q} 
+%    	\qquad & j = 0
+%    	\\
+%		\widetilde{\beta}_j 
+%		+
+%		{\ell}_{n+1-j}(t_{n-q})	\widetilde{\beta}_{n-q},
+%		\qquad & j = 1,\ldots, q.
+%	\end{dcases}
+%	\label{eq:Beta_AM_AB}
+%\end{align}
+\subsection{Multivalue formulation of Adams methods}
+
+In the previous pages it has been stated the equivalence between Adams methods and approximated truncated Taylor expansions. In the classical formulation of Adams methods given by (\ref{eq:ABM_methods}) the number of steps is fixed while the order of accuracy depends on the stencil used to construct the approximation of the differential operator $\vect{I}(t)$. It was mentioned that implicit methods of $s$ steps have one order more of accuracy than explicit methods. In the following pages a new formulation of these methods that fixes the order $q$ of accuracy is presented. But first, we will answer the question ``\textit{Why do we need a reformulation of Adams methods?}''. The reason is that in the formulation (\ref{eq:ABM_methods}) the chosen method is determined by the coefficients (\ref{eq:ABM_beta}) which have different values depending on the step size distribution and the amount of steps required. Let's suppose that we wanted to advance some steps with a given method and then for other specific steps we wanted a method with a different step size and/or order of accuracy. This would require to calculate again the coefficients $\beta_{j}$ using (\ref{eq:ABM_beta}), which is computationally expensive. Only for the case in which we have equally distributed step sizes is easy to change the order of the method, as the coefficients of Adams methods for this case have to be computed just once in a lifetime. Changing the step size however, would always require to recompute the coefficients $\beta_{j}$. This fact makes complicated to use multistep methods in variable step variable order algortihms. To overcome this complication, an alternative formulation exists, which is based on the equivalence between Adams methods and approximated truncated Taylor expansions, the \textit{multivalue formulation}. In multivalue formulation we write the approximation of order $q$ as the Taylor expansion
+%
+\begin{align}
+	\vect{u}(t)
+	& =
+	\vect{u}^n
+	+
+	\sum_{k = 1}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{(t-t_n)^k}{k!}
+	,
+	\qquad 
+	t \in [t_n,t_{n+1}],
+	\label{eq:Multivalue_Taylor}
+\end{align}
+which uses the $q+1$ values $\{ \Eval{ \dv*[k]{\vect{u}}{t} }_{t_n} \}_{k=0}^{q}$ (with the notation $\dv*[0]{\vect{u}}{t}=\vect{u}$). We have seen that to obtain an Adams method we just have to approximate $\{ \Eval{ \dv*[k]{\vect{u}}{t} }_{t_n} \}_{k=1}^{q}$ using an interpolant for $\vect{F}(\vect{u}(t),t)$ with the appropriate stencil. On figure \ref{fig:Multivalue_ABM_Stencil} are represented the stencil used by the interpolant for Adams-Bashforth methods (denoted $\widetilde{\vect{I}}(t)$) and for Adams-Moulton methods (denoted $\vect{I}(t)$) of order $q$. However, for multivalue methods the approach is slightly different. The method evolves in time both $\vect{u}$ and its derivatives $\{ \dv*[k]{\vect{u}}{t} \}_{k=1}^{q}$ and the manner in which they are evolved determines the multistep method. To clarify the link between both approaches, we advance that for Adams-Bashforth methods the solution $\widetilde{\vect{u}}^{n+1}$ is obtained using the interpolant $\widetilde{\vect{I}}(t)$ from figure \ref{fig:Multivalue_ABM_Stencil} in the interval $[t_n,t_{n+1}]$, however, we will see that evolving the derivatives at $t=t_{n+1}$ requires the usage of the interpolant $\vect{I}(t)$ once $\widetilde{\vect{u}}^{n+1}$ is known. This fact dictates a manner in which the solution and its derivatives evolve in an Adams-Bashforth method. For Adams-Moulton methods both the solution $ \vect{u}^{n+1}$ and its derivatives at $t=t_{n+1}$ can be obtained with the interpolant $\vect{I}(t)$. Multivalue formulation evolves the solution and its derivatives in this manner. In the following pages the multivalue formulation of Adams-Bashforth and Adams-Moulton methods is presented. For each method we will show its equivalence to the correspondent Adams and later the scheme for the solution and its derivatives is given. Finally, the more practical matricial formulation of multivalue methods is presented.    
+
+\FloatBarrier
+\begin{figure}[h]
+	\MultivalueABMStencil{}
+	\caption{Different stencils used by the interpolants for multivalue Adams methods of order $q$.}
+	\label{fig:Multivalue_ABM_Stencil}
+\end{figure}
+
+ 
+
+
+
+
+\subsubsection*{Multivalue Adams-Bashforth}
+As has been stated before, an order $q$ Adams-Bashforth method matches the expansion
+%
+\begin{align}
+	\widetilde{\vect{u}}(t)
+	& =
+	\vect{u}^n
+	+
+	\sum_{k = 1}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{(t-t_n)^k}{k!}
+	,
+	\qquad 
+	t \in [t_n,t_{n+1}],
+	\label{eq:AB_Multivalue_Taylor}
+\end{align}
+in which the derivatives are obtained as
+%
+\begin{align}
+	\eval{ \dv[k]{ \vect{u} }{t} }_{t_n}
+	=
+	\eval{ \dv[k-1]{\widetilde{\vect{I}}}{t} }_{t_n},
+	\label{eq:Multivalue_extrapolation_derivatives}
+\end{align}
+where $\vect{\widetilde{\vect{I}}}(t)$ is the interpolant constructed with the stencil $\{t_{n+1-j}\}_{j=1}^{q}$
+%
+\begin{align}
+	\vect{\widetilde{\vect{I}}}(t)
+	=
+	\sum_{j=1}^{q}
+	\widetilde{\ell}_{n+1-j}(t)
+	\vect{F}^{n+1-j}
+	,
+	\qquad
+	t\in[t_{n+1-q},t_{n+1}],
+	\label{eq:AB_Multivalue_Interpolant}
+\end{align}
+and
+%
+\begin{align}
+	\widetilde{\ell}_{n+1-j}(t)
+	=
+	\prod_{\substack{k=1\\k\ne j}}^{q}
+	\frac{t-t_{n+1-k}}{t_{n+1-j}-t_{n+1-k}}
+\end{align}
+are the correspondent Lagrange polynomials of degree $q-1$.
+
+Note that (\ref{eq:AB_Multivalue_Taylor}) produces also an approximation for the derivatives
+%
+\begin{align}
+	\dv[i]{ \widetilde{\vect{u}} }{t}
+	=
+	\sum_{k = i}^{q}
+	\eval{ \dv[k]{ \vect{u} }{t} }_{t_n}
+	\frac{(t-t_n)^{k-i}}{(k-i)!}
+	,
+	\label{eq:AB_Multivalue_Taylor_derivatives}
+\end{align}
+which however is not suitable to be applied to the interval $[t_n,t_{n+1}]$. The reason is that it should include the value $\widetilde{\vect{u}}^{n+1}= \widetilde{\vect{u}}(t_{n+1})$ obtained by evaluating (\ref{eq:AB_Multivalue_Taylor}) at $t_{n+1}$. To convince the reader, first notice that for $i=1$ equation (\ref{eq:AB_Multivalue_Taylor_derivatives}) does not satisfy the differential equation, i.e. $	\Eval{\dv*{ \widetilde{\vect{u}} }{t}}_{t_{n+1}}\ne \widetilde{\vect{F}}^{n+1} = \vect{F}(\widetilde{\vect{u}}^{n+1},t_{n+1})$ which would yield an incorrect approximation. Second, for $i=q$, we obtain a non evolving in time $q-$th derivative, i.e. $	\Eval{\dv*[q]{ \widetilde{\vect{u}} }{t}}_{t_{n+1}} = \Eval{\dv*[q]{ \widetilde{\vect{u}} }{t}}_{t_{n}}$. Therefore, $\widetilde{\vect{u}}$ alone cannot be used to correctly update the derivatives $\dv*[i]{ \vect{u} }{t}$ at $t>t_{n}$. Multivalue formulation evolves $\dv*[i]{ \vect{u} }{t}$ at $t>t_{n}$ by correcting (\ref{eq:AB_Multivalue_Taylor_derivatives}) as follows
+%
+\begin{align}
+	\dv[i]{ \vect{u} }{t}
+	=
+	\dv[i]{ \widetilde{\vect{u}} }{t}
+	+
+	\frac{i!}{(t-t_n)^{i}} 
+	r_i
+	\vect{\alpha}(t)
+	,
+	\qquad
+	t\in[t_n,t_{n+1}],
+	\label{eq:ABM_Multivalue_Taylor_derivatives}
+\end{align}
+for $i=1,2,\ldots,q$ and we select $r_i$ and $\vect{\alpha}(t)$ to heal the aforementioned issues of (\ref{eq:AB_Multivalue_Taylor_derivatives}). Notice that we have $q+1$ unknowns and (\ref{eq:ABM_Multivalue_Taylor_derivatives}) provides only $q$ equations\footnote{This count of equations and unknowns takes $\vect{\alpha}$ as a single unknown. A componentwise count would lead to $q+N_v$ unknowns and $qN_v$ equations but as for both counts the system is closed and solved in the exact same manner, the latter introduces an unnecessary complication.}. To close the system, we can set $r_1=1$. In first place, forcing $\dv*{ \vect{u} }{t}=\vect{F}(\vect{u}(t),t)$ yields
+%
+\begin{align}
+	\vect{\alpha}(t) 
+	=
+	(t-t_n)
+	\left(
+	\vect{F}(\vect{u}(t),t)
+	-
+	\dv{\widetilde{\vect{u}}}{t}
+	\right).
+	\label{eq:ABM_Multivalue_alpha}
+\end{align}
+
+In order to fix $r_i$ for $i>1$, we introduce a new set of Lagrange polynomials $\ell_{n+1-j}(t)$ associated to the stencil $\{t_{n+1-j}\}_{j=0}^{q-1}$ 
+%
+\begin{align}
+	{\ell}_{n+1-j}(t)
+	=
+	\prod_{\substack{k=0\\k\ne j}}^{q-1}
+	\frac{t-t_{n+1-k}}{t_{n+1-j}-t_{n+1-k}}.
+	\label{eq:Lagrange_polynomials_Multivalue}
+\end{align}
+
+The strategy to fix the rest of $r_i$ consists on selecting them in such a manner that transform (\ref{eq:ABM_Multivalue_Taylor_derivatives}) in $\dv*[i]{ \vect{u} }{t} = \dv*[i-1]{ \vect{I} }{t}$, for this we will change the polynomial basis in which $\widetilde{\vect{I}}$ is expressed. Polynomia  (\ref{eq:Lagrange_polynomials_Multivalue}) constitute a basis of the vector space of degree $q$ polynomia and permit to express the interpolant $\widetilde{\vect{I}}(t)$ as
+%
+\begin{align}
+	\vect{\widetilde{ \vect{I}} }(t)
+	& =
+	\sum_{k=0}^{q-1}
+	\widetilde{\vect{I}}(t_{n+1-k})
+	\ell_{n+1-k}(t)
+	\nonumber
+	\\
+	&
+	 =
+	\widetilde{\vect{I}}(t_{n+1})
+	\ell_{n+1}(t)
+	+
+	\sum_{k=1}^{q-1}
+	\vect{F}^{n+1-k}
+	\ell_{n+1-k}(t).
+	\label{eq:Multivalue_interpolant_new_basis}
+\end{align}
+
+Imposing $\dv*[i]{\widetilde{\vect{u}}}{t} = \dv*[i-1]{\widetilde{\vect{I}}}{t}$, (\ref{eq:ABM_Multivalue_alpha}) and (\ref{eq:Multivalue_interpolant_new_basis}) to (\ref{eq:ABM_Multivalue_Taylor_derivatives}) yields
+%
+\begin{align}
+	\dv[i]{ \vect{u} }{t}
+	&
+	=
+	\widetilde{\vect{I}}(t_{n+1})
+	\ell_{n+1}^{(i-1)}(t)
+	+
+	\sum_{k=1}^{q-1}
+	\vect{F}^{n+1-k}
+	\ell_{n+1-k}^{(i-1)}(t)
+	\nonumber
+	\\
+	&	
+	+
+	\frac{i!}{(t-t_n)^{i-1}} 
+	r_i
+	\left(
+	\vect{F}(\vect{u}(t),t)
+	-
+	\widetilde{\vect{I}}(t_{n+1})
+	\ell_{n+1}(t)
+	-
+	\sum_{k=1}^{q-1}
+	\vect{F}^{n+1-k}
+	\ell_{n+1-k}(t)
+	\right)
+	\nonumber
+	\\
+	&
+	=
+	\frac{i!}{(t-t_n)^{i-1}} 
+	r_i
+	\vect{F}(\vect{u}(t),t)+
+	\sum_{k=1}^{q-1}
+	\left(
+	\ell_{n+1-k}^{(i-1)}(t)
+	-
+	\frac{i!}{(t-t_n)^{i-1}} 
+	r_i
+	\ell_{n+1-k}(t)
+	\right)
+	\vect{F}^{n+1-k}
+	\nonumber
+	\\
+	&
+	+
+	\widetilde{\vect{I}}(t_{n+1})
+	\left(
+	\ell_{n+1}^{(i-1)}(t)
+	-
+	\frac{i!}{(t-t_n)^{i-1}} 
+	r_i
+	\ell_{n+1}(t)
+	\right)
+	.
+	\label{eq:ABM_Multivalue_Derivatives_r_i_t}
+\end{align}
+
+Evaluating (\ref{eq:ABM_Multivalue_Derivatives_r_i_t}) at $t=t_{n+1}$ reveals the condition that $r_i$ must satisfy
+%
+\begin{align}
+	\eval{\dv[i]{ \vect{u} }{t}}_{t_{n+1}}
+	&
+	=
+	\frac{i!}{\Delta t_n^{i-1}} 
+	r_i
+	\vect{F}^{n+1}
+	+
+	\sum_{k=1}^{q-1}
+	\ell_{n+1-k}^{i-1}(t_{n+1})
+	\vect{F}^{n+1-k}
+	\nonumber
+	\\
+	&
+	+
+	\widetilde{\vect{I}}(t_{n+1})
+	\left(
+	\ell_{n+1}^{(i-1)}(t_{n+1})
+	-
+	\frac{i!}{\Delta t_n^{i-1}} 
+	r_i
+	\right)
+	.
+	\label{eq:ABM_Multivalue_Derivatives_r_i}
+\end{align}
+
+The condition for $r_i$ is that $\Eval{\dv*[i]{ \vect{u} }{t}}_{t_{n+1}}$ must be independent of the value of $\widetilde{\vect{I}}(t_{n+1})$. Thus, in order to eliminate the term proportional to $\widetilde{\vect{I}}(t_{n+1})$ in (\ref{eq:ABM_Multivalue_Derivatives_r_i}), the coefficient $r_i$ must be
+%
+\begin{align}
+	r_i
+	=
+	\frac{\Delta t_n^{i-1}}{i!}
+	\ell_{n+1}^{(i-1)}(t_{n+1}). 
+	\label{eq:ABM_Multivalue_Derivatives_r_i_2}
+\end{align}
+
+As was advanced, the selection of $r_i$ given by (\ref{eq:ABM_Multivalue_Derivatives_r_i_2}) the multivalue method evolves the derivatives as   
+%
+\begin{align}
+	\eval{\dv[i]{ \vect{u} }{t}}_{t_{n+1}}
+	&
+	=\eval{\dv[i-1]{ \vect{I} }{t}}_{t_{n+1}},
+\end{align} 
+for the interpolant
+%
+\begin{align}
+	\vect{I}(t)=
+	\sum_{k=0}^{q-1}
+	\ell_{n+1-k}(t)
+	\vect{F}^{n+1-k},
+	\qquad
+	t\in[t_{n+2-q},t_{n+1}].
+	\label{eq:Multivalue_AM_Interpolant}
+\end{align}
+
+Summarizing, with the given values of $\vect{\alpha}(t)$ and $r_i$ (\ref{eq:ABM_Multivalue_alpha}) and (\ref{eq:ABM_Multivalue_Derivatives_r_i_2}), a multivalue method of order $q$ equivalent to a $q$ steps Adams-Bashforth reads
+%
+\begin{align}
+	\vect{u}^{n+1}
+	& =
+	\vect{u}^{n}
+	+
+	\sum_{k = 1}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{\Delta t_n^k}{k!}
+	\label{eq:AB_Multivalue_u}
+	\\ 
+	\eval{\dv[i]{ \vect{u} }{t}}_{t_{n+1}}
+	& =
+	\sum_{k = i}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{\Delta t_n^{k-i}}{(k-i)!}
+	+
+	\frac{i!}{\Delta t_{n}^{i}} 
+	r_i
+	\vect{\alpha}(t_{n+1})
+	,
+	\qquad i = 1,2 \ldots q.
+	\label{eq:AB_Multivalue_derivatives}
+\end{align}
+
+
+\subsubsection*{Multivalue Adams-Moulton}
+In the previous pages the multivalue formulation of an order $q$ Adams-Bashforth has been presented. The derivation of the multivalue formulation of an Adams-Moulton method is very similar to the one for the Adams-Bashforth. The derivatives of $\vect{u}(t)$ at $t_{n+1}$ are calculated in the same exact manner that for Adams-Bashforth multivalue formulation, but $\vect{u}(t)$ is not. For computing $\vect{u}(t)$, again a correction with respect to the extrapolation $\widetilde{\vect{u}}(t)$ is done
+%
+\begin{align}
+	\vect{u}(t)
+	=
+	\widetilde{\vect{u}}(t)
+	+
+	r_0 \vect{\alpha}(t),
+	\qquad
+	t\in[t_{n},t_{n+1}]
+	\label{eq:Multivalue_AM}.
+\end{align}
+
+The coefficient $r_0$ is again obtained by expressing $\widetilde{ \vect{I}}(t)$ in the basis $\{\ell_{n+1-k}(t)\}_{k=0}^{q-1}$ and
+that
+%
+\begin{align}
+	\widetilde{\vect{u}}(t)
+	=
+	\vect{u}^n
+	+
+	\int_{t_n}^{t}
+	\widetilde{ \vect{I}}(t')
+	\dd{t'}
+\end{align}
+
+Using that 
+\begin{align}
+	\vect{u}(t)
+	& = 
+	\vect{u}^n
+	+
+	r_0
+	\Delta t_n
+	\vect{F}(\vect{u}(t),t)
+	+
+	\sum_{k=1}^{q-1}
+	\vect{F}^{n+1-k}
+	\int_{t_n}^{t}
+	\ell_{n+1-k}(t')
+	\dd{t'}
+	\nonumber
+	\\
+	&
+	+
+	\widetilde{\vect{I}}(t_{n+1})
+	\left(
+	\int_{t_n}^{t}
+	\ell_{n+1}(t')
+	\dd{t'}
+    -
+    r_0 \Delta t_n
+	\ell_{n+1}(t)
+	\right)
+	-
+	r_0	\Delta t_n
+	\sum_{k=1}^{q-1}
+	\vect{F}^{n+1-k}
+	\ell_{n+1-k}(t)
+	.
+	\label{eq:Multivalue_AM_r_i_t}
+\end{align}
+
+Forcing $\vect{u}(t_{n+1})$ in (\ref{eq:Multivalue_AM_r_i_t}) to be independent of $\widetilde{\vect{I}}(t_{n+1})$ gives
+%
+\begin{align}
+	r_0 
+	=
+	\frac{1}{\Delta t_n}
+	\int_{t_n}^{t_{n+1}}
+	\ell_{n+1}(t)
+	\dd{t},
+    \label{eq:Multivalue_AM_r0}
+\end{align}
+which matches $\beta_0$ from (\ref{eq:ABM_beta}). Note that this selection of $r_0$ gives 
+%
+\begin{align}
+	\vect{u}^{n+1}
+	=
+	\widetilde{\vect{u}}^{n+1}
+	+
+	r_0
+	\vect{\alpha}(t_{n+1})
+	=
+	\int_{t_n}^{t_{n+1}}
+	\vect{I}(t)
+	\dd{t},
+\end{align}
+for the interpolant (\ref{eq:Multivalue_AM_Interpolant}) which clarifies the equivalence between the Adams-Moulton method and the multivalue formulation just derived.
+
+\subsubsection{Matricial form of multivalue methods}
+We have just seen that we can express both explicit and implicit Adams methods as 
+%
+\begin{align}
+	\vect{u}^{n+1}
+	& =
+	\vect{u}^{n}
+	+
+	\sum_{k = 1}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{\Delta t_n^k}{k!}
+	+
+	r_0
+	\alpha(t_{n+1})
+	\\ 
+	\eval{\dv[i]{ \vect{u} }{t}}_{t_{n+1}}
+	& =
+	\sum_{k = i}^{q}
+	\eval{ \dv[k]{\vect{u}}{t} }_{t_n}
+	\frac{\Delta t_n^{k-i}}{(k-i)!}
+	+
+	\frac{i!}{\Delta t_{n}^{i}} 
+	r_i
+	\vect{\alpha}(t_{n+1})
+	,
+	\qquad i = 1,2 \ldots q,
+\end{align}
+where
+%
+\begin{align}
+	r_0
+	=
+	\begin{cases}
+		0, \qquad & 
+		\mbox{for Adams-Bashforth},
+		\\
+		\beta_0, \qquad & 
+		\mbox{for Adams-Moulton},
+	\end{cases}
+\end{align}
+and $r_i$ for $i\geq 1$ is given by (\ref{eq:ABM_Multivalue_Derivatives_r_i_2}) and $\vect{\alpha}(t)$ is given by (\ref{eq:ABM_Multivalue_alpha}). Although this serves to understand the equivalence between multistep and multivalue methods is not of practical use. Instead, it is convenient for multivalue formulation to define the state array
+%
+\begin{align}
+	\vect{y}^{n}
+	=
+	\Matrix{c}
+	{
+		\vect{y}_{0}^{n}
+		\\
+		\vect{y}_{1}^{n}
+		\\
+		\vdots
+		\\
+		\vect{y}_{i}^{n}
+		\\
+		\vdots
+		\\
+		\vect{y}_{q}^{n}
+	}
+    =
+    \Matrix{c}
+    {
+        \vect{u}^{n}
+        \\
+        \Delta t_n
+        \eval{\dv*{ \vect{u} }{t}}_{t_{n}}
+        \\
+        \vdots
+        \\
+        (\Frac{\Delta t_n^i}{i!})
+        \eval{\dv*[i]{ \vect{u} }{t}}_{t_{n}}
+        \\
+        \vdots
+        \\
+        (\Frac{\Delta t_n^q}{q!})\eval{\dv*[q]{ \vect{u} }{t}}_{t_{n}}
+    }
+    \in \M{q+1}{N_v}
+    ,
+\end{align}
+whose rows are $\vect{y}_{i}^{n}=(\Frac{\Delta t_n^i}{i!})
+\eval{\dv*[i]{ \vect{u} }{t}}_{t_{n}}\in\R{N_v}$ and which permits to write the extrapolation as
+%
+\begin{align}
+	\widetilde{\vect{y}}^{n+1}
+	=
+	B
+	\vect{y}^{n},
+\end{align}
+where the components of $B\in\M{q+1}{q+1}$ are 
+%
+\begin{align}
+	B_{ij}
+	=
+	\begin{cases}
+		0, & \quad \mbox{if }i > j,
+		\\
+		\dfrac{j!}{i!(j-i)!}
+		, & \quad \mbox{if }i \le j,
+	\end{cases}
+    \qquad
+    i,j,=0,1,\ldots q
+\end{align}
+which is a matrix whose upper triangular components are given by the binomial coefficients. Hence, we can rewrite multivalue methods compactly, as
+%
+\begin{align}
+	\vect{y}^{n+1}
+	& =
+	\widetilde{\vect{y}}^{n+1}
+	+
+	\vect{r}
+	\otimes 
+	\vect{\alpha}(t_{n+1})
+	\nonumber\\
+	& =
+	B
+	\vect{y}^{n}
+	+
+	\vect{r}
+	\otimes 
+	\left( 
+	\Delta t_n\vect{F}^{n+1}
+	-
+	\vect{e}_{1}
+	\cdot
+	\widetilde{\vect{y}}^{n+1}	
+	\right)
+	\nonumber\\
+	& =
+	\left(
+	I
+	-
+	\vect{r}
+	\otimes 
+	\vect{e}_{1}
+	\right)
+	\cdot
+	B
+	\vect{y}^{n}
+	+
+	\Delta t_n
+	\vect{r}
+	\otimes 
+	\vect{F}^{n+1}
+	,
+	\label{eq:Multivalue_vector_formulation}
+\end{align}
+where $I$ is the $(q+1)\times(q+1)$ identity matrix, $\vect{e}_1 = (0,1,\ldots,0)\in\R{q+1}$ is the canonical basis vector, $\vect{r}=(r_0,r_1,\ldots,r_q)\in\R{q+1}$ and $\otimes$ denotes the tensorial product between real vector spaces. There are a few major advantages in multivalue formulation (\ref{eq:Multivalue_vector_formulation}) for implementing predictor-corrector and variable step-variable order algorithms. To switch between an Adams-Bashforth (predictor) to an Adams-Moulton (corrector) is easy just by setting $r_0=0$ for the predictor and $r_0 $ from (\ref{eq:Multivalue_AM_r0}) for the corrector. The order of the scheme is determined by the size of the state vector $\vect{y}^{n+1}$ and can be changed by using the appropriate $B$ and $\vect{r}$. Last, but not least, multivalue formulation permits to modify the step size $\Delta t_n$ in a very simple manner. If we denote by $\widehat{\vect{y}}^{n+1}$ the solution correspondent to a new step size $\Delta\widehat{t}_n = \widehat{t}_{n+1} - {t}_n $ we have the nice property that $\widehat{\vect{y}}^{n+1}$ is obtained by updating in (\ref{eq:Multivalue_vector_formulation}) the initial condition to $\widehat{\vect{y}}^{n} = D \vect{y}^n$, where $D$ is the diagonal $(q+1)\times(q+1)$ matrix whose entries are
+%
+\begin{align}
+	D_{ij} = \delta_{ij}
+	\left(
+	\frac{\Delta \widehat{t}_n}{\Delta t_n}
+	\right)^{i},
+	\qquad
+	i,j,=0,1,\ldots q.
+\end{align}
+
+Explicitly $\widehat{\vect{y}}^{n+1}$ reads
+%
+\begin{align}
+	\widehat{\vect{y}}^{n+1}
+	&
+	=
+	\left(
+	I
+	-
+	\vect{r}
+	\otimes 
+	\vect{e}_{1}
+	\right)
+	\cdot
+	B
+	\widehat{\vect{y}}^{n}
+	+
+	\Delta \widehat{t}_n
+	\vect{r}
+	\otimes 
+	\widehat{\vect{F}}^{n+1}
+	\nonumber\\
+	&
+	=
+	\left(
+	I
+	-
+	\vect{r}
+	\otimes 
+	\vect{e}_{1}
+	\right)
+	\cdot
+	B D
+	{\vect{y}}^{n}
+	+
+	\Delta \widehat{t}_n
+	\vect{r}
+	\otimes 
+	\widehat{\vect{F}}^{n+1}
+\end{align}
+where we have denoted $\widehat{\vect{F}}^{n+1}=\vect{F}(\vect{u}(t_n + \Delta \widehat{t}_n), t_n + \Delta \widehat{t}_n)$. Of course, in case $r_0\ne 0$ the change of step requires to solve the implicit equation for $\widehat{\vect{y}}_0^{n+1}$. However, for explicit methods the solution for the new step size is obtained as a correction of the solution for the old step size
+%
+\begin{align}
+	\widehat{\vect{y}}_0^{n+1} = {\vect{y}}_0^{n+1} + B(D-I){\vect{y}}_0^{n}.
+\end{align}
+
+This fact about the easiness of changing the step size for explicit multivalue methods is of special interest for predictor-corrector algorithms. It permits to change the step size of the predictor-corrector scheme by two consecutive corrections. First we obtain $\widehat{\vect{y}}_0^{n+1}$ as a correction of ${\vect{y}}_0^{n+1}$. With this new solution we evaluate $\vect{F}$ to obtain the derivatives $\widehat{\vect{y}}_i^{n+1}$ (for $i>0$). Thus, we can obtain the predictor solution for the new step size which will serve to produce the final solution using the corrector. 

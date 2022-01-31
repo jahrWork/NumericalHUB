@@ -1,0 +1,336 @@
+
+    
+    %*************************************************************************
+    \chapter{Systems of equations}
+    %*************************************************************************
+    \label{User:Linear_Algebra}
+    
+    \vspace*{-1cm} 
+    \section{Overview} 
+    
+    In this section, solutions of linear problems are obtained as well as the determination of zeroes of implicit functions. The first 
+    problem is the solution of a linear system of algebraic equations. LU factorization method (subroutine \verb|LU_Solution|) and Gauss 
+    elimination method are proposed to obtain the solution.  The natural step is to deal with solutions of a non linear system of equations. 
+    These systems are solved by the Newton method in the subroutine \verb|Newton_Solution|. The eigenvalues problem of a given matrix is 
+    considered in the subroutine \verb|Test_Power_Method| computed by means of the power method. 
+    To alert of round--off errors when solving linear systems of equations,
+    the condition number of the Vandermonde matrix is computed in the subroutine 
+    \verb|Vandermonde_condition_number|.
+    Finally, a singular value decomposition (SVD) is carried out by 
+    \verb|Test_SVD| as an example of matrix factorization. 
+     All these subroutines are called from the subroutine \verb|Systems_of_Equations_examples| which can 
+    be executed typing the first option of the main menu of the \verb|NumericalHUB.sln| environment. 
+    
+    
+    
+    \vspace{0.2cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+             {subroutine Systems_of_Equations_examples}
+             {end subroutine}{API_Example_Systems_of_Equations.f90}
+  
+%_____________________________________________________________________________________             
+\section{LU solution example}
+    Let us consider the following system of linear equations:  
+    \begin{equation*}
+    	A \ x = b ,
+    \end{equation*}
+    where $A \in {\cal M}_{4 \times 4} $ and $b \in  \mathbb{R}^4$  are:
+    
+    \begin{equation}
+    	A = \begin{pmatrix}
+    	4 & 3 & 6 & 9 \\
+    	2 & 5 & 4 & 2 \\
+    	1 & 3 & 2 & 7 \\
+    	2 & 4 & 3 & 8 
+    	\end{pmatrix}, \qquad 
+    	b = \begin{pmatrix}
+    	3 \\
+    	1 \\
+    	5 \\
+    	2
+    	\end{pmatrix}.
+    \end{equation}
+    
+    A common method to compute the solution to this problem is the LU factorization method. This method consists on the factorization of the matrix $A$ into two simpler matrices $L$ and $U$:
+    %
+    \begin{equation*}
+    	A = L \ U,
+    \end{equation*}
+    where $L$ is a lower triangular matrix and $U$ is an upper triangular matrix. This decomposition permits to calculate the solution $x$ 
+    taking advantage of the factorization. Once the $A$ matrix is factorized (subroutine \verb|LU_factorization|), the solution by means of a 
+    backward substitution can be obtained for any independent term $b$ (subroutine \verb|Solve_LU|). The implementation of this problem is 
+    done as follows:
+    
+    %\vspace{5mm}
+    %\lstinputlisting[language=Fortran, firstline=24, lastline=41, caption = \mycap{API_Example_Systems_of_Equations.f90} ]{\home/examples/API_Example_Systems_of_Equations.f90}
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine LU_Solution}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    Once the program is executed, the solution $x$ results:
+    
+    \begin{equation}
+    x = 
+    \begin{pmatrix}
+    -7.811 \\
+    -0.962 \\
+     4.943 \\
+     0.830
+    \end{pmatrix}.
+    \end{equation}
+    
+    
+
+ %   A batch file named: \mycap{main_Linear_Algebra_examples.bat} allows to compile and to run this main program.  
+    
+%_____________________________________________________________________________________     
+\section{Newton solution example} 
+    
+    Another common problem is to obtain the solution of a system of  non linear equations. 
+    Iterative methods based on approximate solutions are always required. The rate of convergence and radius of convergence from an initial condition determine the election of the iterative method. The highest rate of convergence to the final solution is obtained with the Newton-Raphson method. However, the initial condition to iterate must be  close to the solution to achieve convergence. Generally, this method is used when the initial approximation of the  solution can be estimated approximately. 
+     To illustrate the use of this method,  an example of a  function ${F}:\mathbb{R}^3 \rightarrow \mathbb{R}^3$ is defined as follows:
+    %
+    \begin{align*}
+    &	F_1 = x^2 - y^3 - 2,\\
+    &   F_2 = 3 \ x \ y - z,\\
+    &   F_3 = z^2 -x.
+    \end{align*}
+    
+    The implementation of the previous problem requires the definition of a vector function $F$ as:
+   
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {function F}
+    {end function}{API_Example_Systems_of_Equations.f90}
+    
+    The subroutine \verb|Newton|  gives the solution by means of an iterative method from the  initial approximation \verb|x0|.
+    The solution is given in the same variable  \verb|x0|. 
+
+    
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Newton_Solution}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    
+    Once the program is executed, the computed solution results:
+    
+    \begin{equation*}
+    	(x,y,z)= (1.4219,   0.2795,	1.1924)
+    \end{equation*}
+    
+%_____________________________________________________________________________________     
+\section{Implicit and explicit equations} 
+    Sometimes, the equations that governs a problem comprises explicit and implicit equations. For example, 
+    the following system of equations:  
+    %
+    \begin{align*}
+    &	F_1 = x^2 - y^3 - 2,\\
+    &   F_2 = 3xy - z,\\
+    &   F_3 = z^2 -x,
+    \end{align*}
+     can be expressed by maintaining two equations as implicit equations and one as an explicit equation: 
+    \begin{align*} 
+        &   x =  z^2, \\
+        &	F_1 = x^2 - y^3 - 2,\\
+        &   F_2 = 3xy - z.\\
+    \end{align*}
+    To solve this kind of problems, the subroutine \verb|Newtonc| has been implemented. This subroutine takes into account that some equations are zero for all values of the unknown $x$. In this case, the function $ F (x) $ should provide explicit relationships for the components of $ x $. 
+    An example of this kind of problem together with an initial approximation for the solution is shown in the following code: 
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Implicit_explicit_equations}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+ 
+   
+%_____________________________________________________________________________________    
+\section{Power method example} 
+
+    The determination of eigenvalues of square matrix are very valuable and also very challenging. If the matrix is symmetric, all eigenvalues are real and the determination of the eigenvalue with the largest module can be obtained easily by the power method.
+    The power method is an iterative method that allows to determine the     
+    
+    Let us consider the symmetric matrix:
+    \begin{equation*}
+    	A = 
+    	\begin{pmatrix}
+    		7 & 4 & 1 \\
+    		4 & 4 & 4 \\
+    		1 & 4 & 7
+    	\end{pmatrix}.
+    \end{equation*}
+   
+    The determination of the largest eigenvalue is implemented in the following code by means of the power method: 
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Test_Power_Method}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    
+      Once the program is executed,  the largest eigenvalue yields:
+        \begin{equation*}
+        	\lambda = 12.00 
+        \end{equation*}
+    and the associated eigenvector: 
+      \begin{equation*}
+      	U = \begin{pmatrix}
+      		 0.5773 \\
+      		 0.5773 \\
+      		 0.5773
+      	\end{pmatrix}.
+      \end{equation*}      
+  
+    \newpage 
+    
+    Once the largest eigenvalue is obtained, it can be removed from the matrix $ A $ as well as its associated subspace.
+    The new matrix $ A $ is obtained with the following expression  
+    $$
+     A_{ij} \rightarrow A_{ij} - \lambda_k \  U^k_i \  U^k_j. 
+    $$
+    Following this procedure, the next largest eigenvalue is obtained. This is done in the subroutine \verb|eigenvalues_PM|.
+    
+    An example of this procedure is shown in the following code where the eigenvalues of the same matrix $ A $ are calculated. 
+    The subroutine \verb|eigenvalues_PM| calls the subroutine \verb|power_method| and removes the calculated eigenvalues.  
+    
+     
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Test_eigenvalues_PM}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    
+    Once the program is executed,  the eigenvalues yield:
+            \begin{equation*}
+            	\lambda_1 = 12.00, \qquad \lambda_2 = 6.00, \qquad \lambda_3 =  1.33\cdot 10^{-15}, 
+            \end{equation*}
+    and the associated eigenvectors:
+    \begin{equation*}
+    	U_1 = \begin{pmatrix}
+    		 0.5773 \\
+    		 0.5773 \\
+    		 0.5773
+    	\end{pmatrix} , \qquad
+        U_2 = \begin{pmatrix}
+            	-0.7071 \\
+            	-8.5758 \cdot 10^{-13}\\
+    	        0.7071
+        \end{pmatrix} , \qquad 
+         U_3 = \begin{pmatrix}
+         0.5773 \\
+         0.5773 \\
+         0.5773
+         \end{pmatrix}.
+    \end{equation*}
+
+    Notice that as $\lambda_3$ is null, the third eigenvector $U_3$ is the same as the first eigenvector $U_1$.
+ 
+
+\newpage
+%_____________________________________________________________________________________ 
+\section{Condition number example} 
+When solving a linear system of equations, 
+\begin{equation*}
+	A \ x = b,
+\end{equation*}
+it is important to bound the error of the computed solution $ \delta x $ when 
+considering a small error $ \var b $ of the independent term $ b $. 
+Since the independent term $ b $ and the  matrix $ A $ are entered in the computer as approximate values due to the round--off errors, 
+the propagated error of the solution must be known.
+The condition number $\kappa(A)$ of a matrix $ A $ is defined as: 
+\begin{equation*}
+\kappa(A) = \norm{A^{\mbox{}}}\norm*{A^{-1}}, 
+\end{equation*}
+where $ \norm{A} $ stands for the induced norm of matrix $ A $. 
+The condition number allows to bound the error of the computed solution of a system of linear equations by the following expression: 
+\begin{equation*}
+\frac{\norm{\var x}}{\norm{ x}} \ \leq  \  \kappa(A)  \   \frac{\norm{\var 
+b}}{\norm{ b}}.
+\end{equation*}
+
+
+
+The condition number of  $6\times6$ Vandermonde matrix $A$ is calculated in the following code: 
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Systems_of_Equations.f90}
+{subroutine Vandermonde_condition_number}
+{end subroutine}{API_Example_Systems_of_Equations.f90}
+Once this code is executed, the result given for the condition number is:
+\begin{equation*}
+	\kappa(A)= 0.55E+08,
+\end{equation*}
+which indicates that the Vandermonde matrix is \textit{ill-conditioned}.
+When solving a linear system of equations where the system matrix $A$ is the Vandermonde matrix, a small error in the independent term $b$ will be amplified by the condition number giving rise to 
+large errors in the solution $x$. 
+
+%_____________________________________________________________________________________ 
+\section{Singular value decomposition example} 
+ Let us consider the following matrix $A \in {\cal M}_{4 \times 5} $:
+    \begin{equation}
+    	A = \begin{pmatrix}
+    	1 & 0 & 0 & 0 & 2 \\
+    	0 & 0 & 3 & 0 & 0 \\
+    	0 & 0 & 0 & 0 & 0 \\
+    	0 & 2 & 0 & 0 & 0
+    	\end{pmatrix}.
+    \end{equation}
+The singular value decomposition (SVD) or factorization is applicable to any square or non-square matrix. 
+SVD allows to write  matrix $A$ as
+   %
+   \begin{align*}
+   	A = U \ \Sigma \ V^T,
+   \end{align*}
+where $U$ and $V$ are squared unitary matrices constructed with eigenvalues of $ A^T \ A $ and  
+and $\Sigma$ is a diagonal matrix containing the square root of those eigenvalues.    
+SVD  factorization has many applications such as thew rank of matrix $ A $,  the solution of ill-posed systems of equations 
+and  compression of images.
+
+
+
+The SVD factorization is carried out by the subroutine \verb|SVD|).
+The implementation of this decomposition  can be found in the subroutine  \verb|Test_SVD| :
+    
+    %\vspace{5mm}
+    %\lstinputlisting[language=Fortran, firstline=24, lastline=41, caption = \mycap{API_Example_Systems_of_Equations.f90} 
+    %]{\home/examples/API_Example_Systems_of_Equations.f90}
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Test_SVD}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    
+The factorization of matrix A is finally obtained: 
+
+$$
+        A =
+    	\begin{pmatrix}
+    	    	0 & 1 & 0 & 0  \\
+    	    	1 & 0 & 0 & 0  \\
+    	    	0 & 0 & 0 & -1  \\
+    	    	0 & 0 & 1 & 0 
+    	\end{pmatrix}
+    	\begin{pmatrix}
+    	 	   	3 & 0 & 0 & 0 & 0 \\
+    	  	   	0 & 2.24 & 0 & 0 & 0 \\
+    	       	0 & 0 & 2 & 0 & 0 \\
+    	       	0 & 0 & 0 & 0 & 0
+    	\end{pmatrix} 
+    	\begin{pmatrix}
+    	 	   	0 & 0 & 1 & 0 & 0 \\
+    	  	   	0.45 & 0 & 0 & 0 & 0.89 \\
+    	       	0 & 1 & 0 & 0 & 0 \\
+    	       	0.43 & 0 & 0 & 0.88 & -0.22  \\
+    	       	-0.78 & 0 & 0 & -0.48 & -0.39
+    	\end{pmatrix}.  
+$$    
+In this example, the rank of matrix $ A $ is $ r = 3 $ which means that matrix $ A $ 
+can be expressed by: 
+\begin{equation} 
+A = \sigma_1 \  U_1 \otimes V_1 + \sigma_2 \ U_2 \otimes V_2 + \sigma_3 \ U_3 \otimes V_3, 
+\label{A_reduction}
+\end{equation}
+where $ \sigma_1, \sigma_2 $ and $\sigma_3 $ are the singular values which are diagonal 
+components of the matrix $ \Sigma $ and $ \otimes $ stands for the tensor product 
+calculated by the  function \verb|Tensor_product| used in the above snippet.  
+
+This Reduced Singular Value Decomposition given by equation (\ref{A_reduction})  allows to 
+reconstruct matrix $ A $ from its relevant information. Since singular values $ \sigma_i $ are
+given in matrix $ \Sigma $ from greatest to least, an approximation of matrix $ A $ 
+can be obtained by truncating (\ref{A_reduction}) for those $ \sigma_i <  \sigma_{min}$. 
+
+
+

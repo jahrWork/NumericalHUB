@@ -1,0 +1,78 @@
+     
+       %*************************************************************************
+       \chapter{Three partial differential models   }\label{PDES}
+       %*************************************************************************  
+       
+       In this chapter, several partial differential equation models shall be considered. To start, a brief mathematical description will be given in order to clarify the types of equations that can be solved using the provided code. In particular, three models are presented: \textit{Boundary Value Problems} (BVP), \textit{Initial Value Boundary Problems} (IVBP) and \textit{Mixed Problems}. Along with the mathematical explanation, examples for each type of problem, will be exposed, with its respective Fortran implementation and results.
+       
+       \section{Boundary Value Problems}\label{BVP}
+	   In the study of many non-transient physical phenomenons, partial differential equations for the spatial distribution of the studied magnitudes appear. Along with these equations, several equations for the boundaries of the spatial domain must appear. The combination of these two sets of equations constitute a \textit{Boundary Value Problem}. More rigurously it can be defined as follows:
+	    
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vec{x} \in D $.
+
+       It is defined a boundary problem for a vectorial function $\vec{u}: D \rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, as:
+       \begin{eqnarray}
+       	&\vec{\mathcal{L}} (\vec{x},\vec{u}(\vec{x})) = 0, &  \forall \ \vec{x} \in \Omega,\\ 
+       	&\vec{g} (\vec{x},\vec{u}(\vec{x}))\big\rvert_{\partial \Omega}=0 , & \forall \  \vec{x} \in \partial \Omega, 
+       \end{eqnarray}\label{BVPeq}
+       where $\vec{\mathcal{L}}$ is the spatial differential operator and $\vec{g}$ is the boundary conditions operator for the solution at the boundary points $\vec{u} \big\rvert_{\partial \Omega}$. 
+       
+       In general, the differential operator is not linear and therefore we will distinguish between both cases as the numerical resolution of each one has its own particularities. 
+
+
+       \subsection{Linear Problems}\label{LinearProblems}
+       
+       \begin{enumerate}
+       	\item \textbf{Poisson equation}
+       \end{enumerate}
+        
+       \subsection{Non Linear Problems}\label{NonLinearProblems}
+       
+       \begin{enumerate}
+        \item \textbf{Von Karmann plate}
+       \end{enumerate}
+       %*************************************************************************  
+       \newpage
+       \section{Initial Value Boundary Problems}
+       
+       Whenever in the considered physical model, the magnitudes vary not only along the spatial dimension but also along time, the equations that result are partial differential equations that involve temporal derivatives. In this case, not only boundary conditions are required for the resolution of the problem but also an initial value for the unknown variable shall be provided. The set of differential equation, boundary conditions and initial value is called \textit{Initial Value Boundary Problem}, and more rigorously can be defined as follows:
+       
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vec{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $. 
+       
+       An Initial Value Boundary Problem for a vectorial function $\vec{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, is defined as:
+       \begin{eqnarray}
+         &\frac{\partial \vec{u} }{\partial t}(\vec{x},t) =\vec{\mathcal{L}} (\vec{x},t,\vec{u}(\vec{x},t)) , & \forall \ \ \vec{x} \in  \Omega, \\
+         &\vec{g} (\vec{x},t,\vec{u}(\vec{x},t))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vec{x} \in \partial \Omega,\\
+         & \vec{u}(\vec{x},t_0)=\vec{u}_0(\vec{x}), 
+       \end{eqnarray}
+       where $\vec{\mathcal{L}}$ is the spatial dif{}ferential operator, $\vec{u}_0(\vec{x})$ is the initial value and $\vec{g}$ is the boundary conditions operator for the solution at the boundary points $\vec{u} \big\rvert_{\partial \Omega}$.
+       
+       
+
+       \subsection{Parabollic Equations}
+       \subsubsection{Heat equation}
+       
+       \subsection{Hyperbollic Equations}
+       \subsubsection{Waves equation}
+       \subsubsection{Biharmonic equation}
+
+       %*************************************************************************  
+       \newpage
+       \section{Mixed Problems}
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vec{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $. 
+       
+       The intention of this section is to numerically solve a temporal evolution problem for two vectorial functions $\vec{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_u}$ of $N_u$ variables and $\vec{v}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, such as:
+       \begin{align*}
+       & \frac{\partial \vec{u} }{\partial t}(\vec{x},t) =\vec{\mathcal{L}}_u (\vec{x},t,\vec{u}(\vec{x},t),\vec{v}(\vec{x},t)) ,   & \forall & \ \vec{x} \in  \Omega, \\
+       & \vec{g} (\vec{x},t,\vec{u}(\vec{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vec{x} \in \partial \Omega, \\ 
+       & \vec{u}(\vec{x},t_0)=\vec{u}_0(\vec{x}),  & \forall & \ \vec{x} \in  D, \\ \\
+       & \vec{\mathcal{L}}_v (\vec{x},t,\vec{v}(\vec{x},t),\vec{u}(\vec{x},t)) = 0 ,  & \forall & \ \vec{x} \in  \Omega, \\
+       & \vec{h} (\vec{x},t,\vec{v}(\vec{x},t))\big\rvert_{\partial \Omega}=0 , & \forall & \ \vec{x} \in \partial \Omega,
+       \end{align*}
+       
+       where $\vec{\mathcal{L}}_u$ is the spatial dif{}ferential operator of the initial value problem of $N_u$ equations, $\vec{u}_0(\vec{x})$ is the initial value, $\vec{g}$ is the boundary conditions operator for the solution at the boundary points $\vec{u} \big\rvert_{\partial \Omega}$,  $\vec{\mathcal{L}}_v$ is the spatial dif{}ferential operator of the boundary value problem of $N_v$ equations and $\vec{h}$ is the boundary conditions operator for $\vec{v}$  at the boundary points $\vec{v} \big\rvert_{\partial \Omega}$. It can be seen that both problems are coupled as the dif{}ferential operators are defined for both variables. The order in which appear in the dif{}ferential operators $u$ and $v$ indicates its number of equations, for example: $\vec{\mathcal{L}}_v(\vec{x},t,\vec{v},\vec{u})$ and $\vec{v}$ are of the same size as it appears first in the list of variables from which the operator depends on.
+       
+       \subsection{Von Karmann equations}
+       \subsection{Diffusion-advection equation}
+       
+ 

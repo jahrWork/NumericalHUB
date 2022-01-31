@@ -1,0 +1,154 @@
+ 
+    
+    %*************************************************************************
+    \chapter{Finite Differences  }
+    %*************************************************************************
+    \label{Finite_Differences}
+
+    
+    
+    
+    \section{Overview} 
+    
+   From the numerical point of view, derivatives of some function $ f(x) $ are always obtained by building an interpolant, deriving the interpolant analytically and later particularizing it at some point.  When piecewise polynomial interpolation is considered, finite difference formulas are built to calculate derivatives. 
+       
+  In this chapter, several examples of derivatives are gathered in the subroutine \verb|Finite_difference_examples|. 
+   The first example is run in the subroutine \verb|Derivative_function_x| which calculates the derivatives  of a function $f:\mathbb{R} \rightarrow \mathbb{R}$.
+  The subroutine \verb|Derivative_function_xy| performs the same for a function   $f:\mathbb{R}^2\rightarrow \mathbb{R}$. 
+  Finally, the influence of the truncation and round off errors with the spatial step between nodes are highlighted in the subroutine \verb|Derivative_error|.     
+
+  \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Finite_Differences.f90}
+    {subroutine Finite_difference_examples}
+    {end subroutine}{API_Example_Finite_Differences.f90}
+    
+    All functions and subroutines used in this chapter are gathered in a Fortran module 
+    called: \verb|Finite_differences|. To make use of these functions the statement: 
+    \verb|use Finite_differences|
+    should be included at the beginning of the program.
+  
+    
+    
+    
+    
+   %___________________________________________________________________________________________
+    \section{Derivatives of a 1D function}
+  As it was mentioned in the previous section, to calculate derivatives a polynomial interpolant should be built 
+  $$
+      I_N(x) = \sum _{j=0} ^{N} f_j \ \lagrange_j(x). 
+  $$
+  To calculate the $k$--th derivative, the interpolant is derived analytically,
+   $$
+       \frac{d^{(k)} I_N }{ dx ^k }  (x) = \sum _{j=0} ^{N} f_j \ \frac{d^{(k)} \lagrange_j }{ dx ^k }(x). 
+   $$ 
+  Finally, these derivatives are particularized at the nodal points,
+   $$
+         \frac{d^{(k)} I_N }{ dx ^k }  (x_i) = \sum _{j=0} ^{N} f_j \ \frac{d^{(k)} \lagrange_j }{ dx ^k }(x_i). 
+     $$ 
+
+  
+  In the following subroutine \verb|Derivative_function_x|, the first and the second derivative of 
+  \begin{equation*}
+    u(x) = \sin(\pi x) 
+   \end{equation*}
+  are calculated particularized at $ N+1 $ grid points $ x_i $. First, a nonuniform grid $ x_i \in  [-1, +1]$ is created by the subroutine \verb|Grid_initialization|. It builds internally a piecewise polynomial interpolant of order or degree 4, calculates the derivatives $ k=1, 2, 3 $  of the Lagrange polynomials and particularizes their derivatives at $ x_i $. The numbers or weights  $ \lagrange^{(k)}_j(x_i) $ are stored internally in a data structure to be used later by the subroutine \verb|Derivative|. This subroutine multiplies the  weights $ \lagrange^{(k)}_j(x_i) $ by the function values $ u(x_j) $ to yield the required derivative in the desired nodal point. 
+  The values $ I_N ^{(k)}(x_i) $ are stored in a matrix \verb|uxk| of two indexes. The first index standing for the grid point $ x_i $ and the second one for the order of the derivative $ k $.  
+  
+  In this case, a polynomial interpolation or degree 4 is used. It means that the polynomial valid around $ x_i $ is built with 5 surrounding points.
+  If  $ x_i $ is an interior grid point,  not close to the boundaries, these points are $ \{x_{i-2},x_{i-1},x_{i},x_{i+1},x_{i+2}\}$ and the first and second derivatives give rise to: 
+  \begin{align*}
+    \frac{du } { dx } (x_i) = \sum _{j=i-2} ^{j=i+2} u(x_j) \ \lagrange^{(1)}_j(x_i),  \qquad 
+      \frac{d^2u } { dx^2 } (x_i) = \sum _{j=i-2} ^{j=i+2} u(x_j) \ \lagrange^{(2)}_j(x_i). 
+   \end{align*}
+   The first argument of the subroutine \verb|Derivative| is the direction \verb|"x"| of the derivative, the second argument is the order of the derivative, the third one is the vector of images of $ u(x) $ at the nodal points and  the fourth argument is the derivative evaluated at the nodal points $ x_i$·
+  
+  
+  Additionally, the error of the first and second derivatives are calculated by subtracting  the approximated value from the exact value of the derivative
+ 
+  \begin{align*}
+    E_1 = \left[ \frac{\text{d} I}{\text{d} x }(x_i)  - \pi \ \cos(\ \pi x_i\ ) \right],    \qquad
+    E_2 = \left[ \frac{\text{d}^2 I}{\text{d} x ^2}(x_i)  + \pi^2 \  \sin(\ \pi x_i\ ) \right].
+  \end{align*}
+  
+  
+  
+  \vspace{0.5cm} 
+  \listings{\home/examples/API_Example_Finite_Differences.f90}
+  {subroutine Derivative_function_x}
+  {end subroutine}{API_Example_Finite_Differences.f90}
+   
+   In figure \ref{fig:Derivatives1D}, the first and second derivatives of $ u(x) = \sin (\pi x) $ are plotted together with their numerical error. 
+   
+     
+  \fourgraphs{ \FirstDerivative{(a)} }{ \FirstDerivativeError{(b)} }
+            { \SecondDerivative{(c)} }{ \SecondDerivativeError{(d)} }
+            {First and second derivatives of $u(x) = \sin( \pi x ) $ by means of finite difference formulas and their associated error. The piecewise polynomial interpolation of degree 4 and $21$ nodal points. (a) First numerical derivative  \ensuremath{\dv*{u}{x}}. (b) Error on the calculation of \ensuremath{\dv*{u}{x}}. (c) Second numerical derivative  \ensuremath{\dv*[2]{u}{x}}. (d) Error on the calculation of \ensuremath{\dv*[2]{u}{x}}.}{fig:Derivatives1D}
+
+  
+\newpage 
+  \section{Derivatives of a 2D function}
+   In this section, a two dimensional space is considered and partial derivatives are calculated.  It is considered the function:
+  \begin{equation*}
+  	u(x,y) = \sin(\pi x)\sin(\pi y). 
+  \end{equation*}
+  The code implemented in subroutine \verb|Derivative_function_xy| is similar to the preceding code of a 1D problem. Internally, the module 
+  \verb|Finite_differences| interpolates in two orthogonal directions. This is done by calling  twice the subroutine  \verb|Grid_Initiallization|.
+  In this case, a piecewise polynomial interpolation of degree 6 is considered in both directions and 21 nodal points are used. 
+   \vspace{0.5cm} 
+   \listings{\home/examples/API_Example_Finite_Differences.f90}
+   {subroutine Derivative_function_xy}
+   {end subroutine}{API_Example_Finite_Differences.f90}
+   
+The computed partial derivatives calculated by means of finite difference formulas together with their associated error  are represented in  figure \ref{fig:Derivatives2D}
+  \FloatBarrier
+  
+   \fourgraphs{ \Uxx{(a)} }{ \ErrorUxx{(b)} }
+              { \Uxy{(c)} }{ \ErrorUxy{(d)} }
+              {  Numerical derivatives \ensuremath{\pdv*[2]{u}{x}}, \ensuremath{\pdv*[2]{u}{x}{y}} of $ u(x,y) = \sin(\pi x) \ \sin(\pi y) $ and associated error for $21\times 21$ nodal points and order $q=6$. (a) Numerical derivative \ensuremath{\pdv*[2]{u}{x}}. (b) Error on the calculation of \ensuremath{\pdv*[2]{u}{x}}. (c) Numerical derivative  \ensuremath{\pdv*[2]{u}{x}{y}}. (d) Error on the calculation of \ensuremath{\pdv*[2]{u}{x}{y}}. }{fig:Derivatives2D}
+
+  
+ 
+%_______________________________________________________________________________________________________________________________    
+    \newpage 
+    \section{Truncation and Round-off errors of derivatives} 
+    
+   In order to analyze the effect of the truncation and round-off error produced in the approximation of a derivative by finite differences, the following example is considered. 
+   As it was shown in the Lagrange interpolation chapter, two contributions or errors are always present when interpolating some function: truncation error and round--off error. While the truncation error is reduced when decreasing the step size $ \Delta x $ between grid points, the round-off error is increased when reducing $ \Delta x $. This is due to the growth of the Lebesgue function when reducing $ \Delta x $. 
+       
+   In the following code, the second derivative for $ f(x) = \cos(\pi x)$ is calculated with piecewise polynomial interpolation 
+   of degree $ q =2, 4, 6, 8 $. The calculated value is compared with the exact value at some point $ x_p $ and the resulting is determined by: 
+   $$
+      E(x_p) = \frac{ d^2 I }{ d x^2 } ( x_p ) - \pi^2 \ \cos ( \pi x_p ).
+   $$  
+   Since the grid spacing initialized in \verb|Grid_initialization| is uniform, the step size $ \Delta x = 2 / N$. There are two loops in the code, the first one takes into account different degree  $ q $  for  the piecewise polynomial  and the second one varies the number of grid points  $ N $ 
+   and, consequently, the step size $\Delta x$. To measure the effect of the machine precision or errors associated to measurements, the function is perturbed by means of the subroutine \verb|randon_number| with a module of order
+    $ \epsilon = 10^{-12} $ giving rise to the following perturbed values: 
+     \begin{equation*}
+        	f(x) = \cos(\pi x) + \varepsilon(x).
+     \end{equation*}
+   The resulting error $ E(x_p)$ is evaluated at the boundary $ x_p = -1 $ for each step size $ \Delta x$.     
+    
+    In figure  \ref{fig:Derivative_error_N_0} and figure \ref{fig:Derivative_error_N_N2},  the error $ E $ versus the step size $ \Delta x  $ is plotted  in logarithmic scale.  As it is expected,  when the step size $\Delta x$ is reduced, the error decreases. However,  when derivatives are calculated with smaller step sizes $ \Delta x $,  the round-off error becomes the same order of magnitude than the truncation error and the global error stops decreasing. When reducing, even more, the step size, the round-off error becomes dominant and the global error increases a lot.   This behavior is observed in figure \ref{fig:Derivative_error_N_0} and figure \ref{fig:Derivative_error_N_N2}, which display the error at $x=-1$ and $x=0$ respectively. As the order of interpolation grows, the minimum value of $\Delta x$ grows too indicating that the round-off error starts being relevant for larger step sizes.
+ 
+
+    \newpage
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Finite_Differences.f90}
+    {subroutine Derivative_error}
+    {end subroutine}{API_Example_Finite_Differences.f90}
+    
+   
+    
+    \fourgraphs{ \ErrorqTwoBoundary{(a)} }{  \ErrorqFourBoundary{(b)} }
+               { \ErrorqSixBoundary{(c)} }{ \ErrorqEightBoundary{(d)} }
+    { Numerical error of a second order derivative versus the step size $ \Delta x$ at \ensuremath{x=-1}. (a) Piecewise polynomials of degree \ensuremath{q=2}. (b) \ensuremath{q=4}. (c)  \ensuremath{q=6}. (d)  \ensuremath{q=8}. }{fig:Derivative_error_N_0}
+    
+    \fourgraphs{ \ErrorqTwoMiddle{(a)} }{  \ErrorqFourMiddle{(b)} }
+    { \ErrorqSixMiddle{(c)} }{ \ErrorqEightMiddle{(d)} }
+    { Numerical error of a second order derivative versus the step size $ \Delta x$ at \ensuremath{x=0}. (a) Piecewise polynomials of degree \ensuremath{q=2}. (b)  \ensuremath{q=4}. (c)  \ensuremath{q=6}. (d)  \ensuremath{q=8}. }{fig:Derivative_error_N_N2}
+    
+    
+    
+    
+    
+    

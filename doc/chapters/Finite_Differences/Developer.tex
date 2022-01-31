@@ -1,0 +1,209 @@
+
+    %*************************************************************************
+    \chapter{Finite Differences }
+    %*************************************************************************
+    \label{Dev:Finite Differences}
+    
+ 
+    \section{Finite differences}
+ 
+     On chapter \ref{dev:Interpolation}, the interpolation using Lagrange polynomials has been presented. By means of this interpolation we have seen how it is possible to compute an approximation of the derivatives of a function. This is very advantageous not only to calculate derivatives of a known function but also to obtain approximate solutions of differential equations. Given a set of nodes $\{x_i \in \R{} \, |\quad i = 0,\ldots,q\}$ a \textit{finite difference} formula is an expression that permits to approximate the derivative of a function $f(x)$ at these nodal points from its image at the set of nodes $\{f_i=f(x_i) \, |\quad i = 0,\ldots,q\}$. Let's suppose that we approximate $f$ in a domain $[x_0,x_q]$ using Lagrange interpolation, that is we consider $f$ to follow the expression:
+     %
+     \begin{align}
+     	f(x) = \sum_{i=0}^{q} f_i\ell_i(x),
+     \end{align}
+    therefore its $k$-th order derivative is written as
+    %
+    \begin{align}
+    \dv[k]{f(x)}{x}= \sum_{i=0}^{q} f_i\dv[k]{\ell_i(x)}{x}.
+    \label{eq:Derivative_k_finite_difference}
+    \end{align}
+    
+    If we want to calculate the derivative at a nodal point $x_j$ we just have to evaluate (\ref{eq:Derivative_k_finite_difference}) at that point, that is:
+    %
+    \begin{align}
+    \dv[k]{f(x_j)}{x}= \sum_{i=0}^{q} f_i\dv[k]{\ell_i(x_j)}{x}.
+    \label{eq:Finite_difference_k}
+    \end{align}
+    The expression (\ref{eq:Finite_difference_k}) is the finite difference formula of order $q$ which approximates the derivative of order $k$ at the point $x_j$. To illustrate the procedure let's consider the computation of the two first derivatives for order $q=2$ and the set of equispaced nodes $\{x_0,x_1,x_2\}$, that is $x_2-x_1=x_1-x_0=\Delta x$. For this problem the interpolant and its derivatives are:
+    %
+    \begin{align*}
+    	f(x)
+    	&
+    	=
+    	f_0 
+    	\frac{(x-x_1)(x-x_2)}{2\Delta x^2}
+    	-
+    	f_1 
+    	\frac{(x-x_0)(x-x_2)}{ \Delta x^2}
+    	\\
+    	&
+    	+
+    	f_2 
+    	\frac{(x-x_0)(x-x_1)}{2\Delta x^2},
+    	\\
+    	\dv{f(x)}{x}
+    	&
+    	=
+    	f_0 
+    	\frac{(x-x_1)+(x-x_2)}{2\Delta x^2}
+    	-
+    	f_1 
+    	\frac{(x-x_0)+(x-x_2)}{ \Delta x^2}
+    	\\
+    	&
+    	+
+    	f_2 
+    	\frac{(x-x_0)+(x-x_1)}{2\Delta x^2},
+    	\\
+    	\dv[2]{f(x)}{x}
+    	&
+    	=
+    	\frac{f_0}{\Delta x^2}
+    	-
+    	\frac{2f_1}{\Delta x^2}
+    	+
+    	\frac{f_2}{\Delta x^2}.
+    \end{align*}
+    
+    Note that the second derivative is the famous finite difference formula for centered second order derivatives. Evaluating the first derivative in the nodal points we obtain the well-known forward, centered and backward finite differences approximations of order 2:
+    %
+    \begin{align*}
+          \mbox{Forward:}
+          \qquad
+          &
+          \dv{f(x_0)}{x}
+          =
+          \frac{-3f_0 + 4f_1 - f_2}{2\Delta x}.
+          \\
+          \mbox{Centered:}
+          \qquad
+          &
+          \dv{f(x_1)}{x}
+          =
+          \frac{f_2-f_0}{2\Delta x}.
+          \\
+          \mbox{Backward:}
+          \qquad
+          &
+          \dv{f(x_2)}{x}
+          =
+          \frac{ f_0 - 4f_1 + 3f_2 }{2\Delta x}.
+    \end{align*}
+    
+    The main application of finite differences is the numerical resolution of differential equations. They serve to approximate the value of the unknown function in a set of nodes taking a finite number of points of the domain. For example, if we want to solve the 1D Boundary value problem:
+    %
+    \begin{align*}
+    	\dv[2]{u}{x} + 2\dv{u}{x} + u(x) = 0,
+    	\qquad & x \in (0,1),
+    	\\
+    	\dv*{u}{x}{}(0)=-2, \qquad & u(1)=0.
+    \end{align*} 
+    We can select a set of equispaced nodes $\Set{x_j\in[0,1]}{j=0,1,\ldots N }$ which satisfy $0=x_0<x_1<\dots<x_N=1$ and approximate the derivatives at those points by means of finite differences. If we use the previously derived second order formulas we get the following system of $N+1$ equations:
+    %
+    \begin{align*}
+    	\frac{-3u_0 + 4u_1 - u_2}{2\Delta x} &= -2, 
+    	\\
+    	\frac{u_{j-1}-u_j+u_{j+1}}{\Delta x^2}
+    	+
+    	2\frac{u_{j+1}-u_{j-1}}{2\Delta x}
+    	+
+    	u_j &= 0,
+    	\qquad j=1,2,\ldots N-1,
+    	\\
+    	u_N &= 0,
+    \end{align*}
+    whose solution is an approximation of $u(x)$ in the nodal values. Note that for every point $j=0,1,\ldots,N-1$ the formula used to approximate the first derivative is different. This is so as the set of Lagrange polynomials used to approximate the derivative at each point is different. For $j=0$ we use $\{\ell_0,\ell_1,\ell_2\}$ for the stencil $\{0,1,2\}$, while for $j=1,\ldots,N-1$ we use $\{\ell_{j-1},\ell_{j},\ell_{j+1}\}$ for the stencil $\{j-1,j,j+1\}$. The selection of the stencil must be done taking into account the order $q$ of interpolation. In this example, we just had to differentiate between the inner points $0<j<N$ and the boundary points $j=0,N$ (note that if we needed to compute derivatives at $x_N$ the formula would be the backward finite difference) but for generic order $q$ the situation is slightly different. First of all, the stencil for even values of $q$ consists of an odd number of nodal points and therefore the formulas can be centered. On the contrary, for odd values of $q$ as the stencil contains an even number of nodal points the formulas are not centered. Nevertheless, in both cases the stencil is composed of $q+1$ nodal points which will be the ones used by the corresponding Lagrange interpolants. In the following lines we give a classification for both even and odd generic order $q$.
+    %
+    \begin{enumerate}
+    	\item \textbf{Even order}: When $q$ is even we have three possible scenarios for the stencil depending on the nodal point $x_j$. We classify the stencil in terms of its first element which corresponds to the index $j-q/2$.
+    	
+    	\begin{itemize}
+    		\item For $j - q/2 <0$ we use the stencil $\{x_0,\ldots,x_q\}$ and its associated Lagrange polynomials $\{\ell_0(x),\ldots,\ell_q(x)\}$ evaluated at $x_j$.
+    		
+    		\item For $0 \leq j - q/2 \leq N-q$ we use the stencil $\{x_{j-q/2},\ldots,x_{j+q/2}\}$ and its associated Lagrange polynomials $\{\ell_{j-q/2}(x),\ldots,\ell_{j+q/2}(x)\}$ evaluated at $x_j$.
+    		
+    		\item For $j - q/2 >N-q$ we use the stencil $\{x_{N-q},\ldots,x_N\}$ and its associated Lagrange polynomials $\{\ell_{N-q}(x),\ldots,\ell_N(x)\}$ evaluated at $x_j$.
+    	\end{itemize}
+    	On figure \ref{fig:Even_stencil} is represented a sketch of the three different stencils for even order and the conditions under which are used.
+    \end{enumerate}
+    
+    \onegraphw
+    {\EvenStencil}
+    {Sketch of the possible stencils for finite differences of even order $q$. Each set of three nodes represent the $q+1$ nodes that 
+constitute the grid for the Lagrange polynomial $\ell_j(x)$.}
+    {fig:Even_stencil}
+    
+    \begin{enumerate}[resume]
+    	\item \textbf{Odd order}: When $q$ is odd we have three possible scenarios for the stencil depending on the nodal point $x_j$. We classify the stencil in terms of its first element which corresponds to the index $j-(q-1)/2$.
+    	
+    	\begin{itemize}
+    		\item For $j - (q-1)/2 <0$ we use the stencil $\{x_0,\ldots,x_q\}$ and its associated Lagrange polynomials $\{\ell_0(x),\ldots,\ell_q(x)\}$ evaluated at $x_j$.
+    		
+    		\item For $0 \leq j - (q-1)/2 \leq N-q$ we use the stencil $\{x_{j-(q-1)/2},\ldots,x_{j+(q+1)/2}\}$ and its associated polynomials $\{\ell_{j-(q-1)/2}(x),\ldots,\ell_{j+(q+1)/2}(x)\}$ evaluated at $x_j$.
+    		
+    		\item For $j -(q-1)/2 >N-q$ we use the stencil $\{x_{N-q},\ldots,x_N\}$ and its associated Lagrange polynomials $\{\ell_{N-q}(x),\ldots,\ell_N(x)\}$ evaluated at $x_j$.
+    	\end{itemize}
+    	On figure \ref{fig:Odd_stencil} is represented a sketch of the three different stencils for odd order and the conditions under which are used.
+    \end{enumerate}
+    
+    \onegraphw
+    {\OddStencil}
+    {Sketch of the possible stencils for finite differences of odd order $q$. Each set of three nodes represent the $q+1$ nodes that 
+constitute the grid for the Lagrange polynomial $\ell_j(x)$.}
+    {fig:Odd_stencil}
+    
+    Hence, given a set of nodal points $\{x_0,\ldots,x_N\}$ and an order of interpolation $q$, we can compute the coefficients of the finite difference formulae for the $k$-th derivative selecting the stencil as exposed using equation (\ref{eq:Finite_difference_k}). This procedure is used to discretize the spatial domains of differential equations and transform them into systems of $N$ equations. Although the procedure presented is for 1D domains it can be extended to higher dimensions in which the coefficients will involve Lagrange polynomials and stencils along the different dimensions. The main purpose of the module \verb|Finite_differences| is: given a spatial grid (set of nodes) and an order $q$ to compute the coefficients of the finite difference formulas for each point of the grid. In the following pages we present a brief explanation of how a library that carries out this procedure is implemented.
+    
+    \newpage
+    \subsection{Algorithm implementation}
+    
+    In order to store the information and properties of the grid, a derived data type called \verb|Grid| is defined and its properties declared as globals. This will permit to perform the computation of the coefficients of the high order derivatives just once.
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Finite_differences.f90}
+    {type Grid}
+    {integer, save :: ind = 0}{Finite_differences.f90}
+  
+     The computation of the derivatives is carried out by the subroutine: \\
+     \verb|High_order_derivatives| which calls the function \verb|Lagrange_polynomials|.
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Finite_differences.f90}
+     {subroutine High}
+     {end subroutine}{Finite_differences.f90}
+    
+    \newpage 
+    The coefficients are computed once by the subroutine \verb|Grid_initialization|.
+    \vspace{0.5cm} 
+    
+  %  \renewcommand{\home}{../libraries/Numerical_Methods/Finite_Differences}
+  %  \listings{../libraries/Numerical_Methods/collocation_methods/Collocation_methods.f90}
+   \listings{\home/sources/Finite_differences.f90}
+    {subroutine FD}
+    {end subroutine}{Finite_differences.f90}
+    
+    Hence, after a single call to \verb|Grid_initialization|, the uniform or non uniform grid of order $q$ is defined and the coefficients of 
+    the derivatives settled down. In these conditions, defining a derivative (by finite differences) requires only an aditional slice of 
+    information, which is the stencil. It is clear that the amount of nodes required to compute a finite difference increases as the 
+    interpolation order does. For this, the subroutine that computes the derivatives must know how is defined the computational cell, that 
+    is, it must call the function \verb|Stencilv|.
+    Taking this into account, the subroutine \verb|Derivative1D| which calculates derivatives of single variable functions is implemented as 
+    follows.
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Finite_differences.f90}
+    {subroutine FD_Derivative1D}
+    {end subroutine}{Finite_differences.f90}
+    
+    \newpage
+    In an analogous manner, the computation of derivatives of functions of two variables is carried out by the subroutine 
+    \verb|Derivative2D|.    
+    \vspace{0.2cm} 
+    \listings{\home/sources/Finite_differences.f90}
+    {subroutine FD_Derivative2D}
+    {end subroutine}{Finite_differences.f90}
+    
+
+
+

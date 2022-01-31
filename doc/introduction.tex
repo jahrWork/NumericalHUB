@@ -1,0 +1,46 @@
+\chapter*{Introduction}
+
+The following book is intended to serve as a guide for graduate students of engineering and scientific disciplines. 
+Particularly, it has been developed thinking on the students of the Technical Superior School of Aeronautics and Space Engineering (ETSIAE) from Polytechnic University of Madrid (UPM). 
+The topics presented cover many of the mathematical problems that appear on the different subjects of aerospace engineering problems. Far from being a classical textbook, with proofs and extended theoretical descriptions, the book is focused on the application and computation of the different problems. 
+For this, for each type of mathematical problem, an implementation in Fortran language is presented. A complete library with different modules for each topic accompanies this book. 
+The goal is to understand the different methods by directly by plotting numerical results and by changing parameters to evaluate the effect. Later, the student is advised to modify or to create his own code by studying the developer part of this book.
+
+A complete set of libraries and the software code which is explained is this book can be downloaded from the repository: 
+
+
+\begin{verbatim}
+           https://github.com/jahrWork/NumericalHUB. 
+\end{verbatim}
+
+ 
+This repository is in continuous development by the authors. 
+Once the compressed file is downloaded, Fortran sources files comprising different libraries as well as a Microsoft Visual Studio solution called \texttt{NumericalHUB.sln} can be extracted.  
+If the reader is not familiar with the Microsoft Integrated Development Environment (IDE), it is highly recommended to read the book \textit{Programming with Visual Studio: Fortran \& Python \& C++ \& WEB projects. Amazon Kindle Direct Publishing 2019 }. This book describes in detail how to manage big software projects by means of the Microsoft Visual Studio environment.  
+Once the Microsoft Visual Studio is installed, the software solution \verb|NumericalHUB.sln|  allows running the book examples very easily. 
+
+
+The software solution  \texttt{NumericalHUB.sln}  comprises a set of extended examples of different simulations problems. 
+Once the software solution  \texttt{NumericalHUB.sln} is loaded and run, the following simple menu appears on the Command Prompt:
+
+ 
+\vspace{0.5cm}
+  \listings{./sources/main_NumericalHUB.f90}
+       {Welcome}
+       {9}{main_NumericalHUB.f90}
+
+
+
+
+Each option is related to the different chapters of the book explained before. 
+As was mentioned, the book is divided into three parts: Part I User, Part II Developer and Part III Application Program Interface (API) which share the same contents. 
+From the user point of view, it is advised to focus on part I where easy examples are implemented and numerical results are explained.
+From the developer's point of view, part II explains in detail how different layers or levels of abstraction are implemented. This philosophy
+will allow the advanced user to implement his own codes. 
+Part III of this book is intended to give a detailed API to use this software code by novel users or advanced users to create new codes
+for specific purposes. 
+
+
+
+
+

@@ -1,0 +1,90 @@
+%********************************************************
+\chapter*{Prólogo}
+%********************************************************
+
+\addcontentsline{toc}{chapter}{Prólogo}
+\markboth{Prólogo}{Prólogo}
+Este libro trata de enseñar, con una metodología orientada
+a la simulación de sistemas físicos,  la implementación de proyectos software.
+Está orientado a estudiantes, profesionales e investigadores  interesados en
+desarrollar simuladores de sistemas físicos de envergadura media a elevada,
+en donde el proceso que realiza el sistema sea más complejo
+que el sistema en sí.
+
+Hasta hace  no muchos años
+parecía que la programación estructurada y el FORTRAN estaban reñidos.
+Sin embargo, el FORTRAN 95 ha dotado al lenguaje no sólo de la potencialidad suficiente para
+poder escribir en FORTRAN como con cualquier otro lenguaje,  sino
+que mediante la extensión de su biblioteca de funciones intrínsecas vectoriales pone  al FORTRAN
+en un lugar privilegiado para la simulación numérica de aquellos problemas
+en los que el objeto a simular sea una  estructura de datos vectorial  o matricial.
+No obstante, el FORTRAN es un lenguaje antiguo,  y debido a la compatibilidad de las sucesivas versiones
+ha heredado características no deseables u obsoletas.
+Este libro no es, ni mucho menos, un manual de referencia de FORTRAN 95.
+Las características obsoletas, redundantes y no necesarias
+para la simulación  --a criterio de los autores-- han sido eliminadas.
+Así, los cuatro primeros capítulos de este libro se pueden considerar el subconjunto del FORTRAN 95
+elegido por los autores. En los tres primeros capítulos se explica la sintaxis
+y  la potencialidad del lenguaje con las operaciones
+vectoriales y matriciales. Están estructurados por orden de complejidad y
+contienen numerosos ejemplos para que el lector pueda concretar lo aprendido.
+El capítulo 4 está íntegramente dedicado a la especificación de variables y procedimientos.
+Aunque a primera vista parece que este capítulo debería estar entre los primeros, los autores han considerado que,
+ debido a la dificultad  conceptual que entraña,
+un encuentro sin la asimilación de los ejemplos sencillos de los tres primeros capítulos sería demasiado fuerte.
+Una vez definidas las interfaces de conexión entre unidades de programa se empieza a construir el castillo.
+En el capítulo 5 se explican  las características deseables de una unidad de programa,
+su conexión  con otras unidades y algunas habilidades  para  cambiar el formato de los argumentos
+de entrada o salida de un procedimiento.
+
+El capítulo 6 es el corazón y el objetivo de este libro.
+En este capítulo se desarrolla la metodología multicapa para la simulación de sistemas físicos,  la cual
+se  basa  en la construcción de un programa  de simulación  mediante abstracciones físicas o matemáticas
+estructuradas por nivel de complejidad funcional.
+Las abstracciones físicas o matemáticas permiten al programador escribir
+códigos con un lenguaje tan próximo a las matemáticas o a la física como él quiera.
+De esta forma,  el desarrollo multicapa en uno o dos años de trabajo y  en la  misma área de trabajo
+crea un nivel de abstracción que puede ser considerado como un nuevo lenguaje de más alto nivel
+y específico para el área en cuestión.
+ El coste de esta metodología reside en el equipo de trabajo, obligado a  tener conocimientos
+avanzados del lenguaje. A medio y largo plazo   se obtienen importantes beneficios:
+códigos que se validan muy rápidamente,  puesto que se apoyan en capas ya validadas,
+ y códigos reutilizables con una  larga vida útil.
+
+%Para poder llevar a cabo esta metodología es necesario que el programador tenga
+%conocimientos avanzados del lenguaje.
+%Esta metodología permite al programador con desarrollar
+%códigos que se  validan de forma rápida apoyan en capas ya validadas
+%validan de forma eficaz,  que  tienen una vida útil larga y que son reutilizables.
+%personas que trabajen en una misma área física o matemática,
+ %les  supone   un nivel de abstracción
+%que les permite  escribir  sus  nuevos programas con un lenguaje
+
+Aunque la potencialidad de la programación multicapa se empieza a ver
+en proyectos grandes de  dificultad elevada,
+en el capítulo 6 se incluye  un ejemplo pequeño en el que
+se pueden apreciar las diferencias entre la programación plana, la encapsulada y la multicapa.
+Por último, para que el lector pueda ejercitarse en la programación multicapa, en el capítulo 7 se
+exponen tres problemas sencillos de simulación de sistemas físicos.
+
+Ahora  quisiéramos
+expresar nuestro agradecimiento a todas aquellas personas
+que con sus comentarios han contribuido  al desarrollo de este libro.
+En especial, a D. Jose Miguel Lozano, D. Alberto Lerma, D. Miguel Hermanns
+y a todos los alumnos de ''Informática" y
+''Taller de Cálculo Numérico" de la Escuela Técnica Superior
+de Ingenieros Aeronáuticos de Madrid,
+que a lo largo de muchos cursos, con sus preguntas e inquietudes,  nos han
+ayudado a depurar una metodología de programación para la simulación de
+sistemas físicos que venía gestándose desde hace ya quince años.
+A Dña. Cristina de Lorenzo por
+su minuciosidad en la lectura de este libro.
+
+Por último (``last but not least"),  a  D. Pablo Ripollés por sus útiles y constructivos comentarios.
+
+\begin{flushright}
+Juan A. Hernández \\
+Mario A. Zamecnik  \\
+ Madrid \\
+ Septiembre 2000
+\end{flushright} 

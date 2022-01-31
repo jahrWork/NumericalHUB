@@ -1,0 +1,247 @@
+
+    
+    %*************************************************************************
+    \chapter{Lagrange Interpolation } \label{dev:Interpolation}
+    %************************************************************************* 
+    \section{Overview}
+    One of the most relevant matters of the theory of approximation is the interpolation of functions. The main idea of interpolation is to approximate a function $f(x)$ in an interval $[x_0,x_f]$ by means of a set of known functions $\{g_j(x)\}$ which are intended to be simpler than $f(x)$. The set $\{g_j(x)\}$ can be polynomials, monomials or trigonometric functions.
+    
+    
+    
+    \section{Lagrange interpolation}
+    
+    In this chapter, the polynomic interpolation will be presented. Particularly, the interpolation using Lagrange polynomials will be considered, as they are fundamental on the theory of interpolation.
+    
+    \subsection{Lagrange polynomials}
+    
+    The Lagrange polynomials $\ell_j(x)$ of grade $N$ for a set of points $\{x_j\}$ for $j=0,1,2\ldots,N$ are defined as:
+    
+    \begin{equation}
+    	\ell_j(x) =  \prod_{\substack{i=0 \\ i\neq j}}^{N} \dfrac{x - x_i}{x_j - x_i},
+    \end{equation}
+    
+    which satisfy: 
+    
+    \begin{equation}
+    	\ell_j(x_i) = \delta_{ij}, \label{eq:Lagrange_kronecker}
+    \end{equation}
+    where $\delta_{ij}$ is the delta Kronecker function. This property is fundamental because as we will see it permits to obtain the Lagrange interpolant very easily once the Lagrange polynomials are determined. \\
+    
+    Another interesting property specially for recursively determining Lagrange polynomials appears when considering   $\ell_{jk}$ as the Lagrange polynomial of grade $k$ at $x_j$ for the set of nodes $\{x_0,x_1\ldots,x_k\}$ and $0 \leq j\leq k$, that is:
+    
+    \begin{equation}
+     \ell_{jk}(x) = \prod_{\substack{i=0 \\ i\neq j}}^{k} \dfrac{x - x_i}{x_j - x_i} = \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right) \prod_{\substack{i=0 \\ i\neq j}}^{k-1} \dfrac{x - x_i}{x_j - x_i},
+    \end{equation}
+     which results in the property:
+     
+     \begin{equation}
+     \ell_{jk}(x) = \ell_{jk-1}(x) \, \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right),
+     \end{equation}
+     where $1\leq k \leq N$. This property permits to obtain the Lagrange interpolant of grade $k$ for the set of points $\{x_0,x_1\ldots,x_k\}$ if its known the interpolant of grade $k-1$ for the set of points $\{x_0,x_1\ldots,x_{k-1}\}$. Besides, the value for $k=1$ satisfies:
+     
+     \begin{equation}
+     	\ell_{j0}(x) = 1.
+     \end{equation}
+     
+     Hence, it can be obtained recursively the interpolant at $x_j$ for each grade as:
+     
+     \begin{align*}
+     	& \ell_{j1}(x) = \left(\dfrac{x - x_{0}}{x_j - x_{0}}\right), \\
+     	& \ell_{j2}(x) = \left(\dfrac{x - x_{0}}{x_j - x_{0}}\right) \left(\dfrac{x - x_{1}}{x_j - x_{1}}\right), \\ 
+     	& \qquad \vdots \\
+     	& \ell_{jk}(x) = \underbrace{\left(\dfrac{x - x_{0}}{x_j - x_{0}}\right)  \ldots 
+     	\left(\dfrac{x - x_{j-1}}{x_j - x_{j-1}}\right) \left(\dfrac{x - x_{j+1}}{x_j - x_{j+1}}\right) \ldots 
+     	\left(\dfrac{x - x_{k-2}}{x_j - x_{k-2}}\right)}_{\ell_{jk-1}(x)} \left(\dfrac{x - x_{k-1}}{x_j - x_{k-1}}\right) . 
+     \end{align*}
+    \subsection{Single variable functions}
+    
+    Whenever is considered a single variable scalar function $f:\mathbb{R}\rightarrow\mathbb{R}$, whose value $f(x_j)$ at the nodes $x_j$ for $j=0,1,2\ldots,N$ is known,
+     the Lagrange interpolant $I(x)$ that approximates the function in the interval $[x_0,x_N]$ takes the form:
+     
+     \begin{equation}
+     	I(x) = \sum_{j=0}^{N}   b_j\ell_j (x).
+     \end{equation}
+    
+    This interpolant is used to approximate the function $f(x)$ within the interval $[x_0,x_N]$. For this, the constants of the linear combination $b_j$ must be determined. The interpolant must satisfy to intersect the exact function $f(x)$ on the nodal points $x_i$ for $i=0,1,2\ldots,N$, that is:
+    
+    \begin{equation}
+    	I(x_i) = f(x_i).
+    \end{equation}
+    
+    Taking in account the property (\ref{eq:Lagrange_kronecker}) leads to:
+    
+    \begin{equation}
+    I(x_i) = f(x_i) = \sum_{j=0}^{N}   b_j\ell_j (x_i) =\sum_{j=0}^{N}   b_j \delta_{ij}, \quad \Rightarrow \quad f(x_j) = b_j.
+    \end{equation}
+    
+    Hence, the interpolant for $f(x)$ on the nodal points $x_j$ for $j=0,1,2\ldots,N$ is written:
+    
+    \begin{equation}
+    I(x) = \sum_{j=0}^{N}  f(x_j) \ell_j (x).
+    \end{equation}
+    
+    Notice that the interpolant can be interpreted at each point $x$ as the scalar product:
+    
+    \begin{equation}
+    I(x) = 
+    \begin{bmatrix}
+    f(x_0), & f(x_1) & \ldots, f(x_N)
+    \end{bmatrix} \cdot
+    {\begin{bmatrix}
+    \ell_0 (x) & \ell_1 (x) & \ldots  \ell_N (x)
+    \end{bmatrix}}^T
+    \end{equation}.
+    
+    
+    \subsection{Two variables functions}
+    
+    Whenever the approximated function for the set of nodes $\{(x_i,y_j)\}$ for $i=0,1\ldots , N_x$ and $j=0,1\ldots , N_y$ is $f:\mathbb{R}^2\rightarrow\mathbb{R}$, the interpolant $I(x,y)$ can be calculated as a two dimensional extension of the interpolant for the single variable function. In such case, a way in which the interpolant $I(x,y)$ can be expressed is:
+    
+    \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+    \end{equation}
+    
+    Again, using the property of Lagrange polinomyals (\ref{eq:Lagrange_kronecker}), the coefficients $b_{ij}$ are determined as:
+    
+    \begin{equation}
+    	b_{ij}  = f(x_i,y_j),
+    \end{equation}
+     
+     leading to the final expression for the interpolant:
+     
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} f(x_i,y_j) \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     Notice that when the interpolant is evaluated at a particular coordinate line $x=x_m$ or alternatively at $y=y_n$, it is obtained:
+     
+     \begin{equation}
+     	{I}(x_m,y) = \sum_{j=0}^{N_y} f(x_m,y_j)  \ell_j(y) , 
+     	\qquad {I}(x,y_n) = \sum_{i=0}^{N_x}  f(x_i,y_n) \ell_i(x)  ,
+     	\label{eq:Interpolant_2D}
+     \end{equation}
+     which permits writing the interpolant as
+     
+     \begin{align}
+     	I(x,y) & = \sum_{i=0}^{N_x} {I}(x_i,y) \ell_i(x) \nonumber \\
+     	       & = \sum_{j=0}^{N_y} {I}(x,y_j) \ell_j(y). \label{eq:Interpolant_2D_recursive}
+     \end{align}
+ 
+     The form in which the interpolant is written in (\ref{eq:Interpolant_2D_recursive}) suggests a procedure to obtain the interpolant recursively.\\
+     
+     Another manner to interpret the equation (\ref{eq:Interpolant_2D}) is  as a bilinear form. If the vectors $\vect{\ell}_x = \ell_i(x) \vect{e}_i$, $\vect{\ell}_y = \ell_j(y) \vect{e}_j$ and the second order tensor $\mathcal{F} = f(x_i,y_j) \vect{e}_i  \otimes \vect{e}_j$ are defined, where the index $(i,j)$ go through $[0,N_x]\times[0,N_y]$. This manner, the equation (\ref{eq:Interpolant_2D}) can be written:
+     
+     \begin{equation}
+     	I(x,y) =  \vect{\ell}_x \, \mathcal{F} \, \vect{\ell}_y^T .
+     \end{equation}
+     
+     
+     Another perspective to interpret the interpolation is obtained by considering the process geometrically. In first place, it is calculated a single variable Lagrange interpolant
+     for the function restricted at $y=s$:
+     
+     \begin{equation}
+     \eval{f(x,y)}_{y=s} = \tilde{f}(x;s)  \simeq \tilde{I}(x;s) = \sum_{i=0}^{N_x} b_i(s) \ell_i(x),
+     \end{equation}
+     where $\tilde{f}(x;s)$ is the restricted function, $\tilde{I}(x;s)$ its interpolant, $b_i(s) = \tilde{f}(x_i;s)$ are the coefficients of the interpolation and $\ell_i(x)$ are Lagrange polynomials. \\
+     
+     The coefficients $b_i(s)$ can also be interpolated as:
+     
+     \begin{equation}
+     b_i(s) = \sum_{j=0}^{N_y} b_{ij} \ell_j(s) .
+     \end{equation}
+     
+     Hence, the restricted interpolant can be written:
+     
+     \begin{equation}
+     \tilde{I}(x;s) = \eval{I(x,y)}_{y=s} =\sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(s) ,
+     \end{equation}
+     and therefore the interpolant $I(x,y)$ can be expressed:
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     In the same manner, the interpolated value $I(x,y)$ can be achieved restricting the value in $x=s$:
+     
+     \begin{equation}
+     \eval{f(x,y)}_{x=s} = \tilde{f}(y;s)  \simeq \tilde{I}(y;s) = \sum_{j=0}^{N_y} b_j(s) \ell_j(y),
+     \end{equation}
+     
+     in which the coefficients $b_j(s)$ can be interpolated aswell:
+     
+     \begin{equation}
+     b_j(s) = \sum_{i=0}^{N_x} b_{ij} \ell_i(s) .
+     \end{equation}
+     
+     This time, the restricted interpolant is expressed as:
+     
+     \begin{equation}
+     \tilde{I}(y;s) = \eval{I(x,y)}_{x=s} =\sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(s) \ell_j(y) ,
+     \end{equation}
+     
+     which leads to the interpolated value:
+     
+     \begin{equation}
+     {I}(x,y) = \sum_{i=0}^{N_x} \sum_{j=0}^{N_y} b_{ij} \ell_i(x) \ell_j(y) .
+     \end{equation}
+     
+     The interpolation procedure and its geometric interpretation can be observed on the figure \ref{fig:Geometric_interpolation}. In blue it is represented the values $b_{ij}=f(x_i,y_j)$, in red the desired value $f(x,y)\simeq I(x,y)$ and in black the restricted interpolants.
+     
+     \twographs{\InterpolX{(a)}}{\InterpolY{(b)}}{Geometric interpretation of the interpolation of a 2D function. (a) Geometric interpretation when restricted along $y$.  (b) Geometric interpretation when restricted along $x$}{fig:Geometric_interpolation}
+     
+     \newpage
+     \subsection{Algorithm implementation}
+     In order to compute the interpolation of different functions a Fortran source code is implemented. The library for Lagrange interpolation is composed of four functions:
+     \texttt{Lagrange\_polynomials}, \texttt{Interpolated\_value}, \texttt{Integral} and \texttt{Interpolant}.
+     \newpage
+     The function \texttt{Lagrange\_polynomials} calculates the Lagrange polynomials and its derivatives at a point, given a spatial grid. 
+     %\lstinputlisting[language=Fortran, firstline=33, lastline=64]{\home/sources/Lagrange_interpolation.f90}\newpage
+     %\lstinputlisting[language=Fortran, firstline=65, lastline=79, caption=\mycap{Lagrange_interpolation.f90}]{\home/sources/Lagrange_interpolation.f90}\vspace{0.5cm}
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Lagrange_interpolation.f90}
+     {function Lagrange_polynomials}
+     {end function}{Lagrange_interpolation.f90}
+     
+     \newpage
+     The function \texttt{Interpolated\_value} calculates the interpolated value of a certain degree, given a spatial grid, the image of the function evaluated at those points and the grade of the interpolant. 
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Interpolation.f90}
+     {function Interpolated_value}
+     {end function}{Interpolation.f90}
+     
+     %\lstinputlisting[language=Fortran, firstline=21, lastline=37]{\home/sources/Interpolation.f90}
+     %\newpage
+     %\lstinputlisting[language=Fortran, firstline=38, lastline=63, caption=\mycap{Lagrange_interpolation.f90}]{\home/sources/Interpolation.f90}\vspace{0.5cm}
+     \newpage 
+     The function \texttt{Integral} integrates a function over a given spatial grid, the function at the interval and the approximation order.   
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Interpolation.f90}
+     {function Integral}
+     {end function}{Interpolation.f90}
+    
+     %\lstinputlisting[language=Fortran, firstline=70, lastline=77]{\home/sources/Interpolation.f90}
+     %\newpage
+    % \lstinputlisting[language=Fortran, firstline=78, lastline=112, caption=\mycap{Lagrange_interpolation.f90}]{\home/sources/Interpolation.f90}\vspace{0.5cm}
+     
+    \newpage
+     The function \texttt{Interpolant} gives the Lagrange interpolant, its integral and the derivatives given a grid, the values of the function over it and the order of the interpolation.\\
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Interpolation.f90}
+     {function Interpolant}
+     {end function}{Interpolation.f90}
+     %\lstinputlisting[language=Fortran, firstline=136, lastline=169]{\home/sources/Interpolation.f90}
+     %
+     %\lstinputlisting[language=Fortran, firstline=170, lastline=180, caption=\mycap{Lagrange_interpolation.f90}]{\home/sources/Interpolation.f90}
+     \vspace{0.5cm}
+     
+     Finally, an additional function which will be relevant in the following chapter is defined. This function contains the information of the stencil or information that a $q$ order interpolation requires.
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Lagrange_interpolation.f90}
+     {function Stencilv}
+     {end function}{Lagrange_interpolation.f90}
+     
+     

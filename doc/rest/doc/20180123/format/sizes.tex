@@ -1,0 +1,167 @@
+
+% DOCUMENT FORMAT
+\usepackage[
+top=2cm,
+bottom=2cm,
+left=2.5cm,
+right=2.5cm,
+headheight=17pt, % as per the warning by fancyhdr
+headsep=1cm,
+includehead,includefoot,
+%heightrounded, % to avoid spurious underfull messages
+]{geometry}
+
+%\setlength\parindent{0pt} % Removes all indentation from paragraphs
+%\setlength{\parskip}{2ex} % Space between paragraphs
+
+
+
+
+\definecolor{mygray}{gray}{0.8}
+\definecolor{mygray2}{gray}{0.4}
+\definecolor{mygreen}{rgb}{0.0, 0.42, 0.24}
+\definecolor{myred}{rgb}{0.8, 0.0, 0.0}
+\definecolor{myorange}{rgb}{0.91, 0.41, 0.17}
+\definecolor{myblue}{rgb}{0.0, 0.44, 1.0}
+
+
+
+
+\pagestyle{fancy} % Enables the custom headers/footers
+\lhead{\small{Atentto manual}}
+\chead[]{}
+\fancyhead[R]{\leftmark}
+
+%To make the head rule
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\headrule}{\hrule}{\color{mygray}\hrule}{}{}
+\makeatother
+
+%\setlength{\cftsecindent}{-0.8cm} % the section and the subsection in the table of contents
+%\setlength{\cftsubsecindent}{-0.6cm} % the section and the subsection in the table of contents
+
+
+% Replace the title of the table of contents 
+\addto\captionsenglish{
+	\renewcommand{\contentsname}%
+	{}% Here it goes the new title
+}
+
+% Here we give the color to the subsections in the table of contents
+\makeatletter
+\let\stdl@subsection\l@subsection
+\renewcommand*{\l@subsection}[2]{%
+	\stdl@subsection{\textcolor{blue}{#1}}{\textcolor{black}{#2}}}
+\makeatother
+
+% CHANGING THE FORMAT OF SUBSECTIONS AND SECTIONS
+
+\titleformat\subsection{}{}{0em}{ \bf \todo[inline, color=green!40]}[\vspace{0ex}]
+%\titleformat\section{\centering \LARGE}{}{0em}{ \bf }[]
+
+%\renewcommand{\thesubsection}{} %Subsection numbering
+%\renewcommand{\thesection}{} %Section numbering
+
+
+
+\newcommand{\bluepageref}[1]{\textcolor{blue}{\pageref{#1}}}
+\newcommand{\qnameref}[1]{``\nameref{#1}''}
+
+
+
+% Comment the following to have chapters numbered without interruption (numbering through parts)
+\makeatletter\@addtoreset{chapter}{part}\makeatother%
+
+% \tableofcontents, without the title contents
+%\makeatletter
+%\@starttoc{toc}
+%\makeatother
+%
+
+
+
+\newcommand{\remark}[1]{\textbf{``#1"}}
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\tit}{Raspberry Pi Server}
+\newcommand{\rhdr}{Developer Manual}
+
+
+\DeclareCaptionFormat{myformat}{#1#2#3\vspace{2ex}}
+%\captionsetup{format=myformat}
+
+\captionsetup[lstlisting]{position=bottom,format=myformat}
+%\usepackage{lstautodedent}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,arrows.meta,positioning,shapes.geometric,shapes}
+
+%commands
+
+\renewcommand{\lstpython}{
+	\lstset{
+		language=python,
+		basicstyle=\ttfamily\footnotesize,
+		frame=single,
+		autodedent,
+		showspaces=false,
+		showstringspaces=false,
+		backgroundcolor=\color{white},
+		keywordstyle=\color{blue},
+		deletekeywords={type},
+		commentstyle=\color{mygreen},
+		stringstyle=\color{violet},
+		breaklines=true,
+		alsoletter={.,...},
+		morekeywords={}
+	}
+}
+\newcommand{\relpathto}[1]{./codes/#1}
+
+\renewcommand{\medskip}{\vspace{2ex}}
+\renewcommand{\lstlistingname}{Code}
+\newcommand{\capof}[2]{\begingroup\captionof{#1}{#2}\endgroup}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

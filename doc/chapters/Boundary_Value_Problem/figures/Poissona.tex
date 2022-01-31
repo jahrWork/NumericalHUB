@@ -1,0 +1,14 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ height = \textwidth, width = \textwidth,
+        title style={at={(0.5,-0.4)}, yshift=-0.05}, title={(a)},
+        xlabel={ $x$ },    xmin=    0.00, xmax =    1.00,
+        xlabel={ $y$ },    ymin=    0.00, ymax =    1.00,
+         view={0}{90}, colormap/blackwhite ]
+  \addplot3[contour/labels=false, contour gnuplot = { levels={    0.00,   5.26,  10.51,  15.77,  21.03,  26.29,  31.54,  36.80,  42.06,  47.32,  52.57,  57.83,  63.09,  68.35,  73.60,  78.86,  84.12,  89.37,  94.63,  99.89 }},
+            mesh/ordering = y varies,
+            mesh/rows =   31,
+            mesh/cols =   31
+           ]
+           table [skip first n=2] {./doc/chapters/Boundary_Value_Problem/figures/Poissona.plt};
+     \end{axis}
+ \end{tikzpicture}

@@ -1,0 +1,298 @@
+
+    
+ %*************************************************************************
+ \chapter{Lagrange interpolation   }\label{chap:lagrange_interpolant}
+ %*************************************************************************
+
+
+\section{Overview} 
+ In this chapter,  Lagrange and Chebyshev polynomial interpolations are discussed for equispaced and non uniform grids or nodal points. Given a  set of nodal points $ x_i$, their images through a given function $f(x)$ allow to build a polynomial interpolant. Examples are shown to alert of numerical problems associated to equispaced grid points.  
+ The subroutine \verb|Lagrange_Interpolation_examples| includes different examples to show the origin of these ill conditioning problems. 
+ To cure this problem, Chebyshev points are used to build interpolants. 
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Lagrange_Interpolation_examples}
+         {end subroutine}{API_Example_Lagrange_interpolation.f90}
+ 
+All functions and subroutines used in this chapter are gathered in a Fortran module 
+called: \verb|Interpolation|. To make use of these functions the statement: 
+\verb|use Interpolation|
+should be included at the beginning of the program.
+
+
+%_____________________________________________________________
+\section{Interpolated value} 
+%_____________________________________________________________
+
+In this first example, a set of six points is given: 
+$$
+   {x} = [ 0, 0.1, 0.2, 0.5, 0.6, 0.7 ],
+$$
+and the corresponding images of some unknown function $ f(x) $: 
+$$
+{f} = [ 0.3, 0.5, 0.8, 0.2, 0.3, 0.6 ].
+$$
+The idea is to interpolate or the predict with this information the value of
+$ f(x) $ for $ x_p = 0.15 $. 
+This is done in the following snippet of code:
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+		 {subroutine Interpolated_value_example}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+
+The first argument of the \verb|Interpolated_value| function is the set of nodal points, the second argument is the set of images and the third argument is the order of the interpolant. The polynomials interpolation is built by piecewise interpolants 
+of the desired order. 
+Note that this third argument is optional. When it is not present, the function assumes that the interpolation order is two. 
+
+%\newpage  
+%_____________________________________________________________
+\section{Interpolant and its derivatives} 
+%_____________________________________________________________
+In this example an interpolant is evaluated for a complete set of points. 
+Given a set of nodal or interpolation points: 
+%
+\begin{align*}
+	\vect{x}=\{ x_i \, | \, i=0, \ldots, N     \},
+	\qquad
+	\vect{f}=\{ f_i \, | \, i=0, \ldots, N     \}.
+\end{align*}
+%
+The interpolant and its derivatives are evaluated in the following set of equispaced points: 
+$$
+ \{  x_{pi} = a + {(b-a)i}/{M}, \quad   i=0, \ldots, M  \}.
+$$ 
+Note that in the following example that the number of nodal points is $ N = 3 $ 
+and the number of points where this interpolant and its derivatives are evaluated is $ M = 400 $. 
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Interpolant_example}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+
+
+The third argument of the function \verb|Interpolant| is the order of the polynomial. It should be less or equal to $N$. 
+The fourth argument is the set of points where the interpolant is evaluated. The function returns  a matrix \verb|I_N| containing the 
+interpolation values and their  derivatives in $ x_p $. The first index holds for the order of the derivative and second index holds for the point $ x_{pi} $. 
+On figure \ref{fig:interpolant_and_derivative}, the interpolant and its first derivative are plotted.  
+ 
+\twographs{\Interpol{(a)}}{\InterpDV{(b)}}
+          {Lagrange interpolation with 4 nodal points. (a) Interpolant function. (b) First derivative of the interpolant.}{fig:interpolant_and_derivative}
+ 
+
+
+\FloatBarrier
+%_____________________________________________________________
+\section{Integral of a function} 
+%_____________________________________________________________
+In this section,  definite integrals are considered. Let's give the following example: 
+$$
+   I_0 = \int _{0} ^{1}  \sin ( \pi x) dx.
+$$
+To carry out the integral, an interpolant is built and later by integrating
+this interpolant the required value is obtained.  The interpolant can be a piecewise polynomial interpolation of order $ q < N $  or it can be a unique interpolant of order $ q = N $. 
+The function \mycap{Integral} has three arguments: the nodal points $x$, the images of the function $ f $ and the order of the interpolant $q$. 
+In the  following example,  $ N =6 $ equispaced nodal points are considered and integral is carried out with an interpolant of order $ q = 4$.  
+The result is compared with the exact value to know the error of this numerical integration. 
+
+\vspace{0.2cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Integral_example}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+
+
+%_____________________________________________________________
+\section{Lagrange polynomials} 
+%_____________________________________________________________
+
+A polynomial interpolation $ I_N(x) $ of degree $ N $  can be expressed in terms of the Lagrange polynomials $\lagrange_j(x)$ in the following way: 
+$$
+    I_N(x) = \sum _{j=0} ^{N} f_j \ \lagrange_j(x), 
+$$
+where $ f_j $ stands for the image of some function $ f(x) $ in $ N+1$ nodal points $ x_j $ and $ \lagrange_j(x) $ is a Lagrange polynomial of degree $ N $ that is zero in all nodes except in $ x_j $  
+that is one. 
+Besides, the sensitivity to round-off error is measured by the Lebesgue function and its derivatives defined by: 
+$$
+    \lambda_N (x )=  \sum _{ j=0} ^{ N} | \lagrange_j(x) |, \qquad   \lambda^{(k)} _N (x )=  \sum _{ j=0} ^{ N} | \lagrange^{(k)}_j(x) |.
+$$
+In the following subroutine \verb|Lagrange_polynomial_example|, the  Lagrange polynomials and the Lebesgue function together with their derivatives are calculated for a equispaced grid of $ N=4 $ nodal points. 
+The first index of the resulting matrix \verb|Lg| stands for the order of the derivative (k=-1 integral, k=0 function and k>0 derivative order). 
+The second index identifies the Lagrange polynomial from $ j=0, \ldots, N $ and the third index stands for the 
+point where the Lagrange polynomials or their derivatives are particularized. The same applies for the matrix \verb|Lebesgue_N|. First index for the order of the derivative and second index for the point where the Lebesgue function or their derivatives are particularized. 
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Lagrange_polynomial_example}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+         
+
+On figure \ref{fig:Lagrange} the Lagrange polynomials and the Lebesgue function are shown. 
+It is observed in figure \ref{fig:Lagrange}a that  $\ell_j$ values 1 at $x = x_j$ and  0 at $ x = x_i $ with  $j \ne i$.
+In figure \ref{fig:Lagrange}b, the Lebesgue function together with its derivatives are presented. 
+
+\twographs{ \LagrPol{(a)} }{ \LebesPol{(b)} }{Lagrange polynomials $\ell_j(x)$ with $ N = 4$ and Lebesgue function $\lambda(x)$ and its derivatives. (a) Lagrange polynomials $\ell_j(x)$ for $j = 0,1,2,3,4$. (b) Lebesgue function and its derivatives $\lambda^{(k)}(x)$ for $k = 0,1,2,3$.}{fig:Lagrange}
+
+
+
+
+%_____________________________________________________________
+\section{Ill--posed interpolants} 
+%_____________________________________________________________
+When considering equispaced grid points, the Lagrange interpolation becomes ill--posed which means that a small perturbation like machine round-off error yields big errors in the interpolation result. 
+In this section an interpolation example for the inoffensive $ f(x) = \sin (\pi x) $ is analyzed to show the interpolant can have  noticeable errors at boundaries. 
+
+The error is defined as the difference between the function and the polynomial interpolation 
+$$
+    f(x) - I_N(x) = R_N(x) + R_L(x),
+$$  
+where $ R_N(x)$ is the truncation error and $ R_L(x) $ is the round--off error. 
+Since the round--off error is present in the computer when any value is calculated, a 
+polynomial interpolation $ I_N(x) $ of degree $ N $ can be expressed in terms of the Lagrange polynomials $\lagrange_j(x)$  in the following way: 
+$$
+    I_N(x) = \sum _{j=0} ^{N} ( f_j + \epsilon_j )  \ \lagrange_j(x), 
+$$
+where $ \epsilon_j $ can be considered as the round-off error of the image $ f(x_j) $. Note that when working in double precision 
+this $ \epsilon _j $ is of order $ \epsilon = 10 ^{-15} $.
+Hence, the error of the interpolant has two components. The first one $ R_N(x) $ associated to the truncation degree of the polynomial and the 
+second one $ r_L(x)$ associated to round-off errors. This error can be expressed by the following equation: 
+$$
+    R_L(x) = \sum _{j=0} ^{N}  \epsilon_j  \ \lagrange_j(x). 
+$$
+Although the exact values of the round--off errors $ \epsilon_j $ are not not known, all values $\epsilon_j $  can be  bounded by $\epsilon$. It allows to bound the round--off error by the following expression: 
+$$
+     |R_L(x)| \le  \epsilon \sum _{j=0} ^{N}  | \lagrange_j(x) | 
+$$  
+which introduces naturally the Lebesgue function $\lambda_N(x)$. If the Lebesgue function reaches values of order  $  10 ^{15} $, the round-off error becomes order unity. 
+
+In the following code,  an interpolant for $ f(x) = \sin (\pi x) $ with $ N = 64 $ nodal points is calculated together with the Lebesgue function. 
+In  figure \ref{fig:Ill_posed_interpolation}a,  the interpolant shows a considerable error at boundaries. It can be easily explained by means of figure 
+\ref{fig:Ill_posed_interpolation}b where the Lebesgue function is plotted. The Lebesgue function takes values of order  $  10 ^{15} $  close to the boundaries making the round-off error of order unity at the boundaries.  
+
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Ill_posed_interpolation_example}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+
+
+\twographs{ \IllPosedInt{(a)} }{ \IllPosedIntLeb{(b)} }
+{Interpolation for an equispaced grid with $N=64$. (a) Ill posed interpolation $ I_N(x)$, (b) Lebesgue function $\lambda_N(x)$.}{fig:Ill_posed_interpolation}
+
+
+
+\newpage  
+%_____________________________________________________________
+\section{Lebesgue function and error function} 
+%_____________________________________________________________
+As it was mentioned in the preceding section, 
+the interpolation error has two main contributions: the round-off error and the truncation error. In this section, a comparison of these two contributions is presented. It can be shown that the truncation error has  the following expression: 
+$$
+    R_N(x) = \pi_{N+1}  (x) \frac{ f^{(N+1)} (\xi) } { (N+1) ! },  
+$$
+where $ \pi_{N+1} $ is a polynomial of degree $ N+1 $ and $ f^{(N+1)} (\xi) $ represents the $N+1$--th derivative of the function $ f(x) $ evaluate at some specific point $ x = \xi $. The $ \pi_{N+1} $ polynomial vanishes in all nodal points and it is called the $\pi$ error function. 
+ 
+In this section, the Lebesgue function $ \lambda_N (x) $ and the error function $ \pi_{N+1}(x) $ together with their derivatives are plotted to show the origin of the interpolation error.
+
+In the following code, the $ \pi $ error function as well as the Lebesgue function $ \lambda_N(x) $ are calculated for $ N = 10 $ interpolation points. 
+A grid of $ M = 700 $ points is used to plot the results. 
+In figure \ref{fig:PI0L0}, the $ \pi $ error function is compared with the Lebesgue function $ \lambda_N(x) $. 
+Both the $\pi $ error function and for the Lebesgue function show maximum values near the boundaries making clear that error will become more important near the boundaries. It is also observed that 
+the Lebesgue values are greater than the $\pi $ error function. However, it does not mean that the round--off error is greater than the  truncation error
+because the truncation error depends on the regularity of $ f(x) $ and the round--off error depends on the finite precision $ \epsilon$. 
+
+
+\newpage
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+{subroutine Lebesgue_and_PI_functions}
+{end subroutine}
+{API_Example_Lagrange_interpolation.f90}
+
+
+
+
+What is also true is that the maximum value of the  Lebesgue function grows with $ N $ and the maximum value of the $ \pi $ error function goes to zero with $ N \rightarrow \infty $. Hence, with $ N $ great enough, the round--off error exceeds the truncation error. 
+
+\twographs{ \ErrorFunction{(a)} }{ \LebesgueFunction{(b)} }{ Error function $\pi_{N+1}(x)$ and Lebesgue function $\lambda_N(x)$ for $N=10$. (a) Function \ensuremath{\pi_{N+1}(x)}. (b) Lebesgue function \ensuremath{\lambda_N(x)}}{fig:PI0L0}
+
+
+
+
+
+\twographs{ \ErrorFunctionP{(a)} }{ \LebesgueFunctionP{(b)} }{ First derivative of the error function $\pi^\prime_{N+1}(x)$ and Lebesgue function $\lambda^\prime_N(x)$ for $N=10$. (a) Function \ensuremath{\pi_{N+1}^\prime(x)}. (b) Lebesgue function \ensuremath{\lambda_N^\prime(x)}}{fig:PI1L1}
+
+
+In figures \ref{fig:PI1L1} and  \ref{fig:PI2L2}, first and second derivatives of the $ \pi $ error function and the Lebesgue function are shown and compared.
+It is observed that the first and second derivative of the Lebesgue function grow exponentially making more relevant the round--off error for the first and the second derivative of the interpolant. However, the derivatives of the $ \pi $ error function decreases with the order of the derivative.   
+
+\twographs{ \ErrorFunctionPP{(a)} }{\hspace{0.1cm} \LebesgueFunctionPP{(b)} }{ Second derivative of the error function $\pi^{\prime\prime}_{N+1}(x)$ and Lebesgue function $\lambda^{\prime\prime}_N(x)$ for $N=10$. (a) Function \ensuremath{\pi_{N+1}^{\prime\prime}(x)}. (b) Lebesgue function \ensuremath{\lambda_N^{\prime\prime}(x)}}{fig:PI2L2}
+%\newpage  
+%_____________________________________________________________
+
+\FloatBarrier
+\section{Chebyshev polynomials} 
+%_____________________________________________________________
+Chebyshev polynomials have an important role in the polynomial interpolation theory. It will be shown in the next section that when some specific interpolation  points are used, the polynomial interpolation results very close to a Chebyshev expansion. It makes important to revise the Chebyshev polynomials and their behavior. 
+The approximation of $ f(x) $ by means of Chebyshev polynomials is given by:  
+$$
+    f(x) = \sum_{k=0} ^{ \infty} \  \hat{c}_k \ T_k (x), 
+$$
+where $ T_k(x) $ are the Chebyshev polynomials and  $ \hat{c}_k $ are the projections of $ f(x) $ in the Chebyshev basis. 
+The are some special orthogonal basis very noticeable like Chebyshev polynomials. The  first kind $ T_k(x) $ and the second kind $ U_k(x) $ of
+Chebyshev polynomials are defined by:  
+$$ 
+   T_k (x) = \cos( k \theta),  \qquad  U_k (x) = \frac{ \sin( k \theta) } { \sin \theta },
+$$
+with $ \cos  \theta = x$.\\
+
+ 
+In the following code, Chebyshev polynomials of order $ k$ of first kind and second kind are calculated for different values  of $ x$. 
+
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+{subroutine Chebyshev_polynomials}
+{end subroutine}
+{API_Example_Lagrange_interpolation.f90}
+
+
+\twographs
+{ \FirstChebyshevPol{(a)} }{\SecondChebyshevPol{(b)} }
+{ First kind and second kind Chebyshev polynomials. (a) First kind Chebyshev polynomials $T_k(x)$. (b) Second kind Chebyshev polynomials $U_k(x)$.}{fig:Chebyshev_Pol}
+\FloatBarrier  
+
+
+%_____________________________________________________________
+\section{Chebyshev expansion and Lagrange interpolant} 
+%_____________________________________________________________
+As it was shown in previous sections, when the interpolation points are equispaced, the error grows at boundaries no matter the regularity of the interpolated function $f(x)$.  Hence, high order polynomial  interpolation is prohibited with equispaced grid points. 
+To cure this problem, concentration of grid points near the boundaries are usually proposed. 
+One of the most important distribution of points that cure this bad behavior near the boundaries is the Chebyshev extrema
+$$
+   x_i = \cos \left( \frac{ \pi i  }{ N }  \right) , \quad i=0, \ldots, N.
+$$
+
+In this section, a comparison between a Chebyshev expansion and a Lagrange interpolant is shown when the selected nodal points are the Chebyshev extrema.
+In the following code, a Chebyshev expansion \verb|P_N| of $f(x) = \sin( \pi x ) $ is calculated with 7 terms $(N=6)$. 
+The coefficients $\hat{c}_k $ of the expansion are calculated by means of : 
+$$
+   \hat{c}_k = \frac{1}{\gamma} \int_{-1}^{+1} \frac{ f(x) T_k(x) } { \sqrt{1-x^2} } dx. 
+$$
+In the same code a polynomial interpolation \verb|I_N| based on the Chebyshev extrema is calculated. 
+Errors for the expansion and for the interpolation are also obtained.  
+
+\newpage      
+
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Lagrange_interpolation.f90}
+         {subroutine Interpolant_versus_Chebyshev}
+         {end subroutine}
+         {API_Example_Lagrange_interpolation.f90}
+ 
+In figure \ref{fig:Chebyshev_expansion}a,  the truncated Chebyshev expansion \verb|P_N| is plotted together with the polynomial interpolation \verb|I_N| 
+with no appreciable difference between them. This can be verified in figure \ref{fig:Chebyshev_expansion}b where the error for these two approximations are shown. It can be demonstrated that when choosing some specific nodal or grid points and if the function to be approximated is regular enough, the difference between the truncated Chebyshev expansion and the polynomial interpolation becomes very small. This difference is called aliasing error.
+
+ \twographs{ \ChebyshevExpansion{(a)}}{ \ChebyshevExpansionError{(b)} }{ Chebyshev discrete expansion and truncated series for $N=6$. (a) Chebyshev expansion. (b) Chebyshev expansion error.}{fig:Chebyshev_expansion}
+       

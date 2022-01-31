@@ -1,0 +1,381 @@
+\usepackage[english]{babel} % English language/hyphenation
+
+
+%___________________ FONTS ______________________________________________
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{txfonts}
+\usepackage{mathrsfs}
+\usepackage{mathdots}
+\usepackage{lmodern}
+%\usepackage[classicReIm]{kpfonts}
+\usepackage{physics}    %  partial and total derivatives  
+
+ \usepackage[utf8]{inputenc}
+%___________ MATH THEOREMS
+\usepackage{amsthm}
+\usepackage{cancel}
+\usepackage{mathtools}
+\usepackage{mleftright}
+
+
+
+
+% __________________________FANCY CHAPTERS _____________________________ 
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+%\usepackage[Sonny]{fncychap}
+%\usepackage[Glenn]{fncychap} %1
+%\usepackage[Conny]{fncychap}
+%\usepackage[Rejne]{fncychap}
+%\usepackage[Bjarne]{fncychap} %1
+%\usepackage[Bjornstrup]{fncychap}
+\usepackage[Lenny]{fncychap}
+
+%_______________________ GLOSSARIES & NOMENCLATURE
+
+%\usepackage{nomencl}
+
+%\usepackage{glossaries}
+
+%__________________________HEADERS & FOOTERS_____________________________
+\usepackage{fancyhdr}
+
+
+\pagestyle{fancy} % Enables the custom headers/footers
+\lhead{\thepage}
+\chead[]{}
+\fancyhead[R]{\leftmark}
+
+%To make the head rule
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\headrule}{\hrule}{\color{mygray}\hrule}{}{}
+\makeatother
+
+
+\renewcommand{\headrulewidth}{0.5pt} % No header rule
+\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+
+
+%%PARA DOS CARAS
+%\fancyhf{}				%allows additional selectors H (header) and F (footer)
+\fancyhead[RO]{ \thepage}
+\fancyhead[LE]{ \thepage}
+%\fancyhead[LE,RO]{...}
+\fancyhead[RE]{\sffamily\scshape\footnotesize\leftmark}
+\fancyhead[LO]{\sffamily\scshape\footnotesize\rightmark}
+\fancyfoot[CE,CO]{}
+\fancyfoot[LE,RO]{}
+
+
+
+
+
+
+
+
+
+
+
+%\usepackage{footmisc} %[norule]
+
+%
+%\renewcommand{\headrulewidth}{0.5pt} % No header rule
+%\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+%
+%\fancyhead[RO]{ \thepage}
+%\fancyhead[LE]{ \thepage}
+%%\fancyhead[LE,RO]{...}
+%\fancyhead[RE]{\sffamily\scshape\footnotesize\leftmark}
+%\fancyhead[LO]{\sffamily\scshape\footnotesize\rightmark}
+%\fancyfoot[CE,CO]{}
+%\fancyfoot[LE,RO]{}
+
+
+
+
+%%PARA DOS CARAS
+%\fancyhf{}				%allows additional selectors H (header) and F (footer)
+%\pagestyle{fancy}
+%\fancyhead[RO]{ \thepage}
+%\fancyhead[LE]{ \thepage}
+%%\fancyhead[LE,RO]{...}
+%\fancyhead[RE]{\sffamily\scshape\footnotesize\leftmark}
+%\fancyhead[LO]{\sffamily\scshape\footnotesize\rightmark}
+%\fancyfoot[CE,CO]{}
+%\fancyfoot[LE,RO]{}
+
+
+
+
+
+%Allow us to make the rules larger
+%
+%\renewcommand{\headrulewidth}{0.5pt} % No header rule
+%\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+% Headers - all currently empty
+%\lhead{ }
+%\chead{}
+%\rhead{}
+%% Footers
+%\lfoot{}
+%\cfoot{}
+%%\rfoot{\footnotesize Page \thepage\ of \pageref{LastPage}} % "Page 1 of 2"
+%\rfoot{\footnotesize \thepage\ }
+
+%\usepackage{lettrine} % Package to accentuate the first letter of the text
+
+
+%
+%\renewcommand{\headrulewidth}{0.5pt} % No header rule
+%\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+%
+%
+%%\renewcommand{\headrulewidth}{0.5pt} % No header rule
+%%\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+%
+%%%PARA DOS CARAS
+%%\fancyhf{}				%allows additional selectors H (header) and F (footer)
+%\fancyhead[RO]{ \thepage}
+%\fancyhead[LE]{ \thepage}
+%%\fancyhead[LE,RO]{...}
+%\fancyhead[RE]{\sffamily\scshape\footnotesize\leftmark}
+%\fancyhead[LO]{\sffamily\scshape\footnotesize\rightmark}
+%\fancyfoot[CE,CO]{}
+%\fancyfoot[LE,RO]{}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%_________________ GRAPHS ______________________________________________
+\usepackage{float} % Force image position
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[font=small]{caption}
+\usepackage{graphicx} % For pictures
+\usepackage{epstopdf}
+\usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{arrows,arrows.meta,positioning,shapes.geometric,shapes}
+\usetikzlibrary{decorations.markings}
+
+\usetikzlibrary{matrix}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{pgf}
+\usepackage{pgfcalendar}
+%\usepackage{gnuplottex}
+\usepgfplotslibrary{dateplot,statistics}
+\usepgfplotslibrary{patchplots}
+\usepgfplotslibrary{colormaps}
+\usetikzlibrary{colorbrewer}
+\usepgfplotslibrary{colorbrewer}
+\usetikzlibrary{calc,intersections}	
+\pgfplotsset{compat=1.12}
+%\usepackage{xifthen}
+\usepackage{shellesc}
+%\usetikzlibrary{external}
+%\tikzexternalize[prefix=figures/]
+%, shell escape=-enable-write18, shell escape=-enable-write18
+%________________________ TABLES________________________________________
+\usepackage{booktabs} % Horizontal rules in tables
+
+
+%_____________________ TABLE OF CONTENTS _______________________________
+\usepackage{makeidx} %Table of contents
+%\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+\PassOptionsToPackage{hyphens}{url}\usepackage[driverfallback=dvipdfmdvipdfm,colorlinks=true,linkcolor=black,breaklinks=true]{hyperref}  % Para incluir hipervinculos en el pdf
+\hypersetup{citecolor=blue, urlcolor=blue}%,hyperfootnotes=false}		%Blue is different from blue, Blue is darker
+
+
+\usepackage{enumitem} % Edit the itemizes
+%\usepackage{titletoc,tocloft} % this two lines quit the indent that latex make between
+% To change the format to the subsections
+\usepackage{titlesec}
+\usepackage{todonotes}
+
+
+% ______________________EXTRA SPACE IN TABLES ______________________________
+\usepackage{setspace}
+
+ %_____________________________________ It is used to determine the number of pages in the document ____________________________(for "Page X of Total")
+\usepackage{lastpage}
+
+
+
+%\usepackage{extsizes} %14pt font size is not in the normal sizes of latex, we need this package
+
+
+%_________________________The easylist package for numbered items____________________________________
+%\usepackage[ampersand]{easylist}
+\usepackage{subcaption}
+
+
+
+%___________________ It enhances cross-reference ________________________________________
+%\usepackage{cleveref}
+%\usepackage{nameref}
+
+%__________LUALATEX
+
+%\usepackage{luatex85}
+
+
+
+\usepackage{titling} % Allows custom title configuration
+%\usepackage[a4,frame,center]{crop}
+
+
+
+
+
+
+%\graphicspath{ {images/} }
+%\newcommand{\folder}{./libraries}
+
+
+\definecolor{DarkGoldenrod}{rgb}{0.8,0.6,0.1}
+\definecolor{DarkRed}{rgb}{0.5,0.1,0.1}
+\definecolor{DarkRedPart}{rgb}{0.3,0.1,0.2}
+
+% Defines the gold horizontal rule around the title
+%\newcommand{\HorRule}{\color{DarkGoldenrod} \rule{\linewidth}{1pt}}
+
+
+
+
+\usepackage{titling} % Allows custom title configuration
+% Defines the gold horizontal rule around the title
+\newcommand{\HorRule}{\color{DarkGoldenrod} \rule{\linewidth}{1pt}}
+
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+
+
+
+\definecolor{mygray}{gray}{0.8}
+\definecolor{mygray2}{gray}{0.4}
+\definecolor{mygreen}{rgb}{0.0, 0.42, 0.24}
+\definecolor{myred}{rgb}{0.8, 0.0, 0.0}
+\definecolor{myorange}{rgb}{0.91, 0.41, 0.17}
+\definecolor{myblue}{rgb}{0.0, 0.44, 1.0}
+
+
+
+
+
+
+
+%To make the head rule
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\headrule}{\hrule}{\color{mygray}\hrule}{}{}
+\makeatother
+
+
+
+
+%\setlength{\cftsecindent}{-0.8cm} % the section and the subsection in the table of contents
+%\setlength{\cftsubsecindent}{-0.6cm} % the section and the subsection in the table of contents
+
+
+% Replace the title of the table of contents 
+\addto\captionsenglish{
+    \renewcommand{\contentsname}%
+    {}% Here it goes the new title
+}
+
+% Here we give the color to the subsections in the table of contents
+
+%\makeatletter
+%\let\stdl@subsection\l@subsection
+%\renewcommand*{\l@subsection}[2]{%
+%	\stdl@subsection{\textcolor{blue}{#1}}{\textcolor{black}{#2}}}
+%\makeatother
+
+% CHANGING THE FORMAT OF SUBSECTIONS AND SECTIONS
+
+%\titleformat\subsection{}{}{0em}{ \bf \todo[inline, color=green!40]}[\vspace{0ex}]
+
+
+
+%\titleformat\section{\centering \LARGE}{}{0em}{ \bf }[]
+
+%\renewcommand{\thesubsection}{} %Subsection numbering
+%\renewcommand{\thesection}{} %Section numbering
+
+
+
+%\newcommand{\bluepageref}[1]{\textcolor{blue}{\pageref{#1}}}
+\newcommand{\qnameref}[1]{``\nameref{#1}''}
+
+
+
+% Comment the following to have chapters numbered without interruption (numbering through parts)
+\makeatletter\@addtoreset{chapter}{part}\makeatother%
+
+% \tableofcontents, without the title contents
+%\makeatletter
+%\@starttoc{toc}
+%\makeatother
+%
+
+
+
+\newcommand{\remark}[1]{\textbf{``#1"}}
+
+
+
+
+
+%\newcommand{\tit}{Raspberry Pi Server}
+%\newcommand{\rhdr}{Developer Manual}
+
+
+%\DeclareCaptionFormat{myformat}{#1#2#3\vspace{2ex}}
+%\captionsetup{format=myformat}
+
+%\captionsetup[lstlisting]{position=bottom,format=myformat}
+%\usepackage{lstautodedent}
+
+%commands
+
+%\newcommand{\relpathto}[1]{./codes/#1}
+
+%\renewcommand{\medskip}{\vspace{2ex}}
+
+%\newcommand{\capof}[2]{\begingroup\captionof{#1}{#2}\endgroup}
+
+
+
+
+
+%\usepackage{titling} % Allows custom title configuration
+% Defines the gold horizontal rule around the title
+%\newcommand{\HorRule}{\color{DarkGoldenrod} \rule{\linewidth}{1pt}}
+
+
+%\graphicspath{ {images/} }
+
+
+
+%\graphicspath{ {images/} }
+
+
+
+
+
+

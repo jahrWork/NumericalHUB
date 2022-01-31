@@ -1,0 +1,338 @@
+     
+ %*************************************************************************
+ \chapter{Initial Boundary Value Problems   }\label{user:IVBP}
+ %*************************************************************************  
+\vspace{-1cm}
+\section{Overview}
+\vspace{-0.2cm} 
+In this chapter, several Initial  Boundary Value problems will be presented. 
+These problems can be divided into those purely diffusive are the heat equation and those purely convective as the wave equation. 
+In between,  there are convective and diffusive problems that are represented by the convective-diffusive equation.
+In the subroutine \verb|IBVP_examples|,  seven examples of these problems are implemented.
+The first problem is to obtain the solution of the one-dimensional heat equation. The second problem presents a two-dimensional solution of the heat equation with non-homogeneous boundary conditions. 
+The third problem and fourth problem are devoted to the advection-diffusion equation in 1D and 2D spaces. 
+The fifth problem and sixth problem integrate movement of reflecting waves in a 1D closed tube and   in a 2D quadrangular box. 
+\vspace{0.2cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+         {subroutine IBVP_examples}
+         {end subroutine}{API_Example_Initial_Boundary_Value_Problem.f90}
+%Each problem is presented with the same structure. First, the differential equation with its boundary and initial conditions will be %stated. After that, code snippets are shown to explain how the problem is implemented. 
+\vspace{-0.2cm}
+The statement
+\verb|use Initial_Boundary_Value_Problems| should be included at the beginning of the program.
+
+
+%****************************
+      
+\section{Heat equation 1D}
+%****************************  
+The heat equation is a partial differential equation that describes how the temperature evolves in a solid medium. 
+The physical mechanism is the thermal conduction is associated with microscopic transfers of momentum within a body. The Fourier's law states the heat flux depends on temperature gradient and thermal conductivity. By imposing the energy balance of a control volume and taking into account the Fourier's law, the heat equation is derived: 
+   
+      \begin{equation*}      	
+      \frac{\partial u}{\partial t} =  \frac{\partial^2 u}{\partial x^2}.
+      \end{equation*}
+This spatial domain is $\Omega \subset \mathbb{R} : $ $\{x\in  [-1,1]\}$ and the temporal domain is $t \in [0,1]$.      
+The boundary conditions are set by imposing a given temperature or heat flux at boundaries. In this example, a homogeneous temperature is  imposed at boundaries:
+      \begin{align*}      	
+       & u(-1,t)=0, \\
+       & u(1,t)=0,
+      \end{align*}
+and the initial temperature profile is:
+      \begin{equation*}      	
+      u(x,0)=\exp(-25 x^2).
+      \end{equation*}
+      
+      
+The implementation of the differential operator is done by means of the function \verb|Heat_equation1D|
+      \vspace{0.2cm} 
+      \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {function Heat_equation1D}
+      {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+and  the boundary conditions by means of the function \verb|Heat_BC1D|
+      \vspace{0.2cm} 
+      \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {function Heat_BC1D}
+      {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+      
+The problem is integrated with piecewise polynomials of degree six or finite differences of sixth-order $q=6$.  Once the grid or the mesh points are chosen by the subroutine \verb|Grid_initialization| and the initial condition is set, the problem is integrated by the subroutine
+\verb|Initial_Boundary_Value_Problem| by making use of the definition of the differential operator and the boundary conditions previously defined.
+      \vspace{0.5cm} 
+      \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {Heat equation 1D}
+      {Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+
+In figure \ref{fig:HeatEquation1D}, the temperature $ u(x,t) $ is shown during time integration by different parametric curves. 
+From the initial condition, the temperature diffuses to both sides of the spatial domain verifying zero temperature at boundaries. 
+
+\twographs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat1Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat1Db.tex}}
+{Time evolution of the heat equation with $ Nx = 20$ and  $q=6$. (a) Temperature profile $u(x,t)$ at $t=0, 0.2, 0.4$. (b) Temperature profile $u(x,t)$ at $t=0.6, 0.8, 1$.}{fig:HeatEquation1D}
+   
+      
+  
+\newpage      
+%**********************************************
+\section{Heat equation 2D}
+%**********************************************
+\vspace{-0.1cm}
+In this section, the heat equation is integrated in a two-dimensional quadrangular box   $\Omega \subset \mathbb{R}^2 : $ $\{(x,y)\in  [-1,1]\times[-1,1]\}$ allowing heat fluxes in both in vertical and horizontal directions. The heat equation expressed in a Cartesian two dimensional space is: 
+\begin{equation*}
+       \frac{\partial u}{\partial t} =     \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2},
+\end{equation*}
+This differential operator is implemented in \verb|Heat_equation2D|
+\vspace{0.2cm}
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+{real function Heat_equation2D}
+{end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+In this example, the influence of the non-homogeneous boundary conditions is taken into account by imposing the following temperatures at boundaries: 
+    \begin{align*}      	
+        u(-1, y, t)=1, \quad u(+1, y, t)=0, \quad  u(x, -1, t)=0, \quad  u(x, +1, t)=0,
+      \end{align*}
+and zero temperature as an initial condition $ u(x,y,0) = 0$. 
+\vspace{0.2cm}  
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+{real function Heat_BC2D}
+{end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+The subroutine \verb|InitialValue_Boundary_Problem| uses these definitions to integrate the solution
+\vspace{0.2cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+{Heat equation 2D}
+{Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+              
+In figure \ref{fig:Heat_equation_2D}, the two dimensional distribution of temperature is shown from the early stages of time to its final steady state. The temperature evolves from the zero initial condition to a steady state assuring the imposed boundary conditions. 
+\fourgraphs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat2Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat2Db.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat2Dc.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Heat2Dd.tex}}
+{Solution of the 2D heat equation solution with  $N_x=20, N_y =20$  and order $q=4$, (a) temperature at $ t=0.125$, (b) temperature at $ t=0.250$,(c) temperature at $ t=0.375$, (d) temperature at $ t=0.5$. }{fig:Heat_equation_2D}
+                  
+        
+
+      
+      
+    
+\newpage       
+%****************************************************       
+\section{Advection Diffusion equation 1D}
+When convection together with diffusion is present in the physical energy transfer mechanism, boundary conditions become tricky. 
+For example, let us consider a fluid inside a pipe moving to the right at constant velocity transferring by conductivity heat to right and to the left. At the same time and due to its convective velocity, the energy is transported downstream. It is clear that the inlet temperature can be imposed but nothing can be said of the outlet temperature.  
+In this section, the influence of extra boundary conditions is analyzed. 
+The one-dimensional energy transfer mechanism associated to advection and diffusion is governed by the following equation: 
+       \begin{equation*}      	
+       \frac{\partial u}{\partial t} +  \frac{\partial u}{\partial x} = \nu \frac{\partial^2 u}{\partial x^2},
+       \end{equation*}
+where $ \nu $ is a non dimensional parameter which measures the importance of the diffusion versus the convection.      
+This spatial domain is $\Omega \subset \mathbb{R} : $ $\{x\in  [-1,1]\}$.   
+As it was mentioned, extra boundary conditions are imposed to analyze their effect. 
+       \begin{equation*}      	
+       u(-1,t)=0, \quad u(1,t)=0.
+       \end{equation*}
+The convective and diffusive eveloution is studied from the following initial condition:
+       \begin{equation*}      	
+       u(x,0)=\exp(-25 x^2).
+       \end{equation*}
+       
+           
+The differential operator and the boundary equations are implemented in the following two subroutines: 
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+       {function Advection_equation1D}
+       {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+       {function Advection_BC1D}
+       {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+       
+      
+The subroutine \verb|InitialValue_Boundary_Problem| uses these definitions to integrate the solution     
+       \vspace{0.5cm} 
+       \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+       {Advection diffusion 1D}
+       {Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+ 
+In this example, fourth-order finite differences $ q=$ have been used.         
+In figure \ref{fig:AdvectionEquation1D}, the evolution of the temperature is shown for the early stage of the simulation. 
+The initial temperature profile moves to the right due to its constant velocity 1. At the same time, it diffuses to the right and to the left due to its conductivity. The problem arises when the temperature profile   reaches the boundary $ x = + 1$ where the extra boundary condition $u(+1,t) = 0$ is imposed. The result of the simulation is observed in figure  \ref{fig:AdvectionEquation1D}b where the presence of the extra boundary condition introduces oscillations of disturbances in the temperature profile which are not desirable.   
+the solution evaluated at four instants of time.
+
+       
+\twographs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD1Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD1Db.tex}}
+{Solution of the advection-diffusion equation subjected to extra boundary conditions with $ N_x = 20 $ and order $ q=4$. (a) Early stages of the temperature profile for $ t=0,0.3,0.6$, (b) the temperature profile for $ t=0.9,1.2,1.5$.}{fig:AdvectionEquation1D}
+
+
+    
+   
+\newpage    
+%*****************************************************
+\section{Advection-Diffusion equation 2D}
+%*****************************************************
+ The purpose of this section is to show how the elimination of the extra boundary conditions imposed in the 1D advection-diffusion problem allows obtaining the desired result. 
+ 
+ Let us consider a fluid moving with a given constant velocity $\vect{v} $. 
+ While the convective energy transfer mechanism is determined by $  \vect{v} \cdot \nabla u $, the energy transferred by thermal  conductivity is $ \nabla u $. 
+ With these considerations, the temperature evolution of the fluid is governed by the following equation:
+ \begin{equation*}
+        \frac{\partial u}{\partial t} +  \vect{v} \cdot \nabla u \ = \ \nu \ \nabla u, 
+ \end{equation*}
+ here $ \nu $ is a non dimensional parameter which measures the importance of the diffusion versus the convection.     
+ 
+ In this example, $ \vect{v} = (1, 0) $ and the energy transfer occurs  in a two dimensional domain
+  $\Omega \subset \mathbb{R}^2 : $ $\{(x,y)\in  [-1,1]\times[-1,1]\}$. The above equation yields, 
+   \begin{equation*}
+        \frac{\partial u}{\partial t} +  \frac{\partial u}{\partial x} = \nu \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right). 
+        \end{equation*}
+ This differential operator is implemented in the function \verb|Advection_equation2D|
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+        {function Advection_equation2D}
+        {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
+         
+ 
+ The constant velocity $ \vect{v} $ of the flow allows deciding inflow or outflow boundaries by projecting the velocity on the normal direction to the boundary. In our case, only the boundary $ x=+1$ is an outflow.
+ It is considered the flow enter at zero temperature but no boundary condition is imposed at the outflow. 
+ $$
+   u(-1, y, t) = 0, \quad u(x, -1, t ) = 0, \quad  u(x, +1, t ) = 0.
+ $$   
+ The question that arises is:  if no boundary condition is imposed, how these boundaries conditions are modified or evolved ? 
+ The answer is to consider the boundary points as interior points. In this way, the evolution of these points is governed by the advection-diffusion equation. To take into account that there are points with this requirement, the keyword \verb|FREE_BOUNDARY_CONDITION| is used. 
+ In the following function \verb|Advection_BC2D| these special boundary points are implemented:         
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+        {function Advection_BC2D}
+        {end function}{API_Example_Initial_Boundary_Value_Problem.f90}             
+      
+     
+ The subroutine \verb|InitialValue_Boundary_Problem| uses the function of the differential operator as well as the function that imposes the boundary conditions to integrate the solution    
+        \vspace{0.5cm} 
+        \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+        {Advection diffusion 2D}
+        {Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+        
+   
+ In figure \ref{fig:Advection_diffusion_2D}, the temperature distribution is shown. At the early stages of the simulation \ref{fig:Advection_diffusion_2D}a and \ref{fig:Advection_diffusion_2D}b, the energy is transported to the right and at the same time the thermal conductivity diffuses its initial distribution. In figure \ref{fig:Advection_diffusion_2D}c and \ref{fig:Advection_diffusion_2D}d,  the flow has reached the outflow boundary. Since no boundary conditions are imposed at the outflow boundary $ x=+1$, the simulation predicts what is supposed to happen. The energy abandons the spatial domain with no reflections or perturbation in the temperature distribution.   
+      
+\fourgraphs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD2Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD2Db.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD2Dc.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/AD2Dd.tex}}
+{Solution of the advection-diffusion equation with outflow boundary conditions  with $ N_x =20$,$ N_y =20$  and order $q=8$. (a) Initial condition $u(x,y,0),$ (b) solution at $ t =0.45$, (c) solution at  $t=0.9$, (d) solution at $t=1.35$}{fig:Advection_diffusion_2D}
+         
+   
+
+\newpage       
+%*****************************************************
+\section{Wave equation 1D}
+%*****************************************************  
+The wave equation is a conservative equation that describes waves such as pressure waves or sound waves, water waves, solid waves or light waves. 
+It is a partial differential equation that predicts the evolution of a  function $u(x, t)$ where $ x $ represents the spatial variable and  $ t $ stands for time variable. The equation that governs the quantity $u(x,t)$ such as the pressure in a liquid or gas, or the displacement of some media is: 
+      \begin{equation*}      	
+      \frac{\partial^2 v}{\partial t^2} -  \frac{\partial^2 v}{\partial x^2}  = 0.
+      \end{equation*}
+Since the module \verb|Initial_Boundary_Value_Problems| is written for systems of second order derivatives in space and first order in time, the problem must be rewritten by means of the following transformation: 
+      $$
+        \vect{u}(x, t) = [ \ v(x,t), \ w(x,t) \ ]. 
+      $$
+The wave equation is transformed in a system of equations of first order in time and second order in space     
+      \begin{align*}  
+      \frac{\partial v}{\partial t} & = w,  \\
+      \frac{\partial w}{\partial t} & =  \frac{\partial^2 v}{\partial x^2}. 
+      \end{align*}
+This set of two differential equations is  implemented in \verb|Wave_equation1D|  
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+     {function Wave_equation1D}
+     {end function}{API_Example_Initial_Boundary_Value_Problem.f90}      
+These equations must be completed with initial and boundary conditions. In this example,  a one-dimensional tube
+with closed ends is considered. This spatial domain is $\Omega \subset \mathbb{R} : $ $\{x\in  [-1,1]\}$ and the temporal domain is $t \in [0,4]$.  It means that waves reflects at the boundaries conserving their energy with $v( \pm 1, t) = 0$ and $ w( \pm 1, t) = 0$. 
+The initial condition is $  v(x,0)  = \exp(-15 x^2),$ and  $  w(x,0)  = 0.$
+The boundary conditions are implemented in the following function \verb|Wave_BC1D|:    
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+     {function Wave_BC1D}
+     {end function}{API_Example_Initial_Boundary_Value_Problem.f90}      
+The differential operator and the boundary conditions function  are used as input arguments of the subroutine \verb|Initial_Boundary_Value_Problem|
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+     {Wave equation 1D}
+     {Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+     
+     
+In figure \ref{fig:Wave_equation_1D}, time evolution of $ u(x,t) $ is shown. Since the initial condition is symmetric with respect to $ x=0$ and the system is conservative, the solution is periodic of periodicity $ T=4$. It is shown in \ref{fig:Wave_equation_1D}b that the displacement profile $ u(x,t) $ at $ t= T $ coincides with the initial condition.   
+   
+\twographs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves1Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves1Db.tex}}
+{Wave equation solution with $N_x = 41$ and order $q=6$. (a) Time evolution of $u(x,t)$ from $t=0$ to $t=2$. 
+(b) Time evolution of $u(x,t)$ from $t=2$ to $t=4$.}{fig:Wave_equation_1D}
+    
+
+      
+\newpage 
+%****************************
+\section{Wave equation 2D}
+%****************************
+In two space dimensions, the wave equation is
+      \begin{equation*}      	
+      \frac{\partial^2 v}{\partial t^2} =  \frac{\partial^2 v}{\partial x^2} +  \frac{\partial^2 v}{\partial y^2} 
+      \end{equation*}
+As it was done with the wave equation in 1D, the problem must transformed to a system of first order in time by means of the following change of variables:      
+      \begin{align*}  
+           \vect{u}(x, t) = [ \ v(x,t), \ w(x,t) \ ]
+        \end{align*}
+giving rise to the system    
+      \begin{align*}  
+      \frac{\partial v}{\partial t} & = w,   \\	
+      \frac{\partial w}{\partial t} & =  \frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}.
+      \end{align*}
+This system is implemented in the function \verb|Wave_equation2D|  
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {function Wave_equation2D}
+      {end function}{API_Example_Initial_Boundary_Value_Problem.f90}      
+Regarding boundary conditions, reflexive or non absorbing walls are considered in  
+the spatial domain $\Omega \equiv \{ (x,y) \in [-1,1] \times [-1,1] \}$. The  time interval is $t \in [0,2]$. 
+Hence, the boundary conditions are: 
+\begin{align*}  
+      & v(+1,y,t)  =0, \quad & v(-1,y,t)  =0, \quad &  v(x,-1,t) =0, \quad &  v(x,+1,t) =0,   \\	
+       & w(+1,y,t)  =0, \quad &  w(-1,y,t)  =0, \quad &  w(x,-1,t) =0, \quad &   w(x,+1,t)  =0.   \\	
+      \end{align*}  
+And the initial values:
+      \begin{align*}  
+      v(x,y,0) & = \exp(-10 (x^2+y^2)),   \\	
+      w(x,y,0) & = 0. 
+      \end{align*}
+The  boundary conditions are implemented in \verb|Wave_BC2D| 
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {function Wave_BC2D}
+      {end function}{API_Example_Initial_Boundary_Value_Problem.f90} 
+     
+The differential operator, its boundary conditions and initial condition are used  in the following code snippet:  
+\vspace{0.5cm} 
+\listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
+      {Wave equation 2D}
+      {Solution}{API_Example_Initial_Boundary_Value_Problem.f90}
+        
+    
+In figure  \ref{fig:Wave_equation_2D}  time evolution of $ u(x,y,t)$ is shown from the initial condition to time $ t= 2 $. 
+Since waves reflect from different walls with different directions and the round trip time depends on the direction, the problem becomes much more complicated to analyze than the pure one-dimensional problem. 
+  
+\fourgraphs
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves2Da.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves2Db.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves2Dc.tex}}
+{\input{./doc/chapters/Initial_Boundary_Value_Problem/figures/Waves2Dd.tex}}
+{Wave equation solution  with  $N_x = 20 $, $ N_y =20$ and order $q=8$. (a) Initial value $u(x,y,0)$. (b) Numerical solution at $ t =0.66$, (c) numerical solution at $t = 1.33$, (d) numerical solution at $t = 2.$}{fig:Wave_equation_2D}
+  
+   
+ 
+ 
+ 
+ 
+ 

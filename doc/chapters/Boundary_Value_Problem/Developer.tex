@@ -1,0 +1,322 @@
+     
+%*************************************************************************
+\chapter{Boundary Value Problems}\label{Dev:BVP}
+%*************************************************************************  
+\section{Overview}
+       
+In this chapter,  the mathematical foundations of the boundary value problems are presented. Generally, these problems are devoted to find a solution of some scalar or vector function in a spatial domain. This solution is forced to comply  some  specific boundary conditions.  
+The elliptic character of the solution of a boundary value problem means that the every point of the spatial domain is influenced by the whole points of the domain. From the numerical point of view, it means that the discretized solution is obtained by solving an algebraic
+system of equations. The algorithm and the implementation to obtain and solve the system of equations is presented. 
+
+    
+Let  $\Omega \subset \mathbb{ R}^p$ be an open and connected set and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each point of the spatial domain is written  $\vect{x} \in D $.
+A Boundary Value Problem for a vector function $ \vect{u}: D \rightarrow \mathbb{R}^{N}$ of $N$ variables is defined as:
+       \begin{align}
+           &\vect{\mathcal{L}} (\vect{x},\vect{u}(\vect{x})) = 0, & \forall \ \ \vect{x} \in  \Omega, \\
+           &\vect{h} (\vect{x},\vect{u}(\vect{x}))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vect{x} \in \partial \Omega,
+       \end{align}
+where $\vect{\mathcal{L}}$ is the spatial differential operator and $\vect{h}$ is the boundary conditions operator that must satisfy the solution at the boundary $\partial \Omega$.    
+    
+       
+       
+\newpage 
+%*****************************************************
+\section{Algorithm to solve Boundary Value Problems}
+%******************************************************
+
+If the spatial domain $D$ is discretized in $N_D$ points, the problem extends from vector to tensor, as a tensor system of equations of order $p$ appears for each variable of $\vect{u}(\vect{x})$. The order of the tensor system merging from the complete system is $p + 1$ and its number of elements is $N =   {N_v} \times N_D$ where $ N_v $ is the number of variables of $\vect{u}(\vect{x}) $. The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of the tensor system evaluated on the boundary points is $N_C= {N_v} \times N_{\partial\Omega}$. Once the spatial discretization is done, the system emerges as a tensor difference equation that can be rearranged into a vector system of $N$ equations. Particularly two systems appear: one of $N-N_C$ equations from the differential operator on inner grid points and another of $N_C$ equations from the boundary conditions on boundary points:
+
+\begin{align*}
+  & {L}({U}) =0, \\
+  & {H}({U})\big\rvert_{\partial \Omega}=0
+\end{align*}
+where $U \in \mathbb{ R}^{N}$ comprises the discretized solution at inner points and boundary points. 
+Notice that 
+$$
+{L}: \mathbb{R}^{N} \rightarrow \mathbb{R}^{N-N_C} 
+$$ 
+is the difference operator associated to the differential operator 
+$\vect{\mathcal{L}} $  and 
+$${H}: \mathbb{ R}^{N} \rightarrow \mathbb{R}^{N_C}
+$$ 
+is the difference operator associated to the boundary conditions operator $ \vect{h} $. 
+To solve the  systems, both set of equations are packed in the vector function 
+$$
+{F}: \mathbb{R}^{N} \rightarrow \mathbb{R}^{N}, 
+$$
+with $ F = [ L, H ]$ satisfying the differential equation and the boundary conditions
+$$
+F(U)=0. 
+$$ 
+%Hence, the boundary value problem is transformed into $N$ difference equations for the unknown $U$.
+The algorithm to solve this boundary value problem is explained in two steps:
+       \begin{enumerate}
+       	\item Obtention of the vector function $ F $.
+       	
+       	From a discretized solution $ U $, derivatives are calculated and the differential equation is forced at inner grid points yielding $ N_{\Omega} $ equations. Imposing the boundary conditions constraints, additional $ N_{\partial \Omega} $ equations are
+       	obtained. 
+       	
+       	
+       	\item Solution of an algebraic system of equations.  
+       	
+       	Once $ F $ is built, any available solver to obtain the solution of a system of equations is used. 
+       \end{enumerate}
+        
+
+ 
+       
+The algorithm  is represented schematically on figure \ref{fig:BVPlinearity}.
+If the differential operator $\vect{\cal L}( \vect{x}, \vect{u})$ and the boundary conditions $\vect{h}( \vect{x}, \vect{u})$ depend linearly with the dependent variable  $\vect{u}(\vect{x})$, the problem is linear and the function $ F $ can be expressed by means of sytem matrix $ A $ and independent term $ b $ in the following form: 
+ $$
+      F = A \ U - b. 
+ $$       
+ 
+ \vspace{2cm} 
+ \BVPlinearity
+        
+  
+
+
+\newpage         
+%*************************************************
+\section{From classical to modern approaches}
+%*************************************************
+This section is intended to consolidate the understanding of the procedure to implement the boundary value problem based on lower abstraction layers such as the finite differences layer. 
+A nonlinear one-dimensional  boundary value problem is considered to explain the algorithm.  The following differential equation in the domain \ensuremath{x \ \in [-1,1]} is chosen:
+          \begin{equation*}
+          \frac{\text{d}^2u}{\text{d}x^2} + \sin u = 0,
+          \end{equation*}
+          along with boundary conditions:
+          \begin{align*}
+          u(-1) = 1, \qquad u(1)= 0.
+          \end{align*}
+The algorithm to solve this problem, based on second order finite differences formulas, consists on defining a equispaced mesh with $ \Delta x $ spatial size 
+          $$
+           \{ x_i, \ \ i=0, \ldots, N \}, 
+           $$ 
+          impose the discretized differential equations in these points
+          $$
+              \frac{ u_{i+1} - 2 u_i + u_{i-1} }{ \Delta x^2 } + \sin u_i, \quad i=1, \ldots N-1,
+          $$
+          and impose the boundary conditions
+          $$
+              u_0 = 1, \quad u_N = 0. 
+          $$
+Finally, these  nonlinear  $ N+1$ equations are solved. 
+
+However, this approach is tedious and requires extra analytical work if we change the equation or the order of the finite differences formulas. 
+One of the main objectives of our \verb|NumericalHUB| is to allow such a level of abstraction that these numerical details are hidden, focusing on more important issues related to the physical behavior or the numerical scheme error. 
+
+This abstraction level allows integrating this boundary value problem with different finite-difference orders or with different mathematical models by making a very low effort from the algorithm and implementation point of view.  
+As it was mentioned, the solution of a boundary value problem requires three steps: select the grid distribution, impose the difference equations and solution of the resulting system. 
+Let us try to do it from a general point of view.  
+  \begin{enumerate}
+              \item {\textbf{Grid points}}.
+              
+              Define an equispaced or a nonuniform grid distribution of points ${x_i}$. 
+              This can be done by the following subroutine which determines the optimum distribution of points to minimize the truncation error depending on the degree or order of the interpolation. If second order is considered, this distribution is uniform. 
+              \vspace{0.5cm} 
+              \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+               {Grid points}
+               {Grid_Initialization}{API_Example_Finite_Differences.f90}
+              This grid defines the approximate values $ u_i $ of the unknown  $ u(x) $ at the grid points $ x_i $.
+              Once the order is set and the grid points are given, Lagrange polynomials and their derivatives are built and particularized at the grid points $ x_i$. These numbers are stored to be used as the coefficients of the finite differences formulas when calculating derivatives.
+              
+              
+               \item {\textbf{Difference equations}}.  
+               
+               Once the grid is initialized and the derivative coefficients are calculated, the subroutine \verb|Derivative| allows calculating the second derivative in every grid point $ x_i$ and their values are stores in \verb|uxx|. 
+               Once all derivatives are expressed in terms of the nodal points $ u_i $, the difference equations  are built by means of the following equation: 
+               \vspace{0.5cm} 
+                           \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+                            {Difference equations}
+                            {end function}{API_Example_Finite_Differences.f90}
+                            
+                \item {\textbf{Solution of a nonlinear system of equations}}.
+                
+                The last step is to solve the resulting system of difference equations by means of a Newton-Raphson method: 
+                \vspace{0.5cm} 
+                         \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+                             {call Newton}
+                            {call Newton}{API_Example_Finite_Differences.f90}
+                                          
+           
+          
+ \end{enumerate}     
+\newpage 
+To have a complete image of the procedure presented before, the following subroutine \verb|BVP_FD| implements the algorithm: 
+ \vspace{1cm} 
+\listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+         {subroutine BVP_FD}
+         {end subroutine}{API_Example_Finite_Differences.f90}
+                                                   
+       
+
+
+     
+\newpage        
+%********************************************      
+\section{Overloading the Boundary Value Problem}
+%********************************************              
+Boundary value problems can be expressed in spatial domains   $\Omega \subset \mathbb{ R}^p$ with $ d=1, 2, 3 $. 
+From the conceptual point of view, there is no difference in the algorithm explained before. However, from the implementation point of view, 
+tensor variables are of order $p+1$ which makes the implementation slightly different. To make a user friendly interface for the user, the boundary value problem has been overloaded. It means that the subroutine to solve the boundary value problem 
+is named \verb|Boundary_Value_Problem| for all values of $ d $ and for different number of variables of $ \vect{u} $.  
+The overloading is done in the following code, 
+
+ \vspace{0.2cm} 
+       \listings{\home/sources/Boundary_value_problems.f90}
+       {module Boundary_value_problems}
+       {end module}{Boundary_value_problems.f90}
+For example, if a scalar 2D problem is solved, the software recognizes automatically associated to the interface  of $  \vect{\mathcal{L}} (\vect{x},\vect{u}(\vect{x})) $ and $  \vect{h} (\vect{x},\vect{u}(\vect{x})) $ using the subroutine 
+\verb|Boundary_Value_Problem2D|. If the given interface of $ \vect{\mathcal{L}} $ and $ \vect{h}$ does not match the implemented existing interfaces of the  boundary value problem, the compiler will complain saying that this problem is not implemented. 
+As an example, the following code shows the interface of 1D and 2D differential operators $ \vect{\mathcal{L}} $
+ \vspace{0.2cm} 
+       \listings{\home/sources/Boundary_value_problems1D.f90}
+       {real function DifferentialOperator1D}
+       {end function}{Boundary_value_problems1D.f90}
+ 
+       \listings{\home/sources/Boundary_value_problems2D.f90}
+       {real function DifferentialOperator2D}
+       {end function}{Boundary_value_problems2D.f90}
+
+
+ 
+
+\newpage
+%****************************************************       
+\section{Linear and nonlinear BVP in 1D}
+%****************************************************       
+For the sake of simplicity, the implementation of the algorithm provided below   is only shown  1D problems.
+Once the program matches the interface of a 1D boundary value problem, the code will use the following subroutine:  
+ 
+       \vspace{0.5cm} 
+       \listings{\home/sources/Boundary_value_problems1D.f90}
+       {subroutine Boundary_Value_Problem1D}
+       {end subroutine}{Boundary_value_problems1D.f90}
+ 
+Depending on the linearity of the problem, the implementation differs. For this reason and in order to classify between linear and nonlinear problem, the subroutine \verb|Linearity_BVP_1D| is used.
+Besides and in order to speed up the calculation, the subroutine \verb|Dependencies_BVP_1D| checks if the differential operator
+$ \mathcal{L} $ depends on 
+first or second derivative of $ u(x) $. If the differential operator does not depend on the first derivative, only second derivative  will be calculated to build the difference operator. The same applies if no dependency on the second derivative is encountered. 
+
+
+Once the problem is classified into a linear or a nonlinear problem and dependencies of derivatives are determined, the linear or nonlinear subroutine is called in accordance. 
+
+
+
+
+          
+       
+\newpage        
+%*********************************************************        
+\section{Non Linear Boundary Value Problems in 1D}
+%*********************************************************
+The following  subroutine \verb|Nonlinear_boundary_Problem1d| solves the problem
+
+       \vspace{1.0cm} 
+                \listings{\home/sources/Boundary_value_problems1D.f90}
+                {subroutine Non_Linear_Boundary_Value_Problem1D}
+                {contains}{Boundary_value_problems1D.f90}
+As it was mentioned, the algorithm to solve a BVP comprises two steps: 
+\begin{enumerate} 
+\item Construction of the difference operator or system of nonlinear equations. 
+
+The system of nonlinear equations is built in  \verb|BVP_discretization|. Notice that the interface of the vector function that uses the Newton-Raphson method must be 
+${F}: \mathbb{R}^{N} \rightarrow \mathbb{R}^{N}$. This requirement must be taken into account when implementing 
+the function \verb|BVP_discretization|.
+
+\item Resolution of the nonlinear system of equations by a specific method. 
+ 
+This subroutine checks if the \verb|Solver| is present. 
+If not, the code uses a classical Newton-Raphson method to obtain the solution.
+Since any available and validated \verb|Solver| can be used,  no further explanations to the resolution method will be made.
+
+\end{enumerate}
+
+
+\newpage 
+The function  \verb|BVP_discretization| is implemented by the following code: 
+ \vspace{0.2cm} 
+             \listings{\home/sources/Boundary_value_problems1D.f90}
+             {function BVP_discretization}
+             {end function}{Boundary_value_problems1D.f90}
+\listings{\home/sources/Boundary_value_problems1D.f90}
+{subroutine FD_Equations}
+{contains}{Boundary_value_problems1D.f90}
+First, the subroutine calculates only the derivatives appearing in the problem. Second, the boundary conditions at $ x_0 $ and 
+$x_N $ are analyzed. If there is no imposed boundary condition (\verb|C == FREE_BOUNDARY_CONDITION|), the corresponding equation is taken 
+from  the differential operator. Otherwise, the equation represents the discretized boundary condition. 
+Once the boundary conditions are discretized, 
+the differential operator is discretized for the inner grid  
+points $ x_1, \ldots, x_{n-1}. $
+%Once the complete systems of $ N $ equations is built, the Newton-Raphson  method or the optional \verb|Solver| is used to obtain the 
+%solution of the boundary value problem. 
+\vspace{0.2cm} 
+\listings{\home/sources/Boundary_value_problems1D.f90}
+{C == FREE}
+{end if}{Boundary_value_problems1D.f90}
+
+ 
+ \newpage        
+ %****************************************************       
+ \section{Linear Boundary Value Problems in 1D}
+ %****************************************************
+ The implementation of a linear BVP is more complex than the implementation of a nonlinear BVP. However, the  computational cost of the
+ linear BVP can be lower. 
+ The idea behind the implementation of the linear BVP relies on the expression of the resulting system of equations. If the system is linear, 
+ \begin{equation} 
+        F(U) = A \ U - b, 
+        \label{linear} 
+ \end{equation} 
+ where $ A $ is the matrix of the linear system of equations and $ b $ is the independent term. 
+ 
+ 
+ The algorithm proposed to obtain  $ A $ is based on $ N$ successive evaluations of $ F(U) $ to obtain the matrix $ A $ and the vector $b $.
+ To determine the vector $ b $, the function in equation \ref{linear} is evaluated with $ U= 0$  
+ $$
+   F(0) = - b.
+ $$  
+ To determine the first column of matrix $ A $, the function in equation \ref{linear} is evaluated with $ U^1 = [1, 0, \ldots, 0]^T $
+ $$
+    F(U^1) = A \ U^1 - b 
+ $$  
+ The components of $ F(U^1) $ are $ A_{i1} - b_i$. Since the independent term $ b $ is known, the first column of the matrix $ A $ is 
+ $$
+  C_1 = F(U^1) + b  
+ $$
+  Proceeding similarly with another evaluation of $ F $ with $ U^2 = [0, 1, 0, \ldots, 0]^T $, the second column of $ A $ is obtained
+  $$
+   C_2 = F(U^2) + b.  
+  $$ 
+ In this way, the columns of the matrix $ A $ are determined by means of  $ N+1$ evaluations of the  function $F $. 
+ 
+ Once the matrix $ A $ and the independent term $ b$ are obtained, any validated subroutine to solve linear systems can be used.
+ This algorithm to solve the BVP based on the determination of $ A $ and $ b $ is implemented in the following subroutine called  
+\verb|Linear_Boundary_Valu_Problem1D|: 
+ 
+ 
+ 
+ 
+ \newpage 
+ 
+   
+                      \vspace{1cm} 
+                      \listings{\home/sources/Boundary_value_problems1D.f90}
+                      {subroutine Linear_Boundary_Value_Problem1D}
+                      {contains}{Boundary_value_problems1D.f90}
+                      
+ The function \verb|BVP_discretization| gives the components of the function $ F $ and it is the same  function that is  described in the nonlinear problem. 
+ 
+ At the beginning of this subroutine, 
+ the independent term \verb|b| and the matrix \verb|A| are  calculated. 
+ Then, the linear system is solved by means of a Gauss method. 
+ 
+        
+               
+        
+        
+        
+       
+        
+        

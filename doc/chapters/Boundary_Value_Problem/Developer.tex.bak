@@ -1,0 +1,338 @@
+     
+       %*************************************************************************
+       \chapter{Boundary Value Problems}\label{Dev:BVP}
+       %*************************************************************************  
+       \section{Overview}
+       
+       In this chapter the mathematical foundations which are necessary to solve boundary problems are exposed. Aswell, and algorithm to solve arbitrary classical problems is exposed and its implementation. It is intended for the reader to be able to develop its own software once these concepts are internalized. 
+       
+       
+       
+       %*************************************************************************  
+       
+       \section{Boundary Value Problems}
+       
+       Whenever in the considered physical model, the magnitudes vary along the spatial dimensions, the equations that result are partial differential equations that involve spatial derivatives. In this case, boundary conditions are required for the resolution of the problem. The set of differential equation and boundary conditions is called \textit{Boundary Value Problem}, and more rigorously can be defined as follows:\\
+       
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each point of the spatial domain is written  $\vect{x} \in D $.
+       
+       A Boundary Value Problem for a vectorial function $\vect{u}: D \rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, is defined as:
+       \begin{align*}
+         &\vect{\mathcal{L}} (\vect{x},\vect{u}(\vect{x})) = 0, & \forall \ \ \vect{x} \in  \Omega, \\
+         &\vect{h} (\vect{x},\vect{u}(\vect{x}))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vect{x} \in \partial \Omega,
+       \end{align*}
+       where $\vect{\mathcal{L}}$ is the spatial dif{}ferential operator and $\vect{h}$ is the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$.\\
+       
+       
+       If the spatial domain $D$ is discretized in $N_D$ points, the problem extends from vectorial to tensorial, as a tensorial system of equations of order $p$ appears for each variable of $\vect{u}$. The order of the tensorial system merging from the complete system is $p + 1$ and its number of elements $N$ is $N= {N_v} \times N_D$. The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of the tensorial system evaluated on the boundary points is $N_C= {N_v} \times N_{\partial\Omega}$. Once the spatial discretization is done, the system emerges as a tensorial difference equation that can be rearranged into a vectorial system of $N$ equations. Particularly two systems appear: one of $N-N_C$ equations from the differential operator on inner grid points and another of $N_C$ equations from the boundary conditions on boundary points:
+       $$ {F}({U}) =0,   $$ $${H}({U})\big\rvert_{\partial \Omega}=0,$$
+       where $U \in \mathbb{ R}^{N}$ is the solution in all domain, $U \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_C}$ is the solution on the boundary points of the grid, ${F}: \mathbb{ R}^{N} \rightarrow \mathbb{R}^{N-N_C} $ is the difference operator associated to the differential operator and ${H}: \mathbb{ R}^{N} \rightarrow \mathbb{R}^{N_C}$ is the difference operator of the boundary conditions. Notice that the operators can not be solved separately as they are not invertible functions.\\
+       
+       To solve both systems they must be joined into a complete difference equation operator ${S}: \mathbb{ R}^{N} \rightarrow \mathbb{R}^{N} $, such that both equations for $F$ and $G$ are satisfied when:
+       $$S(U)=0. $$ 
+       
+       Hence, the boundary value problem is transformed into $N$ difference equations for $U$. The intention of this section is to define and implement an algorithm which solves this system.
+       
+       The resolution method used for both cases is quite similar but with a slight variation. In the linear case, the difference equation system can be written in matrix form with constant coefficients, and therefore solved by LU method.  On the other hand in the non linear case, the resolution of the difference equation system must be done by means of an iterative method. This affects on how the differential operator is constructed in the code to its posterior resolution. Nevertheless, this only affects on how the algorithm is implemented and not to its definition. The algorithm is almost the same for both linear and non linear problems but the way its carried out differs slightly. 
+       
+       \subsection{Algorithm.}
+       
+       The algorithm solves for a vectorial function $\vect{u}: D \rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, problems such as:
+       $$\vect{\mathcal{L}} (\vect{x},\vect{u}(\vect{x})) = 0, \qquad \ \ \forall \ \vect{x} \in \Omega, $$ $$ \vect{g} (\vect{x},\vect{u}(\vect{x}))\big\rvert_{\partial \Omega}=0 , \qquad \ \forall \ \ \vect{x} \in \partial \Omega,$$ 
+       
+       Once the problem is discretized it results:
+       
+       $$ {F}({U}) =0,   $$ $${H}({U})\big\rvert_{\partial \Omega}=0,$$
+       
+       
+       
+       The main idea of the resolution algorithm is first use $F$ and $G$ to construct the operator $H$ to then solve it.
+       
+      
+       The algorithm can be explained in two steps:
+       \begin{enumerate}
+       	\item {\textbf{Difference operator on inner and boundary points.}}
+       \end{enumerate}	
+       In first place we use the dif{}ference operators for both inner and boundary points $F$ and $G$, to construct an operator $S$ for all points of the domain. That is, defining $S$ as: 
+       \begin{equation*}
+       	S(U) = \begin{bmatrix}
+       	F(U)  \\ \quad G(U) \big \rvert_{\partial \Omega}
+       	\end{bmatrix} .
+       \end{equation*}
+              
+       Defined this way, it is in the required form to be solved. 
+       
+       \begin{enumerate}[resume]	
+       	\item {\textbf{Difference equation resolution.}} 
+       \end{enumerate}		
+       Finally, using the dif{}ference operator $S$, the problem:
+       $$S(U) = 0,$$ 
+       must be solved. For this, as the system in general is not linear, an iterative method is required. Once the system is solved, the solution at all domain $U$ is known. \\
+       
+       In the particular case in which both the differential operator and boundary conditions are linear, the difference operator $S$ can be written as a linear algebraic system:
+       
+       \begin{equation}
+       	S(U) = AU + \vect{b} = 0.
+       \end{equation}
+       
+       Thus, the solution of the boundary value problem in the linear case results:
+       
+       \begin{equation*}
+       	U= -A^{-1} \cdot \vect{b}.
+       \end{equation*}
+       
+       The algorithm for both linear and non linear case are represented schematically on figure \ref{fig:BVPlinearity}.
+       \BVPlinearity
+       
+     %  \FloatBarrier
+       
+       
+      
+       \section{Algorithm Implementation}
+       
+       In order to implement the resolution of boundary value problems several cases are considered. There are two ways of classifying the problems which are able to be solved by means of the provided code. The first is in terms of the dimension of the spatial domain or in other words the number of independent variables which constitute $\vect{x}$. Thus, the problems can be 1D, 2D or 3D. The second classification depends on the dimension of the unknown variable $\vect{u(\vect{x})}$. The two situations that can be considered are when $\vect{u}$ is a real scalar, that is $N_v=1$ and when $\vect{u}$ is considered a real vectorial field of dimension $N_v > 1$. All these cases are considered separately and then the boundary value problem is overloaded  in a single module as follows: \\
+       
+       %\lstinputlisting[language=Fortran, firstline=5, lastline=30, caption=\mycap{Boundary_value_problems.f90}]{\home/sources/Boundary_value_problems.f90} \vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Boundary_value_problems.f90}
+       {module Boundary_value_problems}
+       {end module}{Boundary_value_problems.f90}
+       
+       For the sake of simplicity, as the functioning of the algorithm for each case is quite similar for 1D, 2D and 3D problems, only the 1D case will be explained in order for the reader to understand the basis of the algorithm and its implementation.
+       
+       \newpage
+       \subsection{Boundary Value Problems 1D}
+       
+       As it was stated before, depending on the linearity or not of the differential operator $\vect{\mathcal{L}}(\vect{x},\vect{u}(\vect{x}))$, the resolution of the problem differs. For this reason, first of all in order to solve 1-dimensional scalar boundary value problems it is necessary to determine whether the problem is linear or not, this is done by means of the subroutine \texttt{Boundary\_Value\_Problem1D}, written as follows:
+       
+       %\lstinputlisting[language=Fortran, firstline=51, lastline=75, caption=\mycap{Boundary_value_problems.f90}]{\home/sources/Boundary_value_problems1D.f90} \vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Boundary_value_problems1D.f90}
+       {subroutine Boundary_Value_Problem1D}
+       {end subroutine}{Boundary_value_problems1D.f90}
+       
+       
+       For each linear and non linear case the implementation shall be presented.
+       
+       \subsubsection*{Linear Boundary Value Problems 1D}
+       
+       The structure that will be followed is the same as in the algorithm, that is each step will be related to its implementation. The starting point of the explanation will be once the spatial domain is discretized in $N_x+1$ points. Thus, the solution $U\in\mathbb{R}^{N_x+1}$ is the solution of the difference equations system $S(U)=0$.
+       
+       \begin{enumerate}
+       	\item \textbf{Difference operator on inner and boundary points.}
+       \end{enumerate}
+       
+       First of all it is necessary to construct the difference operator $S(U)$, the construction method that is used is based on the delta Kronecker function to recursively construct it. For this, it is defined a subroutine called \texttt{Difference\_equation1DL} which given a spatial domain \texttt{x}, a vector in which is yielded the solution \texttt{W}, the first and second derivatives \texttt{Wx} and \texttt{Wxx} yields the difference operator in \texttt{F}.\\
+       
+      % \lstinputlisting[language=Fortran, firstline=127, lastline=137]{\home/sources/Boundary_value_problems1D.f90} 
+       %\lstinputlisting[language=Fortran, firstline=138, lastline=154, caption=\mycap{Boundary_value_problems.f90}]{\home/sources/Boundary_value_problems1D.f90} \vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Boundary_value_problems1D.f90}
+       {subroutine Difference_equation1DL}
+       {end subroutine}{Boundary_value_problems1D.f90}
+       
+       The delta Kronecker method constructs the linear difference operator $S(U)$ by giving values to the solution $U$. We shall asign the subindex $m$ to the variables of the $m$-th step of the Delta Kronecker. In first place, for $m=0$ it is assigned the null value $U_0=0$. Hence, the first value $S_0$ is the non homogenous or forcing term of the equation
+       
+       \begin{equation}
+       	S_0 =  \vect{b}.
+       \end{equation}
+       
+       For the rest of steps the value given to $U_m$ is all components equal to zero excepting the $m$-th term of the vector which is equal to 1. Therefore, it can be expressed in terms of the delta Kronecker function $\delta_{mj}$ as:
+       
+       \begin{equation}
+       	U_m = \delta_{mj}\vect{e}_j, \qquad \mbox{for} \quad  j = 1,2 \ldots, N_x +1.
+       \end{equation}
+       
+       When evaluated in the $m-th$ step the image of the difference operator $S_m = S(U_m)$ takes the value of the $m-th$ column of the matrix $A=A_{ij}\vect{e}_i \otimes \vect{e}_j$ minus the forcing term. In other words:
+       
+       \begin{equation}
+       	S_m = A_{im} \vect{e}_i + \vect{b}, \qquad \mbox{for} \quad  i, m = 1,2 \ldots, N_x +1.
+       \end{equation}
+       
+       Hence, recursively the matrix $A$ can be constructed as:
+       
+       \begin{equation}
+       A = \begin{bmatrix}
+       S_1 | S_2 \ldots | S_{N_x+1}
+       \end{bmatrix}   . 
+       \end{equation}
+       
+       
+       The method is implemented by calling recursively a subroutine which performs the previous operations, called \texttt{Difference\_equation}. 
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Boundary_value_problems1D.f90}
+       {independent term}
+       {enddo}{Boundary_value_problems1D.f90}
+       %\lstinputlisting[language=Fortran, firstline=103, lastline=116, caption=\mycap{Boundary_value_problems.f90}]{\home/sources/Boundary_value_problems1D.f90} \vspace{0.5cm}
+       
+       The matrix $A$ is known and yielded on the array \texttt{Difference\_operator} ready to be solved.
+       
+       \begin{enumerate}[resume]
+       	\item {\textbf{Difference equation resolution.}} 
+       \end{enumerate}
+        
+        Once known $A$ the last step is to solve the problem by the LU method:
+        
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {solve the linear system of equations}
+        {Solution}{Boundary_value_problems1D.f90}
+               
+        And the solution will be yielded on the array \texttt{Solution}.
+        In order to perform the delta Kronecker method, the previously defined subroutine called \texttt{Difference\_equation} must be contained on the interface of a subroutine called:
+        
+         \texttt{Linear\_Boundary\_Value\_Problem1D}.
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {subroutine Linear_Boundary_Value_Problem1D}
+        {enddo}{Boundary_value_problems1D.f90}
+        
+       
+        
+        \subsubsection*{Non Linear Boundary Value Problems 1D}
+        
+        The implementation of the algorithm for non linear boundary value problems is simpler from the programming point of view (however more costly computationally). The reason is that in this case the subroutine which calculates the differential operator on each point of the spatial domain \texttt{Difference\_equation1DNL} is recursively called when its restriction is introduced on the \texttt{Newton} subroutine as an input argument. In the linear case as the delta Kronecker method is used, the differential operator is obtained recursively which requires writing more lines of code.\\
+        
+        As before, the subroutine \texttt{Difference\_equation1DNL} is defined in a similar manner as the equivalent on the linear case. However, in this case it is not necessary to obtain the values of the derivatives, yielded on \texttt{Wx} and \texttt{Wxx}.
+        
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {subroutine Difference_equation1DNL}
+        {end subroutine}{Boundary_value_problems1D.f90}
+        
+       \newpage
+        In order to make this subroutine suitable for the \texttt{Newton} solver it is precise to define a restricting intermediate function called \texttt{System\_BVP} defined as:
+        
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {function System_BVP}
+        {end function}{Boundary_value_problems1D.f90}
+        
+        Thus, the problem can be solved by a simple call:
+        
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {Non linear solver}
+        {end if}{Boundary_value_problems1D.f90}
+        
+        With this it is just necessary to give the code an structure which permits to call both procedures from the interface of the global subroutine.
+        
+       \newpage
+        To permit the lexical scope, both the function \texttt{System\_BVP} and the subroutine \texttt{Difference\_equation1DNL} are contained within the interface of a higher level subroutine called \texttt{Non\_Linear\_Boundary\_Value\_Problem1D}:
+        
+        \vspace{0.5cm} 
+        \listings{\home/sources/Boundary_value_problems1D.f90}
+        {subroutine Non_Linear_Boundary_Value_Problem1D}
+        {contains}{Boundary_value_problems1D.f90}
+        
+        
+%________________________________________________________________________________________________        
+        \newpage
+        \section{Example: Boundary value problem 1D}
+        
+        A more advanced use of the \texttt{Finite\_Differences} module is the resolution of a boundary value problem using finite differences. To start, a 1D boundary value problem will be solved in the domain \ensuremath{x \ \in [-1,1]}. As an example, the differential equation is chosen:
+        
+        \begin{equation*}
+        \frac{\text{d}^2u}{\text{d}x^2} + u = 0,
+        \end{equation*}
+        along with boundary conditions:
+        %
+        \begin{align*}
+        u(-1) = 1, \qquad u(1)= 0.
+        \end{align*}
+        
+        The analytical solution of this problem is:
+        %
+        \begin{equation*}
+        u(x) = A \cos(x) - B\sin(x) ,
+        \end{equation*}
+        
+        where the coefficients are:
+        \begin{align*}
+        A = \frac{1}{2 \cos(1)}, \qquad B = \frac{1}{2 \sin(1)}.
+        \end{align*}
+        
+        The resolution algorithm of this problem by means of finite differences consists on three steps:
+        
+        \begin{enumerate}
+            \item {\textbf{Spatial discretization}}.\\
+            
+            The first thing to do is defining the grid by selecting a discrete sucesion of points of $x \in [0,N]$:
+            \begin{equation*}
+            x_i = - 1 + \frac{2i}{N}, \quad i = (0, 1, 2, \dots N),
+            \end{equation*}
+            where the grid size is $\Delta x = 2/N$.
+            
+            The spatial discretization entails also the definition of the solution as a sucesion:
+            \begin{equation*}
+            u_i = u(x_i), \quad (i = 0, 1, 2, \dots N).
+            \end{equation*}
+        \end{enumerate}
+        
+        \begin{enumerate}[resume]
+            \item{\textbf{Differential operator construction.}}
+        \end{enumerate}
+        
+        Once the domain and the solution are discretized, the derivatives are approximated by finite differences of order $q$. In general, this finite differences can be seen as a linear mapping for the solution in all the discrete points of the domain. Hence, finite differences for a derivative of order $n$, in equispaced domains are functions $D^n_i : \mathbb{R}^{N+1} \rightarrow \mathbb{R}$ for each point $x_i$, $i=0,1,\ldots N$ of the grid. The error approximating these derivatives by finite differences of order $q$ is proportional to $\Delta x ^q$. For the sake of simplicity, in this example the order $q=2$ will be chosen. Once the derivatives are computed by finite differences, the differential equation for the inner points of the grid can be written:
+        %
+        \begin{equation*}
+        D^2_i( u_{i-1}, u_i, u_{i+1} ) + u_i = 0, 
+        \quad 
+        i = 1, 2, \dots N-1,
+        \end{equation*}
+        
+        where $D^2_i= (u_{i-1} - 2 u_i + u_{i+1})/\Delta x^2 $. To complete the algebraic system of equations to be determined the boundary conditions must be added which for this problem are:
+        %
+        \begin{align*}
+        u_0 - 1 = 0, \qquad u_N = 0.
+        \end{align*}
+        
+        Hence, the difference equation system resulting from the differential operator plus the boundary conditions constitute an algebraic system of $N+1$ equations and $N+1$ unknown variables $u_i$.
+        
+        \begin{enumerate}[resume]
+            \item{\textbf{Algebraic system of equations resolution.}}
+        \end{enumerate}
+        
+        The previous step has transformed the differential equation into a set of algebraic equations which must be solved to obtain the succession $u_i$ which is the numerical solution of the problem. This shall be done by means of an iterative method such as Newton-Rhapson.
+        
+        
+        Once the grid is defined, a subroutine that computes the difference equation together with the boundary conditions is defined.
+        
+        %\vspace{0.5cm} 
+        \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+        {subroutine Difference_equation }
+        {end subroutine}{API_Example_Finite_Differences.f90}
+        
+        
+        To use the subroutine that solves algebraic equations by the Newton-Rhapson method, an intermediate function is defined. The only purpose of this function is to make the difference operator computed suitable as an input argument.
+        %\lstinputlisting[language=Fortran, firstline=333, lastline=339, caption=\mycap{API_Example_Finite_Differences.f90}]{\home/examples/API_Example_Finite_Differences.f90}
+        
+        \vspace{0.5cm} 
+        \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+        {function System_BVP}
+        {end function}{API_Example_Finite_Differences.f90}
+        %\newpage
+        
+        These two subprograms are contained on the interface of the subroutine, in which the spatial discretization is carried out, and is implemented as follows:
+        
+        
+        
+        \vspace{0.5cm} 
+        \listings{\home/examples/API_Example_Boundary_Value_Problem.f90}
+        {subroutine BVP_FD}
+        {contains}{API_Example_Finite_Differences.f90}
+        
+        Within the interface is also chosen the order of interpolation, which in this case is $q=6$.
+        Once implemented and executed the result obtained is represented on figure \ref{fig:BVP1D_FD}
+        %\twofigures{\home/doc/figures/}{BVP1D_U}{BVP1D_Error}{Numerical solution and error on the computation of the boundary value problem. (a) Numerical solution with order \ensuremath{q=6} of the boundary value problem. (b) Error of the solution with order \ensuremath{q=6} of the boundary value problem.}
+        
+        
+        \twographs{ \UBVPONED{(a)} }{ \ERRORUBVPONED{(b)} }
+        { Numerical solution and error on the computation of the boundary value problem for $N=20$ and order $q=2$ . (a) Numerical solution with order \ensuremath{q=2} of the boundary value problem. (b) Error of the solution with order \ensuremath{q=2} of the boundary value problem. }{fig:BVP1D_FD}
+        
+        
+        

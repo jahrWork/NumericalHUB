@@ -1,0 +1,341 @@
+%%This is a very basic article template.
+%%There is just one section and two subsections.
+\documentclass[11pt,twoside,a4paper]{book}
+
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{listings}
+\lstset{language=[90]Fortran,
+  basicstyle=\ttfamily,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green},
+  morecomment=[l]{!\ }% Comment only with space after !
+}
+\usepackage{amsmath,amssymb,amsfonts,mathrsfs,latexsym,cancel}
+\usepackage[total={17cm,25cm},top=2.5cm, right=2cm]{geometry}
+\usepackage{epstopdf}
+%Paquetes simbólicos:
+\newcommand{\dif}{\textrm{d}}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{lscape}
+\usepackage{array}
+
+\usepackage[usenames,dvipsnames]{pstricks}
+ \usepackage{epsfig}
+ \usepackage{epsf}
+ \usepackage{float}
+ \usepackage{pst-grad} % For gradients
+ \usepackage{pst-plot} 
+
+\usepackage{float}%para que no ponga los graficos donde le de la gana, poner \begin{figure}[H]
+\usepackage{soul}%para poder remarcar texto, poner \hl{texto a subrayar}
+\usepackage[final]{pdfpages}
+%%%-- \includepdf[pages={x-y,{}(emptypages),x}
+\sloppy % suaviza les reglas de ruptura de l�neas de LaTeX
+\frenchspacing % usar espaciado normal despu�s de '.'
+
+\usepackage{babel}
+\usepackage{framed}
+\usepackage{mdframed}
+
+\newenvironment{blueframed}[1][blue]
+  {\def\FrameCommand{\fboxsep=\FrameSep\fcolorbox{#1}{white}}%
+    \MakeFramed {\advance\hsize-\width \FrameRestore}}
+  {\endMakeFramed}
+  
+\usepackage{relsize}
+
+\usepackage{blindtext} % provides blindtext with sectioning
+
+% \usepackage{scrpage2}  % header and footer for KOMA-Script
+% \pagestyle{scrheadings} 
+% %\thispagestyle{empty} %cuando una página la queramos sin encabezado
+% 
+% %headings---------------------------------------------------------------------------------
+% 
+% \rehead[]{\textit{Manual reference}}        % equal page, right position (inner) 
+% \lohead[]{\textit{Manual reference}}        % odd   page, left  position
+% % (inner)
+
+\usepackage{fancyhdr}
+ 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{\textbf{Manual reference}}
+ 
+\renewcommand{\headrulewidth}{0.5pt}
+
+
+
+%----------------------------------------------------------------------------------------------------
+
+\usepackage{appendix}
+\usepackage{multicol}
+\setlength{\columnsep}{7mm} %Espacio entre columnas en caso de hacer multicol
+\usepackage{xcolor}
+\usepackage{float}	
+\usepackage{subfigure}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+%\decimalpoint %Punto decimal en lugar de comma
+%Por si acaso:
+%\renewcommand{\contentsname}{Contenido}
+%\renewcommand{\partname}{Parte}
+%\renewcommand{\appendixname}{Ap�ndice}
+
+%\renewcommand{\abstractname}{Abstract}
+
+
+
+\usepackage{collectbox}
+\usepackage{tikz}
+\usepackage{forest}
+
+\usepackage{schemabloc}
+\usepackage{pst-tree,array}  
+
+\makeatletter
+\newcommand{\sqbox}{%
+    \collectbox{%
+        \@tempdima=\dimexpr\width-\totalheight\relax
+        \ifdim\@tempdima<\z@
+            \fbox{\hbox{\hspace{-.5\@tempdima}\BOXCONTENT\hspace{-.5\@tempdima}}}%
+        \else
+            \ht\collectedbox=\dimexpr\ht\collectedbox+.5\@tempdima\relax
+            \dp\collectedbox=\dimexpr\dp\collectedbox+.5\@tempdima\relax
+            \fbox{\BOXCONTENT}%
+        \fi
+    }%
+}
+\makeatother
+
+\usepackage{makeidx}
+\makeindex
+
+\usepackage{graphicx}% just for the example text
+
+\usepackage{subfiles}
+%Otros paquetes:
+%\pagestyle{empty} %Eliminar numeraci�n p�gs
+%\parskip=Xmm %Espacio entre p�rrafos
+%\headheight %Altura cabecera
+\parindent=0mm %Eliminar sangr�a
+%\pagestyle{myheadings}: Coloca la numeraci�n de p�gina en la parte superior
+%\markright{�texto�}: Coloca �texto� en la parte superior de la p�gina. Se pueden
+%poner varios \markright en el texto (en cada secci�n, por ejemplo).
+%\newpage: Le indica a LATEX que siga imprimiendo en la p�gina siguiente
+\newtheorem{Teorema}{Teorema}
+\title{\textbf{Manual reference}}
+\author{Pablo L\'opez Negro}
+%=============================================================================
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%===========================Language===================================
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\renewcommand{\refname}{References}
+\renewcommand{\contentsname}{\Large\textbf{Table of contents}}
+\renewcommand{\listfigurename}{List of figures}
+\renewcommand{\listtablename}{List of tables}
+\renewcommand{\appendixname}{Appendix}
+\renewcommand{\appendixtocname}{Appendix}
+\renewcommand{\appendixpagename}{Appendix}
+
+%=============================================================================
+\newcommand{\ww}[1]
+{
+{\color{red}{\textbf {#1}}} \index{#1}
+} 
+\newcommand{\wk}[1]
+{
+{\textbf {#1}} \index{#1}
+} 
+\newcommand{\wb}[1]
+{
+{\color{blue}{\texttt {#1}}} \index{#1}
+} 
+%============================PORTADA===========================================
+
+
+\thispagestyle{empty}
+
+%\begin{multicols}{2}
+%{\includegraphics[scale=0.9]{../Figures/Portada/Logoupm}}
+
+%\vspace{2 cm}
+%\hfill {\includegraphics[scale=0.7]{../Figures/Portada/Logoetsiae}}
+
+%\end{multicols}
+
+\vspace{1 cm}
+
+{\fontfamily{ppl}\selectfont}
+\begin{center} 
+{{\Large UNIVERSIDAD POLIT\'ECNICA DE MADRID}\\[1 cm]
+{\Large Escuela T\'ecnica Superior de Ingenieria Aeron\'autica y del
+Espacio}}\\[3cm] 
+
+\LARGE{\textbf{Manual reference}}
+\rule {16cm}{1pt}
+
+\vspace{0.5cm}
+
+\LARGE{\Huge \textbf{High-order finite difference schemes}}\\[0.5cm] 
+\textbf{ \textbf{Application Programming Interface}}\\[0.5cm]
+
+\end{center} 
+
+
+%==============================================================================
+
+\newpage
+~\vfill
+\thispagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+Copyright \copyright\ \the\year\ Pablo L\'opez Negro
+
+\par {Published by \bf{DMAE}}
+
+\par {\url{http://www.website.com}}
+
+\par Licensed under {\textcolor{red}{[\ldots]}}, Version 1.0 (the ``License'');
+you may not use this file except in compliance with the License. You may obtain a copy
+of the License at \url{http://www.website.com}. 
+
+\par\textit{First printing, \today}
+
+%%====================================================================
+
+%============================ABSTRACT==========================================
+ \newpage
+
+%\includepdf[pages=1]{../Abstract/Abstract}
+
+%======================================================================
+%\newpage
+%~\vfill
+%\thispagestyle{empty}
+
+
+%This page is empty 
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\chapter*{Introduction}
+%\addcontentsline{toc}{chapter}{\protect\numberline{}Introduction}%
+
+This document has been conceived as a \textbf{user's guide} to the
+\ww{HOFD} software repository.\\
+
+The software repository is a collection of libraries which hold different
+modules and subroutines which are useful when dealing with mathematical
+problems.
+
+
+The name of the software repository is chosen after the numerical technique used
+for the spatial discretization. All the procedures described here have taken
+\wk{finite differences} as its basis. The technique is improved using
+\wk{high-order interpolation}. Then, the name comes straight: \ww{High-Order
+Finite-Differences, HOFD}. \\
+
+In order to use these tools, the most important thing is to know the \ww{API},
+which is what this manual is about. 
+
+An \ww{Application programming interface, API,} is a
+collection of rules and procedures which determines the inputs/outputs and internal
+operations of a software component. The API is used to define how different
+pieces of a program interact between each others, or, more generally speaking,
+how a library, module, routine etc. can be called from a different software
+component.\\
+
+With the aid of this manual one should be able to understand and use these
+routines. \\
+
+
+
+\section*{Context of this document}
+\addcontentsline{toc}{section}{\protect\numberline{}Context of this document}%
+
+\ldots\ldots\ldots
+
+
+\section*{Goals}
+\addcontentsline{toc}{section}{\protect\numberline{}Goals}
+
+This document is thought to fulfill the following objectives: 
+
+\begin{itemize}
+  \item{ Help understanding the software. }
+  \item{ Help using the internal procedures of the libraries. }
+  \item{ Help preserving and improving the codes. }
+\end{itemize}
+
+\ldots
+
+\vfill
+
+\section*{Disclaimer}
+
+The software and this manual are the result of a huge work done by several
+people over a few years. All this work and this publication are made with the
+best purposes and the functionality of the software has been tested and is
+presumed to be correct. However, not the writer of this manual, nor the institution
+DMAE, takes any responsibility for any unexpected mistake in the software
+libraries or in this manual. \\
+
+Any suggestion,
+question or feedback will be helpful in order to improve this library.
+Please write an email to \underline{lopeznegro.pablo@gmail.com} in case you
+have any problem or remark.
+
+
+\newpage
+\chapter{Finite Differences}
+\input{1-HOFD_API.tex}
+
+\newpage
+\chapter{Cauchy Problem}
+\input{2-Cauchy_problem.tex}
+
+\newpage
+\chapter{Boundary Value Problem}
+\input{3-BVP_API.tex}
+
+\newpage
+\chapter{Initial Value Boundary Problem}
+\input{4-IVBP_API.tex}
+
+
+\newpage
+\chapter*{Conclusion and perspectives}
+\addcontentsline{toc}{chapter}{\protect\numberline{}Conclusion and perspectives}
+
+
+
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{List of figures}
+
+\newpage
+\printindex
+\addcontentsline{toc}{chapter}{Index}
+
+
+
+
+
+
+
+
+
+\end{document}

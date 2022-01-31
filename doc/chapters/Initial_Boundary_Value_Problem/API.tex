@@ -1,0 +1,197 @@
+\chapter{Initial Value Boundary Problem}
+\vspace{-0.5cm}
+\section{Overview}
+
+
+
+
+This library is intended  to solve an initial value boundary problem. 
+This problem is governed by a set time evolving partial differential equations together with boundary conditions and an initial condition. 
+
+\vspace{0.1cm}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Initial_Boundary_Value_Problem}
+  \listings{\home/sources/Initial_Boundary_Value_Problems.f90}
+       {module Initial_Boundary_Value_Problems}
+       {end interface}{Initial_Boundary_Value_Problems.f90}
+\vspace{-0.1cm}       
+Since the space domain $ \Omega \subset \R{k} $ with $ k=1,2,3$, initial value boundary problems are stated in 1D, 2D and 3D grids. 
+To have the same name interface when dealing with different space dimensions,  the subroutine 
+\verb|Initial_Value_Boundary_Problem| has been overloaded. 
+
+
+
+
+\newpage
+\section{Initial Value Boundary Problem  module}
+
+\subsection*{1D Initial Value Boundary Problem}
+
+\begin{lstlisting}[frame=trBL]
+call Initial_Boundary_Value_Problem(Time_Domain, x_nodes,                & 
+                                    Differential_operator,               & 
+                                    Boundary_conditions, Solution, Scheme)  
+\end{lstlisting}   
+This subroutine calculates the solution to a boundary initial value problem in a  domain $x$ $\in [a,b]$ such as:
+
+\begin{equation*}
+\frac{\partial u}{\partial t} = \mathcal{L}\left(x,\ t,\ u, \ \frac{\partial u}{\partial x}, \ \frac{\partial^2 u}{\partial x^2} \right) 
+\end{equation*}
+
+Besides, an initial condition must be established: $u(x,t = t_0) = u_0 (x)$.
+
+
+%\vspace{-1cm}
+
+\btable		
+				Time\_Domain & vector of reals & in &  Time domain where the solution is calculated.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
+				
+				
+				Differential\_operator & \raggedright real function: $\mathcal{L}\left(x, t, u,  u_x,  u_{xx} \right)$ & in  & Differential operator.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $h\left(x, t, u,  u_x \right)$  & in &   The user must include a conditional sentenceto impose boundary conditions.  \\ \hline
+				
+			
+				
+				Solution & two-dimensional array of reals  & out &  Solution $u = u(x,t)$. \\ \hline
+				
+		    	Scheme & temporal scheme  & optional in & Numerical scheme to integrate in time. If it is not specified, it uses a Runge-Kutta of four stages.    \\ \hline
+				
+				
+				
+\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS} arguments for 1D problems}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection*{1D Initial Value Boundary Problem for systems of equations}
+
+\begin{lstlisting}[frame=trBL]
+call Initial_Boundary_Value_Problem(Time_Domain, x_nodes,                & 
+                                    Differential_operator,               & 
+                                    Boundary_conditions, Solution, Scheme)    
+\end{lstlisting} 
+The subroutine \verb|Initial_Value_Boundary_Problem| calculates the solution to a boudary initial value problem in a rectangular domain $x$ $\in [a,b]$ such as:
+
+\begin{equation*}
+\frac{\partial \vect{u}}{\partial t} = \vect{\mathcal{L}}\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial^2 \vect{u}}{\partial x^2} \right)
+\end{equation*}
+%With proper boundary conditions:
+%\begin{align*}
+%& \vect{f}_a\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}\right)=0, & x=a, \\
+%& \vect{f}_b\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}\right)=0 & x=b.
+%\end{align*}
+Besides, an initial condition must be established: $\vect{u}(x,t = t_0) = \vect{u}_0 (x)$.
+The arguments of the subroutine are described in the following table.
+
+\btable	
+				Time\_Domain & vector of reals & in &  Time domain where the solution wants to be calculated.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
+				
+				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
+				
+				Differential\_operator & \raggedright function: $\vect{\mathcal{L}}\left(x, t, \vect{u}, \frac{\partial \vect{u}}{\partial x}, \frac{\partial^2 \vect{u}}{\partial x^2} \right) $ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright function: $\vect{h}\left(x, t, \vect{u}, \vect{u}_x \right)$  & in &  Boundary conditions.
+				% The user must include a conditional sentence which sets $\vect{f}\left(a,\ t,\ \vect{u}, \ %\vect{u}_x \right) = \vect{f}_a$ and $\vect{f}\left(b,\ t, \ \vect{u}, \ \vect{u}_x \right) = %\vect{f}_b$.  
+				\\ \hline
+				
+				
+				Solution & three-dimensional array of reals  & out &  Solution $\vect{u} = \vect{u}(x,t)$. \\ \hline
+				
+		    	Scheme & temporal scheme  & optional in & Optional temporal scheme. Default: Runge Kutta of four stages.    \\ \hline
+				
+				
+\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS\_System} arguments for 1D problems}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\subsection*{2D Initial Value Boundary Problems}
+
+\begin{lstlisting}[frame=trBL]
+call Initial_Boundary_Value_Problem(Time_Domain, x_nodes, y_nodes,       & 
+                                    Differential_operator,               & 
+                                    Boundary_conditions, Solution, Scheme)  
+\end{lstlisting} 
+This subroutine calculates the solution to a scalar initial value boundary problem in a rectangular domain $(x,y)\in[x_0,x_f] \times [y_0,y_f]$:
+
+\begin{align*}
+\frac{\partial {u}}{\partial t} = {\mathcal{L}}(x,y,t, {u}, {u}_x, {u}_y, {u}_{xx}, {u}_{yy}, {u}_{xy}), \qquad \eval{{h} ( x,y,t,{u}, {u}_x, {u}_y)}_{\partial \Omega} = 0.
+\end{align*}
+Besides, an initial condition must be established: $u(x, y ,t_0) = u_0 (x,y)$.
+The arguments of the subroutine are described in the following table.
+
+\btable	
+				Time\_Domain & vector of reals & in &  Time domain.  \\ \hline
+				
+				x\_nodes & vector of reals & inout & Mesh nodes along $OX$.  \\ \hline
+				
+				y\_nodes & vector of reals & inout & Mesh nodes along $OY$.  \\ \hline
+				
+				Order &  integer  & in & Finite differences order.  \\ \hline
+				
+				Differential\_operator & \raggedright real function: 
+				$ \mathcal{L} $ & in  & Differential operator of the problem.   \\ \hline
+				
+				Boundary\_conditions & \raggedright real function: $h$  & in &  Boundary conditions for $u$.  \\ \hline
+				
+			
+				
+				Solution & three-dimensional array of reals  & out & Solution of the problem $u$. \\ \hline
+				
+					Scheme & temporal scheme  & optional in & Scheme used to solve the problem. If not given a Runge Kutta of four stages is used.    \\ \hline
+				
+				
+\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS} arguments for 2D problems}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection*{Initial Value Boundary Problem System for 2D problems}
+
+\begin{lstlisting}[frame=trBL]
+call Initial_Boundary_Value_Problem(                                &
+             Time_Domain, x_nodes, y_nodes,  Differential_operator, & 
+             Boundary_conditions,  Solution, Scheme                 )  
+\end{lstlisting}   
+The subroutine \verb|Initial_Value_Boundary_ProblemS| calculates the solution to a boundary initial value problem in a rectangular domain $(x,y)\in[x_0,x_f] \times [y_0,y_f]$:
+
+
+\begin{align*}
+\frac{\partial \vect{u}}{\partial t} = \vect{\mathcal{L}}(x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}), \qquad \eval{\vect{h} ( x,y,t,\vect{u}, \vect{u}_x, \vect{u}_y)}_{\partial \Omega} = 0.
+\end{align*}
+Besides, an initial condition must be established: $\vect{u}(x, y ,t = t_0) = \vect{u}_0 (x,y)$.
+The arguments of the subroutine are described in the following table.
+
+\btable			
+				Time\_Domain & vector of reals & in &  Time domain.  \\ \hline
+				
+				x\_nodes & vector of reals & inout &  Mesh nodes along $OX$.  \\ \hline
+				
+				y\_nodes & vector of reals & inout &  Mesh nodes along $OY$.  \\ \hline
+				
+				
+				Differential\_operator & \raggedright function: $     	\vect{\mathcal{L}}$   & in  & Differential operator.   \\ \hline
+				
+				Boundary\_conditions & \raggedright function: $     	\vect{h}$  & in &  Boundary conditions.  \\ \hline
+				
+			
+				Solution & four-dimensional array of reals  & out &  Solution of the problem $\vect{u} $.\\ \hline
+				
+					Scheme & temporal scheme  & optional in & Scheme used to solve the problem. If not given, a Runge Kutta of four stages is used.    \\ \hline
+								
+				
+				
+\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS\_System} arguments for 2D problems}
+
+
+
+

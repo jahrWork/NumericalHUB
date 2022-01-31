@@ -1,0 +1,304 @@
+\chapter{Cauchy Problem}
+
+\vspace{-0.9cm}
+\section{Overview}
+
+The module \verb|Cauchy_Problem| is designed to solve the following problem:
+\begin{equation*}
+\frac{\text{d}\vect{U}}{\text{d}t}=\vect{F}\ (\vect{U},\ t), \quad  \vect{U}(0) 
+=\vect{U}^0,  \ 
+\quad \vect{F}:\mathbb{R}^{Nv} \times\mathbb{R} \rightarrow \mathbb{R}^{Nv}
+\end{equation*}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+  \listings{\home/sources/Cauchy_Problem.f90}
+       {module Cauchy_Problem}
+       {contains}{Cauchy_Problem.f90}
+\vspace{-0.3cm}       
+The subroutine \verb|Cauchy_ProblemS| is called to calculate the solution $ \vect{U}(t) $. If no numerical method is defined, the system is integrated by means of a fourth order Runge Kutta method. To define the error tolerance, the subroutine \verb|set_tolerance| is used. To specify the discrete temporal method,  the subroutine \verb|set_solver| is called.  
+
+
+%__________________________________________________
+\section{Cauchy problem module}
+%__________________________________________________
+
+\subsection*{Cauchy ProblemS}
+\begin{lstlisting}[frame=trBL]
+call Cauchy_ProblemS(Time_Domain, Differential_operator, Solution, Scheme) 
+\end{lstlisting}   
+
+The subroutine \verb|Cauchy_ProblemS| calculates the solution to a Cauchy problem. Previously to using it, the initial conditions must be imposed. The arguments of the subroutine are described in the following table.
+
+\btable         
+                Time\_Domain(0:N) & vector of reals & in &  Time domain partition where the solution is calculated.  \\ \hline
+                
+                Differential\_operator &  vector function: $\vect{F}: 
+                \mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}$  & 
+                in & It is the function $\vect{F}\ (\vect{U},\ t) $ described 
+                in the overview.  \\ \hline
+                
+                Solution(0:N, 1:Nv) & matrix of reals.    & out &  
+                                The first index represents the time and the second index contains the components of the solution.  \\ \hline
+                                
+                Scheme & temporal scheme  &  optional in& Defines the scheme used to solve the problem. 
+                If it is not present, the subroutine \verb|set_solver| allows to define the family and the member of the family. If the family is not defined,  
+                it uses a Runge Kutta of four stages.    \\ \hline
+                
+\etable{Description of \texttt{Cauchy\_ProblemS} arguments}
+
+
+
+\newpage
+\subsection*{Set solver}
+\begin{lstlisting}[frame=trBL]
+call set_solver( family_name, scheme_name) 
+\end{lstlisting}   
+
+The subroutine \verb|set_solver| allows to select the family of the numerical method and some specific member of the family to integrate the Cauchy problem. 
+\btable  
+                familiy\_name & character array  & in & family name of the numerical scheme to integrate the evolution problem. \\ \hline
+                scheme\_name & character array & in &  name of a specific member of the family.   \\ \hline
+\etable{Description of \texttt{set\_tolerance} arguments}
+
+%\newpage
+The following list describes new software implementations of the different families and members:  
+ \begin{enumerate} 
+    \item   Embbeded Runge Kutta familty (\verb|"eRK"|). Specific scheme names:  
+         \begin{enumerate} 
+         \setlength\itemsep{0cm}
+          \item \verb| "HeunEuler21".  |
+          \item \verb| "RK21".  |
+          \item \verb| "BogackiShampine".  |
+          \item \verb| "DOPRI54".      |
+          \item \verb|  "Fehlberg54".  |
+          \item \verb|  "Cash\_Karp".   |
+          \item \verb|  "Fehlberg87".  |
+          \item \verb|  "Verner65".    |
+          \item \verb|  "RK65".        |
+          \item \verb|  "RK87".        |
+        \end{enumerate}  
+    \item  Gragg,  Burlish and Stoer method (\verb|"GBS"|). Specific scheme names: 
+               \begin{enumerate} 
+                  \item  \verb|  "GBS". |  
+               \end{enumerate}     
+    \item  Adams, Bashforth, Moulton methods (\verb|"ABM"|) implemented as multivalue methods. Specific scheme names: 
+                \begin{enumerate} 
+                   \item  \verb|  "PC_ABM". |
+                 \end{enumerate} 
+  \end{enumerate} 
+
+
+\newpage
+The following list describes wrappers for classical codes for the different families:  
+ \begin{enumerate} 
+     \setlength\itemsep{0cm}
+    \item  Wrappers of classical embbeded Runge Kutta (\verb|"weRK"|). Specific scheme names:  
+          \begin{enumerate} 
+              \item  \verb|  "WDOP853".| 
+              \item  \verb|  "WDOPRI5".|
+            \end{enumerate}  
+    \item  Wrappers of classical Gragg Burlish and (\verb|"wGBS"|). Specific scheme names: 
+               \begin{enumerate} 
+                  \item  \verb|  "WODEX". |   
+               \end{enumerate}        
+    \item  Wrappers of classical Adams, Bashforth Methods (\verb|"wABM"|). Specific scheme names: 
+           \begin{enumerate} 
+              \item  \verb|  "WODE113". |
+            \end{enumerate}  
+  \end{enumerate} 
+
+\subsection*{Set tolerance}
+\begin{lstlisting}[frame=trBL]
+call set_tolerance(Tolerance) 
+\end{lstlisting}   
+
+The subroutine \verb|set_tolerance| allows to fix the relative and absolute error tolerance of the solution. Embedded Runge-Kutta methods, Adams Bashforth or GBS methods are able to modify locally their time step to attain the required error tolerance.  
+
+%\btable      
+%                tolerance & real & in &  Relative or absolute error tolerance of the solution.  \\ \hline
+%\etable{Description of \texttt{set\_tolerance} arguments \vspace{-0.5cm} }
+
+
+\subsection*{Set levels of the GBS scheme}
+\begin{lstlisting}[frame=trBL]
+call set_GBS_levels(NL) 
+\end{lstlisting}   
+
+The subroutine \verb|set_GBS_levels| allows to fix the number \verb|NL| of refinement 
+levels of the GBS methods. If this number of levels is not fixed, the GBS 
+determines automatically the number of levels required to achieve a specified 
+error tolerance. 
+
+%\btable      
+%                NL & integer & in &  Number of levels of the GBS method.  \\ 
+%                \hline
+%\etable{Description of \texttt{set\_GBS\_levels} \vspace{-0.5cm} }
+
+
+
+\subsection*{Get effort}
+\begin{lstlisting}[frame=trBL]
+ get_effort() 
+\end{lstlisting}   
+
+The function \verb|get_effort| determines the number of evaluations of the vector function associated to the Cauchy problem that are done by 
+the numerical scheme to accomplish the required tolerance. 
+
+\newpage
+%_______________________________________
+\section{Temporal schemes}
+%_______________________________________
+
+
+The module \verb|Temporal_schemes| comprises easy examples of temporal schemes and allows checking new methods developed by the user.  
+ \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+  \listings{\home/sources/Temporal_schemes.f90}
+       {module Temporal_Schemes}
+       {Predictor_Corrector1}{Temporal_schemes.f90}
+
+The \verb|Cauchy_problem| module uses schemes with the following interface: 
+ \listings{\home/sources/Temporal_scheme_interface.f90}
+       {module Temporal_scheme_interface}
+       {end module}{Temporal_scheme_interface.f90}
+
+
+%______________________________________________
+\section{Stability}
+%______________________________________________
+The module \verb|Stability_regions| allows to calculate the region of absolute stability of any numerical method. This region is defined by the following expression: 
+\begin{equation*}
+{\cal R } = \{ z \in\mathbb{C}, \pi(\rho, \omega) =0, |\rho | < 1  \}
+\end{equation*}
+ \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+  \listings{\home/sources/tools/Stability_regions.f90}
+       {module Stability_regions}
+       {contains}{Stability_regions.f90}
+
+%\subsection*{Absolute Stability Region}
+
+\begin{lstlisting}[frame=trBL]
+call Absolute_Stability_Region(Scheme, x, y, Region)
+\end{lstlisting}
+
+
+\btable     
+                Scheme & temporal scheme  & in  & Selects the scheme whose stability region is computed.    \\ \hline
+                
+                x & vector of reals & in &  Real domain $\Re z$ of the complex plane.  \\ \hline
+                
+                y & vector of reals & in &  Imaginary domain $\Im z$ of the complex plane.  \\ \hline
+                
+                Region & matrix of reals & in &  Maximum value of the roots of the characteristic polynomial for each point of the complex domain.  \\ \hline
+\etable{Description of \texttt{Cauchy\_ProblemS} arguments}
+
+
+
+\newpage
+%______________________________________________
+\section{Temporal error}
+%______________________________________________
+
+
+The module \verb|Temporal_error| allows to determine, based on Richardson extrapolation, the error of a numerical solution.   
+ \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+  \listings{\home/sources/tools/Temporal_error.f90}
+       {module Temporal_error}
+       {contains}{Temporal_error.f90}
+
+The module uses the  \verb|Cauchy_Problem| module and comprises three subroutines to analyze the error of the temporal schemes.
+It is an application layer based on the \verb|Cauchy_Problem| layer. The error is calculated by integrating the same solution in successive time grids. By using the Richardson extrapolation method, the error is determined. 
+\newpage 
+
+
+
+\subsection*{Error of the solution}
+\begin{lstlisting}[frame=trBL]
+call Error_Cauchy_Problem( Time_Domain, Differential_operator, Scheme, & 
+                           order, Solution, Error ) 
+\end{lstlisting}
+
+
+\btable 
+                Time\_Domain(0:N) & vector of reals & in &  Time domain partition where the solution is calculated.  \\ \hline
+                                
+                Differential\_operator &  vector function  $ \ \vect{F}: 
+                \mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}$  & 
+                in & It is the function $\vect{F}\ (\vect{U},\ t) $ described 
+                in the overview.  \\ \hline
+                                
+                Scheme & temporal scheme  & optional in & Defines the scheme used to solve the problem.   \\ \hline
+                
+                order & integer & in & order of the numerical scheme. \\ \hline  
+                                
+                 Solution(0:N, 1:Nv) & matrix of reals.    & out &  
+                 The first index represents the time and the second index contains the components of the solution.  \\ \hline
+                 
+                 Error(0:N, 1:Nv) & matrix of reals.    & out &  
+                 The first index represents the time and the second index contains the components of the solution.  \\ \hline
+\etable{Description of \texttt{Error\_Cauchy\_Problem} arguments}
+
+\newpage 
+\subsection*{Convergence rate with time steps}
+\begin{lstlisting}[frame=trBL]
+call Temporal_convergence_rate( Time_Domain, Differential_operator,   & 
+                                U0, Scheme, order, log_E, log_N) 
+\end{lstlisting}
+
+
+\btable      
+                Time\_Domain(0:N) & vector of reals & in &  Time domain partition where the solution is calculated.  \\ \hline
+                                
+                Differential\_operator &  vector function $ \ \vect{F} : 
+                \mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}$  & 
+                in & 
+                It is the function $\vect{F}\ (\vect{U},\ t) $ described in the 
+                overview.  \\ \hline
+                
+                U0      & vector of reals    & in &   Components of the initial conditions.  \\ \hline     
+                
+                          
+                Scheme & temporal scheme   & in (optional) & Defines the scheme used to solve the problem.   \\ \hline
+                
+                order  & integer           & in            & order of the numerical scheme. \\ \hline    
+                              
+                log\_E & vector of reals   & out           &  
+                Log of the norm2 of the error solution. Each component represents a different time grid.  \\ \hline
+                
+                log\_N & vector of reals   & out           &  
+                Log of number of time steps to integrate the solution. Sequence of time grids N, 2N, 4N...  
+                Each component represents a different time grid.  \\ \hline
+\etable{Description of \texttt{Temporal\_convergence\_rate} } 
+
+
+\newpage 
+\subsection*{Error behavior with tolerance}
+\begin{lstlisting}[frame=trBL]
+call Temporal_steps_with_tolerance(Time_Domain, Differential_operator, & 
+                                   U0, log_mu, log_steps)
+\end{lstlisting}
+
+
+\btable      
+                Time\_Domain(0:N) & vector of reals & in &  Time domain partition where the solution is calculated.  \\ \hline
+                                
+                Differential\_operator &  vector function $\ \vect{F} : 
+                \mathbb{R}^{N} \times\mathbb{R} \rightarrow \mathbb{R}^{N}$  & 
+                in & 
+                It is the function $\vect{F}\ (\vect{U},\ t) $ described in the 
+                overview.  \\ \hline
+                                    
+                U0      & vector of reals    & in &   Initial conditions.  \\ \hline 
+                    
+                log\_mu & vector of reals   & in           &  
+                                Log of the 1/tolerances. This vector is given and it allows to integrate internally different simulations with different error tolerances.    \\ \hline           
+                                               
+                log\_steps & vector of reals   & out           &  
+                Log of the number of time steps to accomplish a simulation with a given error tolerance. 
+                The numerical scheme has to be selected previously with \verb|set_solver|. \\ \hline
+\etable{Description of \texttt{Temporal\_error\_with\_tolerance} } 
+
+
+
+
+
+
+

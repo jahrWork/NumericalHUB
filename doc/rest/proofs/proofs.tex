@@ -1,0 +1,119 @@
+
+
+%******************************************    
+     \section{Condition number} 
+ %******************************************    
+     Let's consider a system of linear equations: 
+      \begin{equation}
+               A  \ \vect{x} = \vect{b},
+               \label{LSE}
+          \end{equation} 
+     where $ A $ is a square system matrix,  $ \vect{b} $ is the independent 
+     term and $ \vect{x}  $ the exact solution.  
+     When solving this linear system of equations by iterative of direct 
+     methods, the approximate solution denoted by  $  \vect{\bar x} $ does not 
+     verify exactly the system of linear equations. 
+     The residual $\vect{r} $  that this solution  leaves in the linear system 
+     is defined by: 
+       \begin{equation}
+                   \vect{r} = \vect{b} - A \ \vect{ \bar x}
+                   \label{residual}
+          \end{equation} 
+     allows to determine the error of the solution by means of the condition 
+     number $\kappa(A)$ of the matrix $A$,  
+      \begin{equation}
+          \frac{\norm{ \vect{x} - \vect{\bar x}  }}{\norm{ \vect{x}}} \ \leq \
+               \kappa(A) \
+               \frac{\norm{ \vect{r}}}{\norm{\vect{b}}}.
+               \label{error}
+     \end{equation}
+     
+     To demonstrate this result, 
+     let subtract equation (\ref{LSE}) and equation (\ref{residual}), 
+       \begin{equation}
+                A  \ ( \vect{x} - \vect{\bar x} )  = \vect{r},
+                \label{residual2}
+         \end{equation} 
+    Let's define the norm of a matrix induced by the norm $ \norm{\cdot} $ of a 
+    vector space $ V $ by: 
+      \begin{equation}
+           \norm{A} =  \sup \frac{ \norm{ A \vect{x} } }{\norm{\vect{x}}},  
+        \end{equation} 
+     for all $ \vect{x}  \in V $. 
+     By multipliying equation (\ref{residual2}) by the inverse of $ A $ and 
+     taking norms,   
+     \begin{equation}
+      \norm{ \vect{x} - \vect{\bar x}  } \le \norm*{ A^{-1} } \ \norm{\vect{r}}.
+      \label{global_error}
+     \end{equation} 
+     Dividing this equation by $ \norm{ \vect{x} } $
+     \begin{equation}
+           \frac{ \norm{ \vect{x} - \vect{\bar x}  } }
+                {    \norm{\vect{x}}    }
+           \le \norm{ A^{-1} } \ 
+           \frac{ \norm{\vect{r}} }{ \norm{ \vect{x} } }.
+           \label{relative_error}
+     \end{equation}
+     Finally, taking norms in equation (\ref{LSE}) gives 
+     \begin{equation}
+           \norm{ \vect{x}  } \ge \frac{ \norm{ \vect{b} } }{ \norm{ A } },
+           \label{SUB}
+      \end{equation}
+     and substituting this result in equation (\ref{relative_error})  yields 
+     the expected result: 
+     \begin{equation}
+               \frac{\norm{ \vect{x} - \vect{\bar x}  }}{\norm{ \vect{x}}} \ 
+               \leq \
+                    \norm{ A } \ \norm*{ A^{-1} } \
+                    \frac{\norm{ \vect{r}}}{\norm{\vect{b}}}, 
+                    \label{error}
+          \end{equation}
+ where  $   \norm{ A } \ \norm*{ A^{-1} }  $ is defined as the condition number 
+ $ 
+ \kappa(A)$ of the matrix $ A$. 
+     
+    
+     
+When  the quadratic norm $\norm{\cdot}_2$ i considered, it will 
+be shown in the following section that the norm of a matrix can be obtained by 
+the square root of maximum eigenvalue of the matrix $ A^T A $ which coincides 
+with the maximum singular value of the matrix $ A $. Hence, the condition 
+number is expressed as:  
+
+
+     \begin{equation*}
+     \kappa(A)= \frac{\sigma_{\mbox{\tiny max}}}{\sigma_{\mbox{\tiny min}}},
+     \end{equation*}
+where the norm of $ A $ is $\sigma_{\mbox{\tiny max}}$, the norm of 
+$A^{-1}$ is $ 1/\sigma_{\mbox{\tiny min}} $  and $\sigma_{\mbox{\tiny 
+max}}$  and $  \sigma_{\mbox{\tiny min}} $ represent the maximum and minimum  
+singular values of the matrix $A$ respectively. 
+To implement the condition number computation for a matrix we follow three 
+steps.
+     \begin{enumerate}
+     	\item \textbf{Maximum singular value of $A^TA$:} This is done calling 
+     	\verb|Power_method| using as input a matrix \texttt{B} that stores 
+     	$A^TA$ and computing the square root of the resulting eigenvalue 
+     	storing it in \verb|sigma_max|
+     \end{enumerate}
+ 
+     \begin{enumerate}[resume]
+     	\item \textbf{Minimum eigenvalue of $A^TA$:} This is done calling 
+     	\verb|Power_method| using as input \texttt{B} and computing the square 
+     	root of the resulting eigenvalue storing it in \verb|sigma_min|
+     \end{enumerate}
+      
+     
+     \begin{enumerate}[resume]
+     	\item \textbf{Condition number of $A$:} The condition number is 
+     	calculated for the output of the function \verb|Condition_number| doing 
+     	the ratio \verb|sigma_max/sigma_min| 
+     \end{enumerate}
+     
+     \vspace{0.5cm} 
+     \listings{\home/sources/Linear_systems.f90}
+     {function Condition_number}
+     {end function}{Linear_systems.f90}
+     
+ 
+

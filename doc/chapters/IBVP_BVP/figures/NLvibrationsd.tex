@@ -1,0 +1,14 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ height = \textwidth, width = \textwidth,
+        title style={at={(0.5,-0.4)}, yshift=-0.05}, title={(d)},
+        xlabel={ $x$ },    xmin=   -1.00, xmax =    1.00,
+        xlabel={ $y$ },    ymin=   -1.00, ymax =    1.00,
+         view={0}{90}, colormap/blackwhite ]
+  \addplot3[contour/labels=false, contour gnuplot = { levels={   -0.40,  -0.38,  -0.36,  -0.33,  -0.31,  -0.29,  -0.26,  -0.24,  -0.22,  -0.20,  -0.17,  -0.15,  -0.13,  -0.10,  -0.08,  -0.06,  -0.03,  -0.01,   0.01,   0.03 }},
+            mesh/ordering = y varies,
+            mesh/rows =   11,
+            mesh/cols =   11
+           ]
+           table [skip first n=2] {./doc/chapters/IBVP_BVP/figures/NLvibrationsd.plt};
+     \end{axis}
+ \end{tikzpicture}

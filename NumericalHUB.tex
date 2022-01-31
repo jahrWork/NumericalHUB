@@ -1,0 +1,266 @@
+% !TeX program = lualatex
+\documentclass[twoside,english]{book}
+
+\maxdeadcycles=200
+
+
+%\usepackage[
+%paperwidth=16.99cm,
+%paperheight=24.41cm,
+%left=2.4cm,
+%right=2cm,
+%top=2.95cm,
+%bottom=2.2cm,
+%twoside
+%]{geometry}
+
+%\usepackage[width=16.99truecm,height=24.41truecm,center]{crop}
+
+\usepackage[
+paperwidth=6.69in,
+paperheight=9.61in,
+left=0.944in,
+right=0.787in,
+top=1.161in,
+bottom=0.866in,
+twoside
+]{geometry}
+
+\usepackage[width=6.69in,height=9.61in,center]{crop}
+
+
+%\include{./format/sizes}
+\include{./doc/format/packages}
+\include{./doc/format/listings}
+
+\usepackage{epic}
+
+\include{./doc/format/graphs}
+\include{./doc/format/luamacros}
+
+\include{./doc/mathcommands}
+
+%\setlength\parindent{18pt}
+%\setlength{\parskip}{\baselineskip}
+
+
+ 
+%_______________________________________________________________________________
+\pretitle{\vspace{-150pt} \begin{flushleft} \HorRule \fontsize{45}{45}
+          \usefont{OT1}{phv}{b}{n} \color{DarkRed} \selectfont}
+
+    \title{How to learn Applied Mathematics through modern FORTRAN} 
+    
+
+    \posttitle{\par\end{flushleft}\vskip 0.5em} 
+
+
+\preauthor{\begin{flushleft}\large \lineskip 0.5em \usefont{OT1}{phv}{b}{sl} \color{DarkRed}} 
+    
+    \author{Juan A. Hern\'andez Ramos \\
+            Javier Escoto L\'opez \\ \vspace{7cm} } 
+    
+    
+    \postauthor{\footnotesize \usefont{OT1}{phv}{m}{sl} \color{Black}
+        Department of Applied Mathematics \\
+        School of Aeronautical and Space Engineering \\
+        Technical University of Madrid (UPM)
+        
+        \par\end{flushleft}\HorRule}
+
+\date{ } 
+%________________________________________________________________________
+
+\begin{document}
+    
+    \maketitle
+    \thispagestyle{empty}
+    \clearpage
+    
+
+    
+    \noindent Portrait:
+    
+    \noindent Find your inspiration.
+    
+    \noindent  ``Under the stars on a summer night" (August 2017). 
+    
+    \noindent  Photography by Juan Ignacio Ruíz--Gopegui. 
+    
+    \noindent  Cover design by Belén Moreno Santamaría.
+    
+       
+    
+    \vfill  
+    
+    \noindent
+    All rights are reserved. No part of this publication may be reproduced, stored or transmitted without the permission of authors. 
+    \vspace{2\baselineskip}
+    
+    
+    \noindent  2019 First edition \newline
+    \noindent  2021 Second edition. Revision and complements \newline    
+    \noindent  2022 Third edition. Revision and complements \newline
+    
+    
+    \noindent \copyright   \ \  Juan A. Hernández Ramos, Javier Escoto López. \\
+    
+    
+    \noindent ISBN 979-8604287071 \\
+     \clearpage
+     
+  
+    \frontmatter
+    \tableofcontents
+    
+    \input{./doc/preface.tex} 
+    \newpage
+    ~\clearpage
+    \pagenumbering{arabic}
+    
+  
+    \input{./doc/introduction.tex} 
+    \newpage
+    \clearpage
+    \pagenumbering{arabic}
+    
+  
+    \mainmatter
+    \parskip = \baselineskip
+    \newcommand{\home}{./}
+    
+   
+    
+
+   
+%______________________________________________________________________________________________
+% Figures of every chapter 
+%______________________________________________________________________________________________
+%   
+%      \renewcommand{\home}{../libraries/Numerical_Methods/System_of_Equations}
+%      \input{./doc/rest/proofs/proofs.tex}
+     
+   
+       \input{./doc/chapters/System_of_Equations/figures.tex}
+       \input{./doc/chapters/Interpolation/figures.tex}
+       \input{./doc/chapters/Finite_Differences/figures.tex}
+       \input{./doc/chapters/Cauchy_problem/figures.tex}
+       \input{./doc/chapters/Boundary_Value_Problem/figures.tex}
+       \input{./doc/chapters/Initial_Boundary_Value_Problem/figures.tex}
+       \input{./doc/chapters/IBVP_BVP/figures.tex}
+       
+  %*******************************************   
+   
+    
+          
+%\end{document}
+  
+  %********************************************   
+      
+    
+%______________________________________________________________________________________________    
+\part{User Manual}\label{PartI}
+%______________________________________________________________________________________________
+      
+     \renewcommand{\home}{./sources/Numerical_Methods/System_of_Equations}
+     \input{./doc/chapters/System_of_Equations/User.tex}
+        
+ 
+     \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+     \input{./doc/chapters/Interpolation/User.tex} 
+   
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Finite_Differences}
+     \input{./doc/chapters/Finite_Differences/User.tex}
+
+
+     \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
+     \input{./doc/chapters/Cauchy_problem/User.tex} 
+     
+    
+     \renewcommand{\home}{./sources/Numerical_Methods/Boundary_Value_Problem}
+     \input{./doc/chapters/Boundary_Value_Problem/User.tex}  
+    
+              
+     \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+     \input{./doc/chapters/Initial_Boundary_Value_Problem/User.tex}   
+            
+    
+     \renewcommand{\home}{./sources/Numerical_Methods/IBVP_BVP}
+     \input{./doc/chapters/IBVP_BVP/User.tex} 
+     
+    
+  
+%_________________________________________________________________________________________  
+\part{Developer guidelines}\label{PartII}
+%_________________________________________________________________________________________  
+  
+
+  
+    
+    \renewcommand{\home}{./sources/Numerical_Methods/System_of_Equations}
+    \input{./doc/chapters/System_of_Equations/Developer.tex}
+   
+    \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+    \input{./doc/chapters/Interpolation/Developer.tex}
+  
+   
+    \renewcommand{\home}{./sources/Numerical_Methods/Finite_Differences}   
+    \input{./doc/chapters/Finite_Differences/Developer.tex}
+   
+    
+    \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
+    \input{./doc/chapters/Cauchy_Problem/Developer.tex}  
+
+
+    \renewcommand{\home}{./sources/Numerical_Methods/Boundary_Value_Problem}
+    \input{./doc/chapters/Boundary_Value_Problem/Developer.tex}      
+   
+
+    \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+    \input{./doc/chapters/Initial_Boundary_Value_Problem/Developer.tex}  
+
+    \renewcommand{\home}{./sources/Numerical_Methods/IBVP_BVP}
+    \input{./doc/chapters/IBVP_BVP/Developer.tex}
+   
+ %  \end{document}
+        
+    \include{./doc/nomenclature}
+    
+ %________________________________________________________________________________________     
+\part{Application Program Interface} \label{PartIII}
+%_________________________________________________________________________________________      
+
+  
+     \renewcommand{\home}{./sources/Numerical_Methods/System_of_Equations}
+     \input{./doc/chapters/System_of_Equations/API.tex}
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+     \input{./doc/chapters/Interpolation/API.tex}
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Finite_Differences}
+     \input{./doc/chapters/Finite_Differences/API.tex}
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
+     \input{./doc/chapters/Cauchy_Problem/API.tex} 
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Boundary_Value_Problem}     
+     \input{./doc/chapters/Boundary_Value_Problem/API.tex}
+             
+     
+     \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+     \input{./doc/chapters/Initial_Boundary_Value_Problem/API.tex}    
+
+     \renewcommand{\home}{./sources/Numerical_Methods/IBVP_BVP}
+     \input{./doc/chapters/IBVP_BVP/API.tex}    
+     
+     \renewcommand{\home}{../NumericalHUB}
+     \input{./doc/chapters/graphs/API.tex}  
+     
+    
+      \input{./doc/bibliography.tex}
+      
+      
+\end{document}
+
+

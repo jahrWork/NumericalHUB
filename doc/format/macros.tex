@@ -1,0 +1,59 @@
+
+
+
+
+
+\graphicspath{ {images/} }
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+
+\par\vspace{\baselineskip}
+
+
+
+
+%Allow us to make the rules larger
+\newlength\FHoffset
+\setlength\FHoffset{1cm}
+
+
+\fancyheadoffset{\FHoffset}
+\renewcommand{\headrulewidth}{0.5pt} % No header rule
+\renewcommand{\footrulewidth}{0.5pt} % Thin footer rule
+% Headers - all currently empty
+\lhead{}
+\chead{}
+\rhead{}
+% Footers
+\lfoot{}
+\cfoot{}
+\rfoot{\footnotesize Page \thepage\ of \pageref{LastPage}} % "Page 1 of 2"
+
+
+
+\usepackage{lettrine} % Package to accentuate the first letter of the text
+\newcommand{\initialgold}[1]{ % Defines the command and style for the first
+	
+	
+	
+% letter
+\lettrine[lines=3,lhang=0.3,nindent=0em]{
+\color{DarkGoldenrod}
+{\textsf{#1}}}{}}
+\newcommand{\initialred}[1]{ % Defines the command and style for the first
+% letter
+\lettrine[lines=3,lhang=0.3,nindent=0em]{
+\color{DarkRed}
+{\textsf{#1}}}{}}
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+\usepackage{titling} % Allows custom title configuration
+
+\newcommand{\ON}{^{\textsc{\tiny ON}}}
+\newcommand{\OFF}{^{\textsc{\tiny OFF}}}
+\newcommand{\INLET}{_{\textsc{\tiny INLET}}}
+\newcommand{\OUTLET}{_{\textsc{\tiny OUTLET}}}

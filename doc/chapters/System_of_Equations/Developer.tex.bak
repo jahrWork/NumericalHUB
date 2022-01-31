@@ -1,0 +1,351 @@
+
+    
+    %*************************************************************************
+    \chapter{Systems of equations}
+    %*************************************************************************
+    \label{Dev:Linear_Algebra}
+    
+    \section{Overview}
+
+    In this chapter, it is intended to cover the implementation of some classic issues that might appear in algebraic problems from applied mathematics. In particular, the operations related to linear and non linear systems and operations with matrices such as: LU factorization, real eigenvalues and eigenvectors computation and SVD decomposition will be presented.
+   \section{Linear systems}
+    Within the following pages, the treatment of linear systems will be exposed. It seems natural to follow the order in which the steps to solve linear systems is implemented. Firstly, the factorization to simplify the linear system matrix $A$ will be presented, followed by the resolution of this factorized matrix. 
+    \subsection{LU Factorization}
+    
+    In order to solve linear problems for an unknown $\vect{x} \in \mathbb{R}^N$, such as:
+    
+    \begin{equation}
+    	A \vect{x} = \vect{b}, \label{eq:Axb}
+    \end{equation}
+    
+    where $A\in\mathcal{M}_{N\times N}$ verifies $\det(A)\neq0$ and $\vect{b} \in \mathbb{R}^N$, it is useful to factorize the matrix $A$ in the form:
+    
+    \begin{equation}
+    	A = LU, \label{eq:LU}
+    \end{equation}
+    
+    in which $L$ and $U$ are lower and upper triangular matrices respectively. The three matrices can be expressed, using Einstein's notation as: 
+    
+    \begin{align}
+    	A = a_{ij} \vect{e}_i \otimes \vect{e}_j \quad &\mbox{for} \quad (i,j)\in[1,N]\times[1,N] \\ 
+       L = l_{ij} \vect{e}_i \otimes \vect{e}_j \quad &\mbox{for} \quad (i,j)\in[1,N]\times[1,N] \\ 
+    	U = u_{ij} \vect{e}_i \otimes \vect{e}_j\quad  &\mbox{for} \quad (i,j)\in[1,N]\times[1,N] .
+    \end{align}
+    
+    To satisfy the factorization the matrices shall satisfy:
+    
+    \begin{equation}
+    	a_{ij}= l_{im} u_{mj}, \quad \mbox{for} \quad m\in[1,\min \{i,j\}]. \label{eq:ALU}
+    \end{equation}
+    By definition the number of non null terms in $L$ and $U$ are $N(N+1)/2$, which leads to a number of unknown variables of $N_u = N^2 + N$. However, the number of equations supplied by (\ref{eq:ALU}) is $N^2$. This makes necessary to fix the value of $N$ unknown variables. To solve this it is common to set the diagonal of either $L$ or $U$ as the identity. The former method is called Doolittle method and is the one presented, that is, we force each element of the diagonal $l_{kk}=1$. Once this is done, from equation (\ref{eq:ALU}) it can be obtained a recursion to obtain the $k$-th element of the diagonal of $U$ if all the previous $k-1$ first rows and columns of $L$ and $U$ are known:
+    %
+    \begin{equation}
+    	u_{kk} = {a_{kk} - l_{km}u_{mk} }, \quad \mbox{for} \quad m \in [1,k-1], \label{eq:recurrence_a}
+    \end{equation}
+    
+    from which $u_{kk}$ is obtained. \\
+    
+    A similar recursion can be obtained for $u_{kj}$, with $k< j $:
+    
+    \begin{equation}
+    u_{kj} = {a_{kj} - l_{km}u_{mj} }, \quad \mbox{for} \quad m \in [1,k-1]. \label{eq:recurrence_b}
+    \end{equation}
+    
+    Finally, a recursion for $l_{ik}$, with $k<i$ results if all the previous $i-1$ rows and $k$ columns of $L$ and $U$ are known
+    
+    \begin{equation}
+    l_{ik} = \frac{a_{ik} - l_{km}u_{mj} }{u_{kk}}, \quad \mbox{for} \quad m \in [1,k-1]. \label{eq:recurrence_c}
+    \end{equation}
+    
+    These three recursions can be used to calculate the elements of both $L$ and $U$. This is checked when it is taken $k=1$, for which is obtained:
+    
+    \begin{align}
+    &	u_{11} = a_{11}, \\
+    &	u_{1j} = a_{1j}, \quad \mbox{for} \quad j \in [1,N],\\
+    &	l_{i1} = \frac{a_{i1}}{u_{11}}, \quad \mbox{for} \quad i \in [1,N]. 
+    \end{align}
+    
+    Hence, from $A$ and the initial value $u_{11}$, the first row of $U$ and the first column of $L$ are calculated. Thus, doing $k=2$, recurrence (\ref{eq:recurrence_a}) permits the calculation of $u_{22}$, (\ref{eq:recurrence_b}) gives $u_{2j}$ and (\ref{eq:recurrence_c}) calculates $l_{i2}$. \\
+    
+     Therefore, an algorithm to obtain both $L$ and $U$ is equivalent to evaluate the recurrences for all $k\in[1,N]$ sequentally in the order:
+    
+    \begin{enumerate}
+    	\item $\qquad u_{kk} = {a_{kk} - l_{km}u_{mk} }, \quad \mbox{for} \quad m \in [1,k-1].$
+    	\item $\qquad u_{kj} = {a_{kj} - l_{km}u_{mj} }, \quad \mbox{for} \quad m \in [1,k-1].$
+    	\item $\qquad l_{ik} = \frac{a_{ik} - l_{km}u_{mj} }{u_{kk}}, \quad \mbox{for} \quad m \in [1,k-1].$
+    \end{enumerate}
+
+    \subsection{Solving LU system}
+    
+    Once the matrix $A$ is factorized it is easier to solve the system (\ref{eq:Axb}). In first place it is defined $\vect{y}= U \vect{x}$, and thus:
+    
+    \begin{equation}
+    L \vect{y} = \vect{b}\ \, \Rightarrow \, l_{ij}y_j = b_i,  \quad \mbox{for} \quad (i,j) \in [1,N]\times[1,N] .\label{eq:Lyb}
+    \end{equation}
+    
+    As $l_{ij}=0$ for $i<j$, and $l_{ii}=1$ the first row of (\ref{eq:Lyb}) gives $y_1=b_1$ and the value of each $y_i$ can be written on terms of the previous $y_j$, that is:
+    
+    \begin{equation}
+    y_i = b_i - l_{ij} y_j, \quad \mbox{for} \quad 1 < j < i, \label{eq:LUy}
+    \end{equation}
+    
+    and thus, sweeping through $i=2, \ldots N$, over (\ref{eq:LUy}) $\vect{y}$ is obtained. \\
+    
+    To obtain $\vect{x}$ it is used the definition of $\vect{y}$, which can be written:
+    
+    \begin{equation}
+    \vect{y}=U\vect{x}, \, \Rightarrow \, y_i = u_{ij} x_j ,  \quad \mbox{for} \quad (i,j) \in [1,N]\times[1,N]. \label{eq:yUx}
+    \end{equation}
+    
+    In a similar manner than before, as $u_{ij}=0$ for $i>j$, the last row of (\ref{eq:yUx}) gives $x_{\tiny \mbox{\textit{N}}}=y_{\tiny \mbox{\textit{N}}} / u_{\tiny \mbox{\textit{NN}}}$ and each $x_i$ can be written in terms of the next $x_j$ with $i<j\leq N$ as expresses the equation (\ref{eq:LUx}).
+    In this equation the term in the denominator $u_{ii}$ makes reference to the $i$-th term on the diagonal of $U$ not its trace.
+    \begin{align}
+    x_i = \dfrac{y_i - u_{ij}x_j}{ u_{ii}}, \quad \mbox{for} \quad i<j\leq N. \label{eq:LUx}
+    \end{align} 
+    
+    Therefore, evaluating recursively $i = N-1, \ldots 1$
+    (\ref{eq:LUx}), the solution $\vect{x}$ is obtained.
+
+\newpage
+    \subsection{Algorithm implementation of LU method}
+    
+    In the code below the algorithm previously explained to obtain the LU factorization of a matrix $A$ is implemented in Fortran. In \mycap{LU_factorization}, the LU factorization of a square matrix \texttt{A} is computed. The value of the upper and lower triangular matrices are stored on \texttt{A}.
+    
+    %\lstinputlisting[language=Fortran, firstline=14, lastline=32, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine LU_factorization}
+    {end subroutine}{Linear_systems.f90}
+    
+    \newpage
+    \subsection{Algorithm implementation of Solving LU}
+    
+    The algorithm presented to solve LU factorised matrices is implemented as shown by the listing below.
+    
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {function Solve_LU}
+    {end function}{Linear_systems.f90}
+    
+    \section{Non linear systems}
+    
+    Whenever, the system to be solved is not linear, it is necessary the use of an iterative method. The most famous of them all is the Newton method. 
+    
+    Let us be $\vect{f}: \mathbb{R}^p \rightarrow \mathbb{R}^p $ a function and $\vect{x}\in\mathbb{R}^p$ the independent variable. In the case in which we want to calculate the roots of:
+    %
+    \begin{equation}
+    	\vect{f}(\vect{x}) = \vect{0}.
+    	\label{eq:Non_Linear_Equation}
+    \end{equation}
+    
+    To solve (\ref{eq:Non_Linear_Equation}) we can approximate the function around a point $\vect{x}_i$ by its first order Taylor series:
+    %
+    \begin{align}
+    	\vect{f}(\vect{x}) 
+    	= \vect{f}(\vect{x}_i) 
+    	+ \nabla\vect{f}(\vect{x}_i)\cdot(\vect{x}-\vect{x}_i)
+    	+ O\left(\norm{\vect{x}-\vect{x}_i}^2\right),
+    	\label{eq:Non_Linear_Taylor}
+    \end{align}
+    where $\nabla \vect{f}$ is the gradient or Jacobian matrix of $\vect{f}$. Imposing $\vect{f}(\vect{x})=0$ to (\ref{eq:Non_Linear_Taylor}) gives a recursion to obtain a solution starting from $\vect{x}_i$:
+    %
+    \begin{equation}
+    	\vect{x}_{i+1}-\vect{x}_{i} 
+    	= - \left(
+    	\nabla\vect{f}(\vect{x}_{i})
+    	\right)^{-1}  \cdot \vect{f}(\vect{x}_i),
+    \end{equation}
+    
+    where $(\nabla \vect{f}(\vect{x}_{i}))^{-1} $ is the inverse of the Jacobian matrix. The recursion can be stopped defining a convergence criteria for $\vect{x}$. That is, the recursion will stop when $\norm{\vect{x}_{i+1}-\vect{x}_{i+1}}\leq\varepsilon$, where $\varepsilon$ is a sufficiently small positive number.
+    
+    \subsection{Algorithm implementation}
+    
+    To implement the Newton method, first, we have to calculate the Jacobian matrix of the function. This is done in the function \texttt{Jacobian}, which computes the gradient at a point \texttt{xp}.
+    
+    %\lstinputlisting[language=Fortran, firstline=22, lastline=43, caption=\mycap{Jacobian_module.f90}]{\home/sources/Jacobian_module.f90}
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Jacobian_module.f90}
+    {function Jacobian}
+    {end function}{Jacobian_module.f90}
+    
+    \newpage
+    The Jacobian is used to compute the next value that approximates the solution, $\vect{x}_{i+1}$ is calculated by the subroutine \texttt{Newton}.
+    %\lstinputlisting[language=Fortran, firstline=18, lastline=58, caption=\mycap{Non_linear_systems.f90}]{\home/sources/Non_linear_systems.f90}
+    \vspace{0.5cm} 
+    \listings{\home/sources/Non_linear_systems.f90}
+    {subroutine Newton }
+    {end subroutine}{Non_linear_systems.f90}
+    
+    
+    \newpage
+    
+     \section{Power method}
+    
+         iterative  we look 
+        The powe method allows to determine 
+        Another classical problem is the calculus of eigenvalues and eigenvectors of normal matrices ($A A^T = A^T A$). The eigenvalues and eigenvectors problem for a square matrix $A$ consists on finding a scalar $\lambda$ and a vector ${v}$ such that:
+        %
+        \begin{equation*}
+        	(A-\lambda I ) v = 0.
+        \end{equation*}
+        
+        A method to compute the numerical solution of this problem is the power method, which gives back the eigenvalue of greater module and its associated eigenvector. The method consists on computing the nth power of the matrix following a recursive procedure.
+        
+        \begin{equation*}
+        	v^{n+1} = \frac{v^n}{\norm{A v^n}},
+        \end{equation*}
+        
+        whenever the iteration $n$ tends to infinity, calling $x = v^{n+1}$, the following relations are satisfied for the maximum module eigenvalue and its associated eigenvector:
+        
+        \begin{equation*}
+        x \rightarrow v, \qquad \qquad \frac{x^T A x}{ \norm{x}  \norm{x} } \rightarrow \lambda.
+        \end{equation*}
+        The main idea is that it is possible to extract all the different real eigenvalues by computing them in descending order. It is important to highlight that this method does not work for eigenvalues which satisfy $\abs{\lambda}=1$, for non real eigenvalues, and for non normal matrices.\\
+         
+         For example,  the matrix:
+         \begin{equation*}
+         A = \begin{pmatrix}
+             0 & 1 \\
+         	-1 & 0 
+         	\end{pmatrix},
+         \end{equation*}
+        has  eigenvalues  $\lambda = \pm i$. However if the power method is applied to this matrix, the result given is $\tilde{\lambda}=1$, which obviously is not the solution. Hence, these considerations must be taken in account to obtain a proper solution for the eigenvalues and eigenvectors if the power method is going to be used.
+    
+    
+    \section{Eigenvalues and eigenvectors}
+    
+    In this section an introduction to eigenvalues and eigenvectors computation will be presented. This problem is extremely difficult to deal with in the general case from the numerical point of view. Iterative methods such as the power method lack of efficacy in delicate situations such as eigenvalues of unitary module or non normal matrices. On figure \ref{fig:MatrixClass} is given a classification from the spectral point of view, of the possible situations for a square matrix. The main characteristic which will classify a matrix is whether it is normal or not. A normal matrix commutes with its transpose, that is, it verifies $AA^T=A^TA$ and these matrices can be diagonalised by orthonormal vectors.
+    
+    
+    \MatrixDiagram{}
+    \FloatBarrier
+    
+    \newpage
+    \subsection{Algorithm implementation}
+    
+    In order to obtain real eigenvalues and eigenvectors of a matrix, the power method is implemented over a subroutine called \texttt{Power\_method} as follows:\\
+    
+    %\lstinputlisting[language=Fortran, firstline=131, lastline=154, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}\vspace{0.5cm}
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine Power_method}
+    {end subroutine}{Linear_systems.f90}
+    
+    This subroutine, given a normal matrix $A$ gives back its maximum module eigenvalue $\lambda$ and its associated eigenvector $\vect{v}_n$ if $|\lambda_n| \neq 1$. The eigenvalue is yielded on the real \texttt{lambda} and the eigenvector in the vector \texttt{U}.
+    
+    \newpage
+    In a similar manner the inverse power method is implemented defining the subroutine \texttt{Inverse\_power\_method}:\\
+    
+    %\lstinputlisting[language=Fortran, firstline=164, lastline=192, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine Inverse_power_method}
+    {end subroutine}{Linear_systems.f90}
+    
+    This subroutine, given a normal matrix $A$ gives back its minimum module eigenvalue $\lambda$ and its associated eigenvector $\vect{v}_n$ if $|\lambda_n| \neq 1$. The eigenvalue is yielded on the real \texttt{lambda} and the eigenvector in the vector \texttt{U}.
+    
+    \newpage
+    The two subroutines defined previously are used recurrently to obtain all the eigenvalues of a matrix. For this task the subroutine \texttt{Eigenvalues} is defined.
+    
+    %\lstinputlisting[language=Fortran, firstline=205, lastline=222, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}\vspace{0.5cm}
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine Eigenvalues}
+    {end subroutine}{Linear_systems.f90}
+    
+     The method implemented on it is based on the fact that if $\lambda_1$ is the maximum module eigenvalue of $A_1$, then $\lambda_1$ is not eigenvalue of $A_2 = A_1 - \lambda_1 I$, that is $\lambda_1 \notin \Lambda(A_2)$, where $\Lambda(A_2)$ is the spectra of $A_2$. Note that as it is based on the power method, the scope of this method is for normal matrices which have non unitary eigenvalues. That is $|\lambda|\neq 1$, for all $\lambda \in \Lambda(A)$.\\ 
+    
+    \newpage
+    Another functionality that can be implemented using \texttt{Eigenvalues} is the SVD decomposition. A subroutine called \texttt{SVD} is implemented. Given a matrix $A$ the eigenvalues and eigenvectors of $B=A^T A $ are calculated and the matrix $V$ is composed of the column eigenvectors of $B$.
+    
+    %\lstinputlisting[language=Fortran, firstline=238, lastline=264, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}\vspace{0.5cm}
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {subroutine SVD}
+    {end subroutine}{Linear_systems.f90}
+    
+    \newpage
+    A direct application of the power and inverse power method is to compute the condition number $\kappa(A)$ of a normal matrix $A$ with quadratic induced norm. For this, the maximum and minimum (module) eigenvalues of $B=A^TA $, $\sigma_{\tiny\mbox{max}}$ and $\sigma_{\tiny\mbox{min}}$ respectively, are computed. Hence, the condition number is calculated as the division of them. For this, a subroutine called \texttt{Condition\_number} is defined:\\
+    
+    %\lstinputlisting[language=Fortran, firstline=286, lastline=309, caption=\mycap{Linear_systems.f90}]{\home/sources/Linear_systems.f90}\vspace{0.5cm}
+    
+    \vspace{0.5cm} 
+    \listings{\home/sources/Linear_systems.f90}
+    {function Condition_number}
+    {end function}{Linear_systems.f90}
+    
+    
+    
+    
+    
+    
+    \section{Condition number example} 
+    When solving a linear system of equations, the round--off error of the solution is associated to the condition number of the matrix system. 
+    In order to understand the motivation of this concept, let us be a linear system of equations such as:
+    \begin{equation*}
+    	A \ x = b,
+    \end{equation*}
+    where $x,b$ are vectors from a vectorial space $V$, equipped with the norm $\norm{\cdot}$ and $A$ is a square matrix.\\
+    
+    If an induced norm is defined for the matrices the previous equation can give us a measurable relation from the system of equations. In particular we define the quadratic norm for square matrices as:
+    
+    \begin{equation*}
+    	\norm{A}= \sup \frac{\norm{A v}}{\norm{v}}, \qquad \forall \ v \neq 0 \in V.
+    \end{equation*}
+    
+    In these conditions, the following order relation is satisfied:
+    
+    \begin{equation*}
+    	\norm{b} \leq \norm{A}\norm{x} .
+    \end{equation*}
+    
+    Given the linearity of the system, if the vector $b$ is perturbed with a perturbation $\var b$, the solution will be as well with the perturbation $\var x$ and if $A$ is non singular, the following order relation is satisfied:
+    
+    \begin{equation*}
+    \norm{\var x} \leq \norm*{A^{-1}}\norm{\var b} .
+    \end{equation*}
+    
+    Combining both order relations it is obtained an upper bound for the relative perturbation of the solution, that is:
+    
+    \begin{equation*}
+    \frac{\norm{\var x}}{\norm{ x}} \leq \norm{A^{\mbox{}}}\norm*{A^{-1}}\frac{\norm{\var b}}{\norm{ b}},
+    \end{equation*}
+    
+    where $\norm{A^{\mbox{}}}\norm*{A^{-1}}$ determines the upper bound of the perturbation in the solution. The condition number $\kappa(A)$ for this linear system can be written:
+    
+    
+    \begin{equation*}
+    \kappa(A) = \norm{A^{\mbox{}}}\norm*{A^{-1}}.
+    \end{equation*}
+    
+    Whenever the norm defined for $V$ is the quadratical norm $\norm{\cdot}_2$, the condition number can be written in terms of the square roots of the maximum and minimum module eigenvalues of $AA^T$, $\sigma_{\mbox{\tiny max}}$ and $\sigma_{\mbox{\tiny min}}$:
+    
+    \begin{equation*}
+    	\kappa(A)= \frac{\sigma_{\mbox{\tiny max}}}{\sigma_{\mbox{\tiny min}}},
+    \end{equation*}
+    
+    as $\norm{A^{\mbox{}}} = \sigma_{\mbox{\tiny max}}$ and $\norm*{A^{-1}}=1/\sigma_{\mbox{\tiny min}}$.
+    
+    Hence, the condition number is intrinsically related to the disturbance of the solution and determines if a matrix $A$ is \textit{well-conditioned} if $\kappa(A)$ is small or \textit{ill-conditioned} if $\kappa(A)$ is large.\\
+    
+    An example of the computation of the condition number, shall be given for the $6\times6$ Vandermonde matrix $A$.
+    %\vspace{5mm}
+    %\lstinputlisting[language=Fortran, firstline=217, lastline=243, caption = \mycap{API_Example_Systems_of_Equations.f90} ]{\home/examples/API_Example_Systems_of_Equations.f90}
+    \vspace{0.5cm} 
+    \listings{\home/examples/API_Example_Systems_of_Equations.f90}
+    {subroutine Vandermonde_condition_number}
+    {end subroutine}{API_Example_Systems_of_Equations.f90}
+    
+    Once this code is executed, the result given for the condition number is:
+    \begin{equation*}
+    	\kappa(A)= 0.109E+09,
+    \end{equation*}
+    which indicates that the Vandermonde matrix is \textit{ill-conditioned}.
+    When solving a linear system of equations where the system matrix $A$ is the Vandermonde matrix, a small error in the independent term ($b$) will be amplified by the condition number giving rise to 
+    large errors in the solution $ x$. 
+     

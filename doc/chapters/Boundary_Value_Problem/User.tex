@@ -1,0 +1,373 @@
+     
+%*************************************************************************
+\chapter{Boundary Value Problems   }\label{BVP}
+%*************************************************************************  
+\vspace{-1cm}
+\section{Overview}
+Let  $\Omega \subset \mathbb{ R}^p$ be an open and connected set and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as 
+its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each point of the spatial domain is written  $\vect{x} \in D $.
+A Boundary Value Problem for a vectorial function $\vect{u}: D \rightarrow \mathbb{R}^{N}$ of $N$ variables is defined as:
+       \begin{align*}
+           &\vect{\mathcal{L}} (\vect{x},\vect{u}(\vect{x})) = 0, & \forall \ \ \vect{x} \in  \Omega, \\
+           &\vect{h} (\vect{x},\vect{u}(\vect{x}))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vect{x} \in \partial \Omega,
+       \end{align*}
+where $\vect{\mathcal{L}}$ is the spatial differential operator and $\vect{h}$ is the boundary conditions operator that must satisfy the 
+solution at the boundary $\partial \Omega$.
+In the subroutine \verb|BVP_examples|, examples of boundary value problems are presented.
+The first and second examples are 1D boundary value problems. 
+The first one (\verb|Legendre_1D|) associated to one unknown function 
+and the second one (\verb|Elastic_beam_1D|) associated to a system of differential equations. 
+Then, 2D BVP are considered: scalar, vector, linear and nonlinear problems. 
+%  second solves a Poisson problem in a 2D. The third studies the 
+% deflection of an elastic plate subjected to external loads in a 2D space. 
+%Finally, the fourth example analyzes the deflection on an 
+% nonlinear plate subjected to external loads.
+       \vspace{0.2cm} 
+       \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+       {subroutine BVP_examples}
+       {end subroutine}{API_example_Boundary_Value_Problem.f90}
+\vspace{-0.5cm}       
+To  use all functions of this module, the statement: 
+ \verb|use Boundary_value_problems|
+ should be included at the beginning of the program.          
+  
+       
+\newpage
+%_______________________________________________________________________________________
+\section{Legendre equation}
+       Legendre polynomials are a system of complete and orthogonal polynomials with numerous applications.
+              Legendre polynomials can be defined as the solutions of the Legendre's differential equation on a domain $\Omega \subset 
+              \mathbb{R} : $ $\{x\in  [-1,1]\}$:
+              \begin{equation*}      	
+              (1 - x^2) \frac{\text{d}^2 y}{\text{d} x^2} - 2x \frac{\text{d} y}{\text{d} x} + n (n + 1) y = 0,
+              \end{equation*}
+              where $ n $ stands for the degree of the Legendre polynomial. 
+              For $n = 6$,  the boundary conditions are: $y(-1) = - 1, \  y(1) = 1$ and the exact solution  is:
+              \begin{equation*}
+              	y(x) = \frac{1}{16}( 231 x^6 - 315 x^4 + 105 x^2 - 5).
+              \end{equation*}
+              This problem is solved by means of piecewise polynomial interpolation of degree q or finite differences of order q.  The 
+              implementation of the problem requires the definition of the differential operator $\vect{\mathcal{L}} 
+              (\vect{x},\vect{u}(\vect{x}))$:
+              
+              \vspace{0.5cm} 
+              \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+              {real function Legendre}
+              {end function}
+              {API_example_Boundary_Value_Problem.f90}
+                    
+              And the boundary conditions $\vect{h} (\vect{x},\vect{u}(\vect{x})) $  are  implemented as a function:
+              \vspace{0.5cm} 
+              \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+              {function Legendre_BCs}
+              {end function}
+              {API_example_Boundary_Value_Problem.f90}
+              These two functions are input arguments of the subroutine \verb|Boundary_Value_Problem|:  
+              \vspace{0.5cm} 
+              \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+              {Legendre solution}
+              {Error}
+              {API_example_Boundary_Value_Problem.f90}
+              In this example, the piecewise polynomial interpolation is of degree $ q=6 $ and the problem is discretized with $ N = 40 $ 
+              grid nodes. 
+               \vspace{0.5cm} 
+                     \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+                     {N = 40}
+                     {N = 40}
+                     {API_example_Boundary_Value_Problem.f90}
+              Since the degree of the piecewise polynomial interpolation coincides with the degree of the solution or the Legendre 
+              polynomial, no error is expected to obtain.  
+              It can be observed in figure  \ref{fig:Legendre}b that error is of the order of the round--off value.  The solution or the 
+              Legendre polynomial is shown in  \ref{fig:Legendre}a.
+              \twographs
+              {\input{./doc/chapters/Boundary_Value_Problem/figures/Legendrea.tex}}
+              {\input{./doc/chapters/Boundary_Value_Problem/figures/Legendreb.tex}}
+              {Solution of the Legendre equation with $N=40$ grid points. (a) Legrendre polynomial of degree   $n=6$. (b) Error of the 
+              solution.}{fig:Legendre}
+       
+\newpage 
+%____________________________________________________________________________      
+\section{Beam deflection}\label{beam} 
+
+If beams are straight and slender and only if small 
+deflections are considered, the equations governing the beam deflection $ w(x) $ can be approximated as: 
+ \begin{equation*}      	
+      \frac{ d^2 w}{d  x^2}  = M(x), \qquad  \frac{d^2 M}{d x^2 } = q(x),
+ \end{equation*}
+where $ M(x) $ is the internal bending moment in the beam and $ q(x) $ is a distributed load.
+This equations are completed with four  boundary conditions to yield the deflection $ w(x) $
+and the moment $ M(x)$. In this section fixed supports at both ends are considered: 
+\begin{equation*}      	
+    w(-1) = 0, \quad\frac{dw}{d x }(-1)  = 0, \quad w(+1) = 0, \quad \frac{dw}{d x }(+1)  = 0.
+\end{equation*} 
+The  problem is implemented with the definition of the differential operator 
+$\vect{\mathcal{L}} (\vect{x},\vect{u})$ and the boundary conditions function
+ $\vect{h} (\vect{x},\vect{u}) $.
+ \vspace{0.5cm} 
+\listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+{function Beam_equations}
+{end function}
+{API_example_Boundary_Value_Problem.f90}
+\listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+{function Beam_BCs}
+{end function}
+{API_example_Boundary_Value_Problem.f90}
+
+%These two functions are input arguments of the subroutine \verb|Boundary_Value_Problem|:  
+%\vspace{0.5cm} 
+%\listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+%{Legendre solution}
+%{Error}
+%{API_example_Boundary_Value_Problem.f90}
+%
+%In this example, the piecewise polynomial interpolation is of degree $ q=6 $ and the problem is discretized with $ N = 40 $ 
+%grid nodes. 
+%     \vspace{0.5cm}
+%     \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+%      {N = 40}
+%      {N = 40}
+%      {API_example_Boundary_Value_Problem.f90}
+%Sinnce the degree of the piecewise polynomial interpolation coincides with the degree of the solution or the Legendre 
+%polynomial, no error is expected to obtain.  
+%It can be observed in figure  \ref{fig:Legendre}b that error is of the order of the round--off value.  The solution or the 
+%Legendre polynomial is shown in  \ref{fig:Legendre}a.
+%\twographs
+%{\input{./doc/chapters/Boundary_Value_Problem/figures/Legendrea.tex}}
+%{\input{./doc/chapters/Boundary_Value_Problem/figures/Legendreb.tex}}
+%{Solution of the Legendre equation with $N=40$ grid points. (a) Legrendre polynomial of degree   $n=6$. (b) Error of the 
+%solution.}{fig:Legendre}
+        
+       
+%___________________________________________________________________________
+\newpage       
+\section{Poisson equation}\label{Poisson}  
+Poisson's equation is a partial differential equation of elliptic type with broad utility in mechanical engineering and theoretical physics. 
+This equation arises to describe the potential field caused by a given charge or mass density distribution. 
+In the case of fluid mechanics, it is used  to determine potential flows, streamlines and  pressure distributions for incompressible flows.   
+It is an in-homogeneous differential equation with a source term representing the volume charge density, the mass density or the vorticity 
+function in the case of a fluid. It is written in the following form:  
+\begin{equation*}
+             	\nabla^2 u = s(x,y), 
+\end{equation*} 
+where $\nabla^2 u = \partial^2 u / \partial x^2 + \partial^2 u / \partial y^2 $ and $ s(x,y) $ is the source term.
+This Poisson equation is implemented by the following code: 
+\vspace{0.8cm} 
+\listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+         {real function Poisson}
+         {end function}
+         {API_example_Boundary_Value_Problem.f90}
+         
+ 
+It is considered two punctual sources given by the expression:
+$$
+      S(x, y) = a e ^{ -a r^2_1} + a e^{ -a r^2 _2 },  \quad r^2_i = (x-x_i)^ 2 + (y-y_i)^2, 
+$$ 
+where $ a $ is an attenuation parameter and $ (x_1, y_1) $ and  $ (x_2, y_2) $ are the positions of the sources.   
+The source term is implemented in the following code:       
+ \vspace{0.8cm} 
+  \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+           {real function source}
+           {end function}
+           {API_example_Boundary_Value_Problem.f90}      
+In this example, homogeneous boundary conditions are considered and they implemented by the  function \verb|PBCs|:  
+ \vspace{0.5cm} 
+ \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+          {function PBCs}
+          {end function}
+          {API_example_Boundary_Value_Problem.f90}
+The differential operator \verb|Poisson|  with its boundary conditions \verb|PBCs| are used as input arguments for the subroutine 
+\verb|Boundary_value_problem|               
+\vspace{0.3cm} 
+ \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+          {Poisson equation}
+          {Solution}
+          {API_example_Boundary_Value_Problem.f90}
+In figure  \ref{fig:Poisson} the solution of this Poisson equation is shown. 
+\vspace{-0.1cm}
+   \twographs
+       {\input{./doc/chapters/Boundary_Value_Problem/figures/Poissona.tex}}
+       {\input{./doc/chapters/Boundary_Value_Problem/figures/Poissonb.tex}}
+       {Solution of the Poisson equation with $Nx = 30$, $Ny = 30$ and piecewise interpolation of degree $ q = 11$.
+       (a) Source term s(x,y).(b) Solution u(x,y). }
+       {fig:Poisson}    
+       
+       
+ \FloatBarrier      
+ %_______________________________________________________________________      
+ \newpage
+ \section{Deflection of an elastic linear plate}\label{LinearPlate}  
+ In this section,  an elastic plate submitted to a distributed load is implemented.    It is Considered a plate with simply supported edges 
+ with a distributed load $p(x,y)$ in a domain $\Omega \subset \mathbb{R}^2 : $$\{ (x,y) \in [-1,1] \times [-1,1] \}$.The deflection $w(x,y)$ 
+ of a the  plate is governed by the following bi-harmonic equation:
+     
+            \begin{equation*}
+            	\nabla^4 w(x,y) = p(x,y),  %!  4 \pi ^4 \sin(\pi x)\sin(\pi y), 
+            \end{equation*}      
+where $\nabla ^4 = \nabla^2(\nabla^2) $ is the bi-harmonic operator. The simply supported condition is set by imposed that the displacement 
+is zero and bending moments are zero at the boundaries. It can be proven that the zero bending moment condition is equivalent  that the 
+Laplacian of the displacement is zero $\nabla^2 w= 0$. 
+            
+Since the module \verb|Boundary_value_problems|  only takes into account  second-order derivatives, the problem must be  transformed into the 
+second-order problem by means of the transformation:
+             \begin{equation*}
+                \vect{u}(x,y) = [ \  w(x,y), \ v(x,y) \ ],
+             \end{equation*}
+which leads to the system: 
+             \begin{align*}
+                     &   \nabla^2 w  = v, \\
+                     &   \nabla^2 v = p(x,y). 
+            \end{align*}
+The above equations are implemented in the function \verb|Elastic_Plate|
+            \vspace{0.5cm} 
+            \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+            {function Elastic_Plate}
+            {end function}
+            {API_example_Boundary_Value_Problem.f90}
+            
+In this example, it is considered a vertical plate in $y$ direction submitted to ambient pressure to one side and a hydro-static pressure to 
+the other side. 
+Besides, the fluid at $ y=0$ has ambient pressure. With these considerations, the plate is submitted to the following non-dimensional net 
+force: 
+            $$
+                p(x,y) = a y,
+            $$
+where $ a $ is a non-dimensional parameter. This external load is implemented in the function \verb|load| 
+            \vspace{0.5cm} 
+            \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+                   {function load}
+                   {end function}
+                   {API_example_Boundary_Value_Problem.f90}
+The boundary conditions  are: 
+             \begin{align*}
+                                w\big\rvert_{\partial \Omega}=0,  \\
+                               \nabla^2 w \big\rvert_{\partial \Omega}=0. 
+                   \end{align*}
+Since $ v = \nabla^2  w $, these conditions leads to $ w=0, v=0 $ at the boundaries and they are implemented in the following function 
+\verb|Plate_BCs|:     
+              \vspace{0.5cm} 
+            \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+            {function Plate_BCs}
+            {end function}
+            {API_example_Boundary_Value_Problem.f90}
+            
+In this example, piecewise polynomial interpolation of degree $ q = 4 $ is chosen. The non-uniform grid points are selected by the subroutine 
+\verb|Grid_initialization| by imposing constant truncation error. 
+            
+The differential operator \verb|Elastic_Plate| and its boundary conditions \verb|Plate_PBCs| are used as input arguments for the subroutine 
+\verb|Boundary_value_problem|. 
+            \vspace{0.5cm} 
+            \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+            {Elastic linear plate}
+            {Solution}
+            {API_example_Boundary_Value_Problem.f90}
+            
+In figure \ref{fig:LinearPlateBVP}a, the external load is shown. As it was mentioned, the net force between the hydro-static pressure and the 
+ambient pressure takes zero value at the vertical position $ y=0$. For values $ y>0 $, the external load is positive and for values $ y<0$ 
+the load is negative. This external load divides the plate vertically into two parts. A depressed lower part and a bulged upper part is shown 
+in figure  \ref{fig:LinearPlateBVP}b.   
+         
+    
+
+      \twographs
+      {\input{./doc/chapters/Boundary_Value_Problem/figures/Platea.tex}}
+      {\input{./doc/chapters/Boundary_Value_Problem/figures/Plateb.tex}}
+      {Linear plate solution with $21\times 21$ nodal points and $q=4$. (a) External load $p(x,y)$. (b) Displacement 
+      $w(x,y)$.}{fig:LinearPlateBVP}
+       
+ %__________________________________________________________________________________
+ \newpage	  
+ \section{Deflection of an elastic non linear plate}
+   
+A more complex example of a 2D boundary value problem is shown in this section. A nonlinear elastic plate submitted to a distributed load 
+simply supported on its four edges is considered. The deflection $w$ of the nonlinear plate is ruled by the bi-harmonic equation plus a non 
+linear term which  depends on the stress Airy function $\phi$. As in the section before, the simply supported edges are considered by 
+imposing zero displacement and zero Laplacian of the displacement. The problem in a domain $\Omega \subset \mathbb{R}^2 : $ $\{(x,y)\in  
+[-1,1]\times [-1,1]\}$ is formulated as:
+          \begin{align*}
+          & \nabla^4 w = p(x,y)  + \mu \ \mathcal{L}(w,\phi),  \\ 
+          & \nabla^4 \phi  + \mathcal{L}(w,w) =0,
+          \end{align*}
+          where $\mu$ is a non-dimensional parameter and $\mathcal{L}$ is the bi-linear operator:
+          \begin{align*}
+          	\mathcal{L}(w,\phi)
+          	=
+          	\pdv[2]{w}{x}\pdv[2]{\phi}{y}
+          	+
+          	\pdv[2]{w}{y}\pdv[2]{\phi}{x}
+          	-
+          	2\pdv[2]{w}{x}{y}\pdv[2]{\phi}{x}{y}.
+          \end{align*}
+          
+        
+Since the module \verb|Boundary_value_problems|  only takes into account  second-order derivatives, the problem must be  transformed into the 
+second-order problem by means of the transformation:
+               \begin{equation*}
+                  \vect{u}(x,y) = [ \  w, \ v, \ \phi, \ F ],
+               \end{equation*}
+               which leads to the system: 
+               \begin{align*}
+                      &    \nabla^2 w  = v, \\
+                  %    &    \nabla^2 v = p(x,y)+ \frac{e}{D} \mathcal{L}(w,\phi), \\
+                   &    \nabla^2 v = p(x,y)+ \mu \ \mathcal{L}(w,\phi), \\
+                      &    \nabla^2 \phi = F, \\
+                      &    \nabla^2 F = - \ \mathcal{L}(w,w).  \\
+              \end{align*}
+The external load applied to the nonlinear plate is the same that it was used in the deflections of the linear plate 
+       $$
+                       p(x,y) = a y. 
+       $$
+It allows comparing a linear solution with a nonlinear solution. The plate behaves non-linearly when deflections are of the order of the 
+plate thickness. Since the deflections are caused by the external load, the non-dimensional parameter $ a $ can be used to take the plate to 
+a nonlinear regime.   
+     
+The nonlinear plate equations expressed as a second order derivatives system of equations is implemented in the following function 
+\verb|NL_Plate|: 
+       
+      
+   \vspace{0.5cm} 
+   \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+   {function NL_Plate}
+   {end function}
+   {API_example_Boundary_Value_Problem.f90}
+   In this function the bi-linear operator  $\mathcal{L}$ is implemented in the function \verb|Lb| 
+   \vspace{0.5cm} 
+   \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+   {function Lb}
+   {end function}
+   {API_example_Boundary_Value_Problem.f90}
+       
+       
+       
+The boundary conditions are implemented in the function \verb|NL_Plate_BCs|
+          \vspace{0.5cm} 
+          \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+          {function NL_Plate_BCs}
+          {end function}
+          {API_example_Boundary_Value_Problem.f90}
+         
+        
+     
+The differential operator \verb|NL_Plate| and its boundary conditions \verb|NL_Plate_BCs| are used as input arguments for the subroutine 
+\verb|Boundary_value_problem|.       
+          \vspace{0.5cm} 
+          \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
+          {Elastic nonlinear plate}
+          {Solution}
+          {API_example_Boundary_Value_Problem.f90}
+          
+        
+In figure \ref{fig:NonLinearPlateBVP}, the solution of the nonlinear plate model is shown. 
+          
+             
+          
+          \twographs
+          {\input{./doc/chapters/Boundary_Value_Problem/figures/NLPlatea.tex}}
+          {\input{./doc/chapters/Boundary_Value_Problem/figures/NLPlateb.tex}}
+          {Non linear elastic plate solution with $ N_x = 20 $ , $ N_y = 20 $, $q=4$ and $\mu=100$. (a) Displacement $w(x,y)$.
+          (b) Solution $\phi(x,y)$}{fig:NonLinearPlateBVP}
+
+
+
+
+
+

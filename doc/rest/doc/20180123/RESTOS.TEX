@@ -1,0 +1,1927 @@
+\vspace{1cm}
+
+           \item transferencia de signo
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+ \hline
+  Función nombre & Definición \hspace{1.0cm} &  Tipo argumento & Tipo función \\ \hline  \hline
+  sign (a, b)      & transfiere signo            & int, real      & int, real      \\ \hline
+  isign (a, b)     & transfiere signo            & integer        & integer        \\ \hline
+\end{tabular}
+\end{center}
+
+
+\vspace{1cm}
+
+           \item operaciones con bits
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+ \hline
+  Función nombre & Definición \hspace{1.0cm} &  Tipo argumento & Tipo función \\ \hline  \hline
+  ior              & OR inclusivo                & integer        & integer        \\ \hline
+  ieor             & OR exclusivo                & integer        & integer        \\ \hline
+  iand (a, b)      & producto lógico           & integer        & integer        \\ \hline
+  not              & complemento lógico        & integer        & integer        \\ \hline
+  ishl (a, b)      & desplazamiento lógico     & integer        & integer        \\ \hline
+  isha (a, b)      & desplazamiento aritmético & integer        & integer        \\ \hline
+\end{tabular}
+\end{center}
+
+
+
+En las funciones mencionadas anteriormente, cuando se indica el tipo
+de argumento en forma genérica {\bf integer}, {\bf real}, o {\bf complex}
+significa que el compilador reconoce que tipo de argumento es y
+en consecuencia define el identificador de tipo de la función.
+
+Además, los compiladores presentan estas mismas funciones
+repetidas para cada identificador de tipo. En estas el nombre de la
+función comienza con una {\bf d} si el argumento es {\bf real(8)}, con
+una {\bf c} si es {\bf complex(4)} y con {\bf cd} si es {\bf complex(8)}. \\
+Por ejemplo, para la función seno los compiladores pueden dar las
+siguientes variantes :
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+ \hline
+  Función nombre & Definición \hspace{1.0cm} &  Tipo argumento & Tipo función \\ \hline  \hline
+  sin              & seno                & real, complex  & real, complex  \\ \hline
+  dsin             & seno                & real(8)        & real(8)        \\ \hline
+  csin             & seno                & complex(4)     & complex(4)     \\ \hline
+  cdsin            & seno                & complex(8)     & complex(8)     \\ \hline
+\end{tabular}
+\end{center}
+Es importante destacar que estas formas de funciones son obsoletas y que
+debemos codificar usando las funciones sín estar viciadas por el
+tipo de argumento.
+
+%****************************************************************************
+%El acceso de los datos de un fichero puede ser secuencial o directo.
+%El acceso directo de lectura o escritura puede hacerse a partir de un
+%determinado registro.
+%Los ficheros los podemos clasificar en externos e internos.
+%Un registro es un conjunto de datos compuesto por campos que constituyen
+%las unidades de información más pequeñas e indivisibles.
+%Denominamos fichero a un conjunto de registros de la misma estructura de datos.
+%******************************************************************************
+
+
+Dadas las siguientes matrices :
+$$
+    {\bf A} = \left(  \begin{array}{rrrrr}
+                                                                 8    &    7   &   4  &   9  &  1         \\
+                                                                 5    &   4    &   2  &   3  &  7         \\
+                                                                 2    &    3   &    9 &    1 &  6         \\
+                                                                 7    &    5   &   8  &    2 &   4       
+                                \end{array}
+                       \right),            \hspace{0.8cm}
+   {\bf B} = \left(  \begin{array}{rrrrr}
+                                                                 3    &    3   &   3  &   3  &  3         \\
+                                                                 3    &   3    &   3  &   3  &  3         \\
+                                                                 3    &    3   &    3 &    3 &  3         \\
+                                                                 3    &    3   &   3  &    3 &   3       
+                                \end{array}
+                       \right),             \hspace{0.8cm}
+  {\bf C} = \left(  \begin{array}{rrrrr}
+                                                                 0    &    0   &   0  &   0  &  0         \\
+                                                                 0    &   0    &   0  &   0  &  0         \\
+                                                                 0    &    0   &    0 &    0 &  0         \\
+                                                                 0    &    0   &   0  &    0 &   0       
+                                \end{array}
+                       \right) 
+$$                    
+
+
+
+%Para las funciones 
+%Como la mayoría de las funciones intrínsecas 
+%Mientras que $ A^3 $ es $ A  A  A $ la potencia n--ésima de una matriz es la  
+%que en FORTRAN 95 , la división, la exponencial y demás funciones intrínsecas 
+%Es importante hacer notar que estas operaciones representan el conjunto de todas las %operaciones escalares para todos los elementos de la matriz. 
+%Es decir, 
+%se son 
+%Es importante hacer notar que mientras en la suma, resta y multiplicación de un escalar 
+%por una matriz estas operaciones coinciden con su definición matemática, 
+
+
+% bien definidas 
+
+
+ 
+la exponencial de una matriz 
+ y la potencia de una 
+matriz definida a través 
+En la línea 3 se suman los elementos de {\bf A} con los correspondientes elementos de {\bf B}
+y se asignan a los correspondientes elementos de {\bf C}. En la línea 4 se multiplican todos los
+elementos de {\bf A} por la constante $5$, se multiplican los elementos de {\bf B} por la
+constante $2$, se suman los elementos correspondientes y se asignan a la matriz {\bf C}.
+En la línea 5 se multiplican los elementos de {\bf A} por los correspondientes de {\bf B}
+y se asignan a {\bf C}. Observese que este no es un producto de matrices que debería 
+obtenerse a través de la función intrínseca {\bf matmul}. Las líneas siguientes muestran
+operaciones de matrices multidimensionales completas con otros operadores matemáticos.
+En todos los casos, la operación se realiza con elementos correspondientes y las matrices
+deben tener igual número de dimensiones e igual número de elementos por dimensión. 
+Las líneas 9 y 10 muestran ejemplos de funciones intrínsecas aplicadas a matrices multidimensionales.
+Todas las funciones intrínsecas aplicables a escalares se pueden utilizar con matrices multidimensionales
+siempre que el identificador de tipo lo permita. 
+
+
+
+
+%donUNIT = unidad, ERR= etiqueta1, END= etiqueta2,
+ %              '(formato1, formato2,....)') variable1,
+  %              bucle implícito,... } 
+
+   % \fbox{ read(UNIT = unidad, ERR= etiqueta1, END= etiqueta2,
+    %           '(formato1, formato2,....)') variable1,
+     %           bucle implícito,...  } 
+%\end{center} 
+
+
+
+
+y dentro del fichero los elementos de la matriz
+        aparecer en su fila y columna correspondientes.
+
+do i = 1, 2
+     write(3, * ) ( a(i,j), j = 1, 3)
+enddo
+
+
+Dependiando de lo que queremos guardar en el fichero, el formato  
+  
+
+        
+
+%************************************************************************
+\item El siguiente programa escribe un conjunto de datos reales con espacios en blanco
+           intercalados. 
+
+{\source\begin{verbatim}
+     real (8) pi
+     pi = -4d0*atan(1d0)
+
+        write (3, '(3(f14.10,5x))' )  pi, 2d0*pi, 3d0*pi
+        write (3, '(3(e20.10,1x))' )  pi, 2d0*pi, 3d0*pi
+\end{verbatim}}
+      La correspondiente salida en pantalla es la siguiente :
+{\source\begin{verbatim}
+ -3.1415926536      -6.2831853072      -9.4247779608
+   -0.3141592654E+01    -0.6283185307E+01    -0.9424777961E+01
+\end{verbatim}}
+
+
+%***********************************************************************************
+
+    \item {\bf sum, product, maxloc, maxval, minloc, minval}: 
+               La sintaxis de todas estas funciones intrínsecas es la misma: 
+
+               Suma todos los elementos de una matriz 
+               o suma todos los elementos correspondientes a una dimensión de la matriz
+               indicada con {\bf dim} (opcional) y que cumplen con una expresión lógica
+               indicada con {\bf mask} (opcional). El resultado es un escalar 
+               que representa la suma de todos los elementos.       
+               Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf sum}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+Los elementos de la matriz pueden ser enteros, reales o complejos.  
+%***********************************************************************************
+\item {\bf product}: Hace el producto de todos los elementos 
+de una matriz o los correspond¡entes a una dimensión de la matriz indicada con { \bf dim } (opcional) 
+y que cumplan con una expresión lógica indicada con {\it mask} (opcional).
+ Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf product}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+Los elementos de la matriz pueden ser enteros, reales o complejos.  
+%***********************************************************************************
+ \item {\bf maxloc}:
+              Esta función intrínseca determina la posición del valor máximo dentro de la matriz  
+              o la posición del valor máximo para una dimensión de la matriz
+              indicada con {\bf dim} (opcional) y que cumple con una expresión lógica
+              indicada con {\bf mask} (opcional).  El resultado es un valor entero que representa la posición 
+             en donde se encuentra el máximo.  Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf maxloc}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+El argumento \verb|matriz| puede tener identificador de tipo {\bf integer} o  {\bf real}. 
+
+
+%***********************************************************************************
+ \item {\bf maxval}:
+             Esta función intrínseca determina el valor máximo de los elementos de una matriz  
+              o el valor máximo para una dimensión de la matriz
+              indicada con {\bf dim} (opcional) y que cumple con una expresión lógica
+              indicada con {\bf mask} (opcional).  Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf maxval}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+El argumento \verb|matriz| puede tener identificador de tipo {\bf integer} o  {\bf real}. 
+%***********************************************************************************
+ \item {\bf minloc} :
+              Esta función intrínseca determina la posición del valor mínimo dentro de una matriz 
+              o la posición del valor mínimo para una dimensión de la matriz
+              indicada con {\bf dim} (opcional) y que cumple con una expresión lógica
+              indicada con {\bf mask} (opcional). 
+               Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf minloc}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+El argumento \verb|matriz| puede tener identificador de tipo {\bf integer} o  {\bf real}. 
+%***********************************************************************************
+    \item {\bf minval}:
+             Esta función intrínseca determina el valor mínimo de los elementos de una matriz 
+              o el valor mínimo para una dimensión de la matriz
+              indicada con {\bf dim} (opcional) y que cumple con una expresión lógica
+              indicada con {\bf mask} (opcional). 
+               Su sintaxis es la siguiente: 
+\begin{center}
+         \fbox{  resultado = {\bf minval}  ( \verb|matriz| [,{\bf dim}] [,{\bf mask} ] ) }
+\end{center}
+El argumento \verb|matriz| puede tener identificador de tipo {\bf integer} o  {\bf real}. 
+
+%***********************************************************************************
+\item { \bf where}:       \ucajas{  {\bf where}  ( expresion-logica)  \newline 
+
+                                  \hspace{2cm}  asignacion--matrices  \newline 
+
+                                  \hspace{2cm} [  construcción where ]  \newline 
+
+                   [    {\bf elsewhere}  ( expresion-logica)  ] \newline 
+
+                                  \hspace{2cm} [ asignacion--matrices ] \newline 
+
+                                  \hspace{2cm} [ construcción where ]  \newline 
+
+                           .................   \newline
+ 
+  [{ \bf end where } ]  }
+donde la expresión lógica debe ser una matriz de valores lógicos de la misma dimensión que la 
+variable a la izquierda de la asignación.  
+
+
+*****************************EJEMPLOS *************************************
+
+Si la variable es escalar, la inicialización puede estar formada por una constante
+o una expresión de variables con atributo parameter.  
+si es 
+{\bf data} : Permite asignar valores iniciales a las variables especificadas
+         por {\it nombre}.  {\bf data}. La sintaxis de esta 
+declaración es:  \\  \\
+         \fbox { {\bf data}  nombre / lista de datos / }  \\
+
+
+
+
+Además de la estructura básica de declaración de una variable desarrollada anteriormente, existen
+otras formas de declaración que la complementan. Estas son :
+{\bf implicit} : Permite declarar implícitamente que todas las variables
+         contenidas en la unidad de programa que empiecen con letras según la {\it lista de especificación de letras}.
+         sean del tipo que se especifique en el {\it identificador de tipo}. La sintaxis del {\bf implicit}
+         puede tener dos formas :                \\      \\
+         \fbox{ {\bf implicit} identificador de tipo ( lista de especificación de letras ) } ; o     \\ \\
+         \fbox{ {\bf implicit none} }                        \\ \\
+         donde la lista de especificación tiene la siguiente estructura:  \fbox{ letra [ - letra ] }.  La
+         declaración {\bf implicit none} anula la declaración intrínseca de FORTRAN y obliga a declarar
+         todas las variables.
+
+  \item Declarar mediante una sentencia implicit  que todos las variables
+        que empiecen por la letra entre la A y la H que sean reales,
+        entre la I y la N enteras y entre la
+        O y la Z reales
+
+{\source\begin{verbatim}
+             implicit real (A-H, O-Z) , integer (I-N)
+        \end{verbatim}}
+
+
+
+%{\source\verbatimfile{op_matrices.for} }
+{\source\begin{verbatim}
+   subroutine matrices 
+        integer n, nv  
+!   parameter(n=1350) 
+!   parameter(n=650) 
+!   parameter(n=10, nv=422500) ! 5 Mbytes
+        parameter(n=4, nv=10)
+
+        real(8) a(n,n), b     ! 15 Mbytes 
+    real(8) va(nv), vb(nv), s(nv)
+    integer  jv(nv), jj(nv)   
+    real t0, tf 
+    integer i, j, k 
+        real(4) x 
+    
+   
+           do j=1, nv 
+            va(j) = j - 1.2d0
+        x = j 
+            vb(j) = x*x + 1.3d0
+            
+        jv(j) = mod(j**3, nv)  
+     
+            if (jv(j).gt.nv) then 
+                                  jv(j) = nv                
+            elseif(jv(j).le.0) then
+                              jv(j) = 1 
+                endif                     
+
+        jj(j) = j  
+     enddo    
+     
+       do j= 1 ,nv
+     if (jv(j).gt.nv) then 
+                 write(*,*) j, jv(j) 
+           read(*,*)                 
+            elseif(jv(j).le.0) then
+             write(*,*) j, jv(j) 
+                 read(*,*) 
+                endif                     
+           enddo  
+
+
+
+           do i=1, n 
+        do j=1, n 
+                  a(i,j) = n*(i-1) + j  
+        
+      enddo 
+     enddo  
+     
+     do i=1,  n; write(*,*) (a(i,j), j=1,n); enddo       
+           read(*,*) 
+
+       
+
+
+!c     *** tiempos de ejecucion
+
+         call test2(a(1:2,1:2),2) 
+     read(*,*) 
+
+     call test3(a(1:4:2,1:4:2),2) 
+     read(*,*)   
+
+c     * evalua la asignacion de memoria frente a la multiplicacion  j,i
+        write(*,*) ' ***** Test 3  ' 
+        call CPU_time(t0) 
+    do k=1, 5   
+          
+          do j=1, n
+      do i=1, n   
+                a(i,j) = a(i,j)**2 
+            enddo 
+          enddo 
+     
+    enddo 
+    call CPU_time(tf) 
+    write(*,*) ' a_ij**2 j=1..n, i=1..n ' , tf- t0 
+    write(*,*) 
+
+ 
+     
+c     * evalua la asignacion de memoria frente a la multiplicacion i,j
+        write(*,*) ' ***** Test 2  '
+    call CPU_time(t0) 
+    do k=1, 5    
+          
+    do i=n, 1, -1
+      do j=1, n   
+                a(i,j) = a(i,j)**2 
+            enddo 
+          enddo 
+     
+    enddo 
+        call CPU_time(tf) 
+    write(*,*) ' a_ij**2 i=n..1, j=1..n ' , tf- t0 
+    write(*,*) 
+     
+
+
+
+
+c     * evalua la asignacion de memoria frente a la multiplicacion  i,j
+        call test2(a,n)
+
+c     * evalua la asignacion de memoria frente a la multiplicacion  i,j
+        call test1(a,n)
+
+
+
+
+
+
+
+
+
+
+
+c     * evalua la asignacion de memoria frente a la multiplicacion      
+        write(*,*) ' ***** Test 4  '
+    call CPU_time(t0) 
+    do k=1, 5  
+          
+          do i=1, n 
+        do j=1, n 
+                    b = a(i,j)**2 
+            enddo 
+          enddo 
+       
+    enddo
+    call CPU_time(tf) 
+    write(*,*) ' a_ij**2 i=1..n, j=1..n' , tf- t0   
+    write(*,*) 
+
+
+        
+c     * evalua el producto escalar
+        write(*,*) ' ***** Test 5  '
+    call CPU_time(t0)      
+    do k=1, 5 
+          
+      
+          do j=1, nv 
+              s(j) =  va(jj(j)) * vb(j)  
+          enddo 
+  
+        enddo 
+    call CPU_time(tf) 
+    write(*,*) ' a_j * b_j   ', tf- t0  
+     
+    write(*,*) 
+
+c     * evalua el producto escalar
+        write(*,*) ' ***** Test 6  ' 
+    call CPU_time(t0)    
+    do k=1, 5 
+          
+       
+          do j=1, nv 
+              s(j) =  va(jv(j)) * vb(j)  
+          enddo 
+    
+        enddo 
+    call CPU_time(tf) 
+    write(*,*) ' a_j * b_j   ', tf- t0  
+    write(*,*) 
+
+
+
+  end 
+
+c*************************************************************
+*
+**************************************************************
+        subroutine test1(a,n)
+        real(8) a(1:n,1:n)
+        integer n   
+
+         real(8) t0, tf
+     integer k, i, j 
+
+
+        write(*,*) ' ***** Test 1  '
+    call CPU_time(t0)  
+    do k=1, 5  
+          
+          do i=1, n 
+        do j=1, n 
+                    a(i,j) = a(i,j)**2 
+            enddo 
+          enddo 
+      
+    
+    enddo
+    call CPU_time(tf) 
+    write(*,*) ' a_ij**2 i=1..n, j=1..n ' , tf- t0  
+    write(*,*)
+
+      end 
+c*************************************************************
+*
+**************************************************************
+        subroutine test2(a,n)
+        real(8) a(1:n*n)
+        integer n   
+
+         real(8) t0, tf
+     integer k, i, j 
+
+
+        write(*,*) ' ***** Test 1  '
+    call CPU_time(t0)  
+    do k=1, 5  
+          
+          do i=1, n*n 
+                  write(*,*) a(i) 
+c                 a(i) = a(i)**2 
+          enddo 
+      
+    
+    enddo
+    call CPU_time(tf) 
+    write(*,*) ' a_ij**2 i=1..n, j=1..n ' , tf- t0  
+    write(*,*)
+
+      end 
+c*************************************************************
+*
+**************************************************************
+        subroutine test3(a,n)
+        real(8) a(1:n*n)
+        integer n   
+
+         real(8) t0, tf
+     integer k, i, j 
+
+
+        write(*,*) ' ***** Test 1  '
+    call CPU_time(t0)  
+    do k=1, 5  
+          
+          do i=1, n*n 
+                  write(*,*) a(i) 
+c                 a(i) = a(i)**2 
+          enddo 
+      
+    
+    enddo
+    call CPU_time(tf) 
+    write(*,*) ' a_ij**2 i=1..n, j=1..n ' , tf- t0  
+    write(*,*)
+
+      end 
+ \end{verbatim} }
+
+
+
+
+
+
+
+
+
+Es importante que el flujo de las variables quede
+confinado a cada capa de programación. Por otra parte, no se debe permitir
+que una misma variable se calcule en sitios diferentes por los que
+obligatoriamente pasa el programa. 
+
+
+*******************************warning **********************************
+En FORTRAN 95,  a diferencia de lo que ocurre en FORTRAN 77,  
+las matrices no se almacenan no existe una relación entre  
+
+con lo que ocurre en otros lenguajes, las matrices
+son almacenadas por columnas. Un correcto dimensionado de éstas nos
+permitirá un manejo inteligente de punteros a esta estructura de datos
+(matriz), mediante los parámetros de llamadas a subrutinas.
+El uso de los punteros nos permitirá trabajar en FORTRAN
+como si existieran estructuras de datos más evolucionadas.
+
+El almacenamiento de una matriz $a$  de  $n $ filas y $ m $ columnas
+es como se detalla:
+
+\makebox[5cm]{ Columna 1 }
+\framebox[4cm]{  $  a_{11}, $
+                 $  a_{21}, $
+                 $  ......, $
+                 $  a_{n1}  $
+             }
+
+\makebox[5cm]{ Columna 2 }
+\framebox[4cm]{  $  a_{12}, $
+                 $  a_{22}, $
+                 $  ......, $
+                 $  a_{n2} $
+             }
+
+\makebox[5cm]{ Columna j }
+\framebox[4cm]{   $  a_{1j}, $
+                  $  a_{2j}, $
+                  $  ......, $
+                  $  a_{nj}  $
+
+             }
+
+\makebox[5cm]{ Columna m }
+\framebox[4cm]{  $  a_{1m}, $
+                 $  a_{2m}, $
+                 $  ......, $
+                 $  a_{nm}  $
+             }
+
+************** WARNING ************
+ Explicar concepto de puntero y su independencia con la memoria fisica. 
+
+
+
+
+**************** WARNING *********************
+Este capitulo es para codigos de hasta 1000 líneas 
+
+
+
+
+
+
+
+A continuación presentamos un ejemplo sencillo para explicar como
+trabaja el compilador en el manejo de punteros :
+
+%{\source\verbatimfile{vector.for} }
+{\source\begin{verbatim}
+
+                       program vector
+
+                       integer, parameter :: n=100, m=10
+                       real(8) a (n, m)
+
+                                !frases
+                                 call divergencia (n, a(1,7) )
+
+                       end
+
+                  !**************************************************
+
+                       subroutine divergencia (n, v)
+                                       integer n
+                                       real(8) v (*)
+
+                                 !frases
+
+                       end
+
+ \end{verbatim} }
+
+
+El programa {\it vector} declara las variables {\it n} y {\it a} y
+el compilador reserva espacio de memoria para ellas.
+El programa {\it vector} llama a la subrutina {\it divergencia} pasando
+un puntero a la dirección de memoria donde se
+encuentra el contenido del escalar {\it n}; y un puntero
+a la fila 1 y columna 7 de la matriz {\it a}.
+En la subrutina {\it divergencia} se realiza la declaración de los
+parámetros {\it n} y {\it v}. En este caso el compilador no reserva
+espacio de memoria para estas variables. Esta declaración constituye
+simplemente una declaración de tipo de los parámetros que se van a
+pasar.
+Al hacer la llamada el compilador evalúa la posición en la memoria
+del elemento {\it a(1,7)}. Como las matrices se almacenan por columnas
+esta posición es la $p = 1 + 7*100$. En la subrutina {\it divergencia}
+tratamos a la variable {\it v} como un vector (un solo índice) es decir
+formado por la columna 7 de la matriz.
+
+Otro ejemplo de manejo de punteros con matrices es el siguiente :
+
+%{\source \verbatimfile{matriz.for}  }
+{\source\begin{verbatim}
+
+                   program matriz
+
+                     integer, parameter :: n=2, n1=60, n2=30
+                     real(8) a (n, n, n1, n2), d
+
+                           !    frases
+
+                                call determinante (n, a(1, 1, 5, 7), d)
+                                write (*,*) ' d = ', d
+
+                   end
+
+                  !***********************************************************
+
+                   subroutine determinante (n, b, d)
+                                   integer  n
+                                   real(8)  b (n, *), d
+
+
+                                 d = b(1,1)*b(2,2) - b(1,2)*b(2,1)
+
+                   end
+ \end{verbatim} }
+
+En este programa se declara una matriz de submatrices en donde cada elemento
+de la matriz es a su vez una matriz. En la llamada a la subrutina
+{\it determinante} pasamos el puntero a la submatriz que es el elemento
+{\it (5,7)} de la matriz general. El compilador automáticamente pasa el
+puntero a la posición en la memoria de ese elemento que es una submatriz
+cuadrada de $n \times n$ y la subrutina evalúa su determinante.
+
+
+Este capitulo es para codigos de hasta 1000 líneas 
+
+
+    
+      
+      
+      
+      
+      
+      
+      
+      
+
+   Calcular numéricamente el Jacobiano del
+        siguiente vector de  funciones :   \\
+        $ F = \{ 4 x^2 + y, x+ y +z, x^3 - z^3 \} $
+        en $ \{x, y, z \} = \{ 0.1, -0.2, 3.0 \}  $.
+
+%{\source\verbatimfile{jacob.for} }
+{\source\begin{verbatim}
+!***********************************************************
+!* Calcula el Jacobiano de un vector de funciones          *
+!***********************************************************
+      program Jacob
+      integer, parameter :: nmax=10
+      real(8) x(nmax), J(nmax,nmax), wk(2*nmax)
+      external F
+      integer i, n
+
+             n = 3
+             x(1) =  0.1d0
+             x(2) = -0.2d0
+             x(3) =  3.0d0
+
+             call Jacobiano (n, x, F, J, wk)
+
+             do i = 1, nmax
+                         write (*,*) J(i,:)
+             enddo
+
+      end
+!***********************************************************
+!*     Subrutina que contiene el vector de funciones       *
+!*       Entrada  xp : punto donde se evaluan              *
+!*       Salida   Fp: valores de las funciones en x        *
+!***********************************************************
+      subroutine F (xp, Fp)
+           real(8)  xp(*), Fp(*)
+
+           real(8) x, y, z
+
+              x = xp(1)
+              y = xp(2)
+              z = xp(3)
+
+              Fp(1) = 4 * x * x  +  y
+              Fp(2) = x  +  y  +  z
+              Fp(3) = x * x * x  -  z * z * z
+
+      end
+
+
+
+
+
+
+
+
+
+!************************************************************
+!*      Calcula el Jacobiano de un vector de funciones      *
+!*                                                          *
+!*  Entradas:                                               *
+!*                                                          *
+!*    n : dimension del problema                            *
+!*    x : punto donde se calcula el Jacobiano (n valores)   *
+!*    F : subrutina que contiene las n funciones.           *
+!*        Llamada ...  call F(x, Fp), donde Fp es el vector *
+!*        de valores de las n funciones en el punto x       *
+!*    wk: area de trabajo de dimension minima 2*n           *
+!*                                                          *
+!*  Salidas:                                                *
+!*                                                          *
+!*    J : matriz Jacobiano de F en el punto x               *
+!*        (n filas y n columnas)                            *
+!*                                                          *
+!************************************************************
+      subroutine Jacobiano (n, x, F, J, wk)
+                   integer  n
+                   real(8)  x(*), J(n,*), wk(*)
+                   external F
+
+              real(8) h
+              data h /1d-5/
+              integer i, k
+
+!         *** Evalua las funciones en x
+              call F(x, wk(1) )
+
+              do i=1, n
+                 x(i) = x(i) + h
+
+!            *** Evalua las funciones en
+!                x(1), ... x(i) + h, ... x(n)
+                 call F( x, wk(n+1) )
+
+!            *** Calcula la derivada parcial
+!                dFj/dxi =
+!                          ( Fj( x(1), ... x(i)+h, ... x(n) ) -
+!                            Fj( x(1), ... x(i)  , ... x(n) )
+!                          )/h
+                 do k=1, n
+                          J(i,k) = (wk(i+n) - wk(i)) / h
+                 enddo
+              enddo
+
+      end
+ \end{verbatim} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+%{\source\verbatimfile{edos.for}}
+{\source\begin{verbatim}
+!************************************************************
+!*  Aplicacion  EDO mediante estructura multicapa           *
+!************************************************************
+      program EDOS
+
+!     *** declaracion de variables
+          real(8)  dt, t
+          real(8), allocatable :: u(:), f(:), wk(:)
+          integer  nt, nv, i, ierr
+          external Sistema_EDO
+
+!     *** parametros de integracion 
+          call parametros (nt, nv, dt)
+
+!     *** asignacion de memoria
+          allocate (u(nv), f(nv), wk(4*nv), stat=ierr)
+
+!     *** condicion inicial 
+          call CI_edo (nv, u)
+
+!     *** bucle para la integracion temporal
+          open (2,file='edos.txt')
+
+          t = 0d0
+          do i=1, nt
+
+!           *** imprime resultados
+!               comprobar como el RK2 no sirve para integrar el problema
+                write(*,'(10e16.8)') t, u
+                write(2,'(10e16.8)') t, u
+
+                 if (i == 1) then
+                        call Euler     (Sistema_EDO, t, dt, nv, u, f, wk)
+                 else
+                        call Leap_Frog (Sistema_EDO, t, dt, nv, u, f, wk)
+                 endif
+
+!                       call Runge_k2  (Sistema_EDO, t, dt, nv, u, f, wk)
+
+          enddo
+
+
+!     *** liberar memoria
+          deallocate (u, f, wk)
+
+
+      end
+
+ \end{verbatim} }
+
+\newpage
+%{\source\verbatimfile{Sistema_EDO.for}}
+{\source\begin{verbatim}
+!*************************************************************
+!*                                                           *
+!*  sistema de Ecuaciones Diferenciales Ordinarias           *
+!*                                                           *
+!*            du/dt = f(u,t),       f(u,t): R^n x R -> R^n   *
+!*                                                           *
+!*      Entradas:                                            *
+!*                u  : vector de estado                      *                                        *
+!*                t  : tiempo                                *
+!*                                                           *
+!*      Salidas:                                             *
+!*                f : aceleraciones                          *
+!*                                                           *
+!*   Ej:  Oscilador armonico                                 *                  *
+!*                                                           *
+!*      |f1| = | 0  1 | |u1|                                 *
+!*      |f2|   | -1 0 | |u2|                                 *
+!*                                                           *
+!*************************************************************
+      subroutine Sistema_EDO (u, t, f, wk)
+                      real(8) u(1:2), t, f(1:2), wk(1) 
+    
+
+!     *** Ejemplo de sistema 
+          f(1) =   u(2)
+          f(2) = - u(1)
+     
+      end
+
+ \end{verbatim} }
+
+%{\source\verbatimfile{CI_edo.for}}
+{\source\begin{verbatim}
+!************************************************************
+!*  Condicion inicial                                       *
+!*                                                          *
+!*   Entradas :                                             *
+!*                nv : dimension del problema               *
+!*   Salidas  :                                             *
+!*                u  : condicion inicial u(j), j=1...nv     *
+!*                                                          *
+!************************************************************
+      subroutine CI_edo (nv, u)
+                 integer nv
+                 real(8) u(nv)
+
+
+!     *** condicion inicial
+          u(1) = 0d0
+          u(2) = 1d0
+
+
+      end
+
+ \end{verbatim} }
+
+\newpage
+%{\source\verbatimfile{parametros.for}}
+{\source\begin{verbatim}
+!************************************************************
+!*   Parametros de integracion                              *
+!*                                                          *
+!*   Salidas:                                               *
+!*                dt : paso temporal                        *
+!*                nt : numero de escalones temporales       *
+!*                nv : numero de variables                  *
+!*                                                          *
+!************************************************************
+      subroutine parametros (nt, nv, dt)
+                     integer nt, nv
+                     real(8) dt 
+
+          real(8) tf
+
+!     *** parametros de integracion
+          dt = 1d-2
+          tf = 12d0
+          nt = tf/dt
+          dt = tf/nt
+
+!     *** dimension del problema
+          nv = 2
+
+          write (*,*) ' nv = ', nv, ' dt = ', dt
+          read  (*,*)
+
+      end
+
+ \end{verbatim} }
+
+\newpage
+%{\source\verbatimfile{Leap-Frog.for}}
+{\source\begin{verbatim}
+!************************************************************************
+!*                         Leap-Frog 2th order                          *
+!************************************************************************
+      subroutine Leap_Frog (f, t, dt, ns, u, du, wk)
+                 external   f
+                 real(8) t, dt, u(*), du(*), wk(*)
+                 integer ns
+
+
+          call LF2 (f, t, dt, ns, wk(1), u, wk(1+ns), du, wk(1+2*ns))
+
+
+      end
+
+!************************************************************************
+!*                         Leap-Frog 2th order                          *
+!*                                                                      *
+!*                        u2 = u0 + 2 * dt * f1                         *
+!*                                                                      *
+!************************************************************************
+      subroutine LF2 (Sistema, t, dt, ns, u0, u1, u2, F1, wk)
+                 external Sistema
+                 integer ns
+                 real(8) t, dt, u0(ns), u1(ns), u2(ns), F1(ns), wk(ns)
+
+
+!        *** F1
+             call Sistema(u1, t, F1, wk)
+
+!        *** u2 = u0 + 2*dt*F1
+             u2 = u0 + 2d0*dt*F1
+             u0 = u1
+             u1 = u2
+
+             t = t + dt
+
+      end
+
+ \end{verbatim} }
+
+
+%{\source\verbatimfile{flujo.for} } 
+{\source\begin{verbatim}
+!***********************************************************************
+! Flujo de datos con forma explicita y asumida
+!***********************************************************************
+   program flujo_de_datos 
+
+      interface 
+                subroutine Sistema(n, C)
+                         integer n 
+                         real C(1:n)
+                end subroutine 
+      end interface 
+        
+
+       real, allocatable :: C(:)  
+
+      allocate( C(1:4) )
+      
+!   *** inicializacion del vector C 
+         C(1:4) = (/1.1, 3.3, 2.2,  4.4/) 
+     
+
+!   *** Opera el vector C 
+         call Sistema(4, C ) 
+  
+    end program 
+!***********************************************************************
+ module interfaces  
+!*********************************************************************** 
+   interface 
+
+      subroutine f_asumida(A) 
+                      real A(:,:) 
+
+      end subroutine 
+
+      subroutine f_explicita(n, m, A) 
+                     integer n, m  
+                     real A(n,m) 
+
+      end subroutine  
+
+   end interface
+
+
+end module
+
+!*************************************************************************
+!  Norma del supremo de una matriz con especificacion de forma explicita 
+!************************************************************************
+      subroutine Sistema( n, vector )
+
+                    use interfaces 
+                     integer n
+                    real vector(1:n)
+     
+       integer m
+
+        m = n/2 
+          
+!    *** paso de una matriz con forma asumida                 
+         call f_asumida(reshape(vector,(/ m, m/) ) )
+
+!    *** paso de una matriz con forma explicita 
+         call f_explicita(m, m, vector) 
+    
+
+      end  
+!**********************************************************************
+!  Paso de una matriz con forma asumida.  
+!  El tamaño es el del objeto con que se llama
+!********************************************************************** 
+      subroutine f_asumida(A) 
+               real A(:,:) 
+
+        integer n(2) 
+         
+        n = shape(A)   ! filas y columnas de A 
+        
+    !** escribe la matriz por filas 
+        do i=1, n(1) 
+            write(*,*) A( i,1:n(2) ) 
+        end do
+        write(*,*) 
+
+      end 
+!**********************************************************************
+!  Paso de una matriz con forma explicita.  
+!  El tamaño esta especificado en la propia subrutina
+!********************************************************************** 
+      subroutine f_explicita(n, m, A) 
+               integer n, m  
+               real A(n,m) 
+            
+    !** escribe la matriz por filas   
+    !   las filas y columnas de A vienen estan dadas de forma explicita 
+        do i=1, n 
+            write(*,*) A( i,1:m ) 
+        end do
+        write(*,*) 
+
+      end 
+ \end{verbatim} }
+
+
+
+
+
+
+
+
+
+
+
+{\source \begin{verbatim} 
+module Problema_Ondas 
+
+integer  nx
+real dx 
+real Pi  
+!real, parameter:: nu=0.1
+!real, parameter:: u0=1.0
+  
+
+contains 
+!********************************************************************
+   subroutine P_Ondas( nt, nv,  dt ) 
+              integer nt, nv 
+              real  dt 
+ 
+          Pi = 4*atan(1.0) 
+
+          nt = 10000 
+            
+          nx = 100 
+          dx = 1.0/(nx-1)  
+          dt = 0.1*dx**2 
+            nv = 2 * nx  
+          
+         
+      end subroutine 
+!******************************************************************
+      subroutine CI_Ondas ( U )
+                         real U(:)
+
+!     *** condicion inicial
+          real x_j 
+   
+          do j=1, nx 
+             x_j = dx * (j-1)  
+             U(j)  = exp( - 40*(x_j-1/2.)**2 ) 
+          enddo
+ 
+          do j=nx+1, 2*nx 
+             U(j)  = 0
+          enddo 
+
+
+
+      end subroutine 
+
+!*****************************************************************
+      subroutine Ondas (U, t, F)
+                      real U(:), t, F(:) 
+
+         
+         call Ondash( nx, U(1:nx), F(1+nx:2*nx), F(1:nx), F(1+nx:2*nx) ) 
+   
+      
+
+      end subroutine 
+
+!*****************************************************************
+      subroutine Ondash (n, u, v, Fu, Fv)
+                    integer n 
+                    real u(n), v(n), Fu(n), Fv(n)  
+
+         
+           
+!     *** condicion de contorno   
+          u(1) =  0.0;   Fu(1)  = 0.0  
+          u(n) =  0.0;   Fu(n)  = 0.0  
+
+     
+          do j=2, n-1 
+              Fu(j) = v(j) 
+              Fv(j) =  ( u(j+1) - 2*u(j) + u(j-1) )/dx**2 
+             
+          enddo 
+
+          Fv(n) = 0.0 ; Fv(1) = 0.0; 
+
+         ! write(*,*) ' Fv = ',   Fv 
+         ! read(*,*)  
+     
+      end subroutine 
+
+
+!***********************************************************************
+   subroutine Pinta_Ondas(Sistema,  t, dt, n, U, F ) 
+             
+                   interface 
+                         subroutine Sistema(U, t, F)
+                         real U(:), t, F(:)
+                         end 
+                end interface 
+                     
+             integer n  
+           real t, dt, U(n), F(n) 
+
+         integer :: ipass = 0  
+         integer j        
+
+
+         ipass = ipass + 1 
+
+        ! if (ipass==1) then 
+                            open(2, file='pepe.dat') 
+        ! endif 
+ 
+       !  write(*,*) F 
+       !  read(*,*) 
+  
+        if (abs(mod(t,1e-3))< 1d-5 ) then 
+
+         open(2, file='pepe.dat') 
+         do j = 1, nx
+            write(2,*)  dx*(j-1), U(j) 
+         enddo  
+         close(2)
+
+         write(*,*) ' t = ', t, dt   
+         read(*,*) 
+        endif  
+
+        
+       
+
+
+    end subroutine
+
+end module 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+!***********************************************************************
+   subroutine Runge_k2(Sistema, t, dt, n, U, F ) 
+
+           external Sistema 
+       integer n 
+           real t, dt, U(n), F(n) 
+
+         call Sistema(U, t, F) 
+      
+         U = U + dt * F  
+
+
+    end subroutine 
+
+\end{verbatim} }  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+en una subrutina que intrega un conjunto de ecuaciones diferenciales ordinarias.  
+Dadas las condiciones iniciales, los parámetros del problema, 
+el sistema de ecuaciones y el integrador temporal esta capa nos da los resultados de la integración a lo largo del tiempo. 
+La capa física es una subrutina que implementa la ecuación de Burgers 
+junto con sus condiciones de contorno y condiciones iniciales. 
+Dado el vector de estado $ u(x_j, t) $ para un tiempo t, esta capa calcula las derivadas con respecto al tiempo del vector de estado. 
+La capa matemática está formada por los integradores temporales 
+y la discretización espacial. 
+Los integradores temporales calculan la solución en $ t_{n+1} $ dado 
+un vector de estado en un instante $ t_n $ y sus derivadas. 
+La funciones que permiten semidiscretizar espacialmente calculan derivadas espaciales 
+a partir de un vector de estado. 
+
+capa es nivel de abstracción 
+
+La aplicación se apoya en abstracciones físicas y matemáticas.
+La abstracción física se basa en operadores en diferencias de la capa matemática 
+que discretizan espacialmente las ecuaciones diferenciales.  
+
+% 
+ En este caso la capa de aplicación es sencilla y no es necesario establecer subcapas. 
+      Lo mismo ocurre con la capa matemática que está simplemente formada por un conjunto 
+      de integradores temporales. 
+      Tal vez en la capa física pudiéramos hablar de la subcapa de condiciones de contorno 
+      que necesita la capa física donde se semidiscretiza espacialmente el problema. 
+
+\newpage
+%{\source\verbatimfile{CI_edp.for}}
+
+%{\source\verbatimfile{euler.for}}
+{\source\begin{verbatim}
+
+
+
+
+!************************************************************
+!*  Integrador Euler para el sistema du/dt = F(u)           *
+!*   Entradas:                                              *
+!*                dt : paso temporal                        *
+!*                ns : dimension del sistema                *
+!*                 u : vector de estado u(t)                *
+!*                wk : area de trabajo                      *
+!*           Sistema : subrutina donde se calcula F(u)      *
+!*   Salidas:                                               *
+!*                 u : vector de estado actualizado u(t+dt) *
+!*                 f : vector donde se almacena F(u)        *
+!************************************************************
+      subroutine Euler (Sistema, t, dt, ns, u, f, wk)
+                  integer ns
+                  real(8) t, dt, u(ns), f(ns), wk(ns)
+                  external Sistema
+
+
+          wk = u
+
+!     *** sistema de ecuaciones
+          call Sistema (u, t, f, wk)
+
+!     *** actualizacion de la funcion u
+          u = u + dt*f
+
+          t = t + dt
+      end
+ \end{verbatim} }
+
+\newpage
+%{\source\verbatimfile{adamsb2.for}}
+{\source\begin{verbatim}
+
+\newpage
+%{\source\verbatimfile{runge_k2.for}}
+{\source\begin{verbatim}
+!************************************************************************
+!*                         Runge_Kutta (orden 2)                        *
+!************************************************************************
+      subroutine Runge_K2 (f, t, dt, ns, u, du, wk)
+                 external  f
+                 real(8)   t, dt, u(*), du(*), wk(*)
+                 integer   ns
+
+          call RK2 (  f, t, dt, ns, u, du, wk(1),                       &
+                      wk(1+ns), wk(1+2*ns), wk(1+3*ns) )
+
+
+      end
+!************************************************************************
+!*                         Runge_Kutta (orden 2)                        *
+!************************************************************************
+      subroutine RK2 (f, t, dt, ns, u, du, wk, u_pr, k1, k2)
+             external f
+             integer  ns
+             real(8)  t, dt, u(ns), du(ns), wk(ns),                     &
+                      u_pr(ns), k1(ns), k2(ns)
+
+
+
+!      *** k1 = F (u^n, t_n)
+           call f (u, t, k1, wk)
+
+!      *** u(prediccion) = u^n + dt*F^n
+           u_pr = u + dt*k1
+
+!      *** k2 = F (u^n + dt*k1, t_n + dt)
+           call f (u_pr, t+dt, k2, wk)
+
+!      *** u^{n+1} = u^n + dt/2 * (k1 + k2)
+           u  = u + dt*(k1+k2)/2d0
+
+
+           t = t + dt
+
+      end
+
+ \end{verbatim} }
+ 
+
+En este ejemplo, se pone de manifiesto la importancia de programar
+unidades de programa con máximo grado de generalización.
+Obsérvese que las mismas subrutinas de integradores temporales
+han sido usadas para el problema de EDOs y para el problema de EDPs.
+
+
+
+{\source \begin{verbatim} 
+   subroutine Euler(Sistema, t, dt, n, U, F ) 
+
+        interface 
+                         subroutine Sistema(U, t, F)
+                         real U(:), t, F(:)
+                         end 
+       end interface  
+    
+          integer n 
+           real t, dt, U(n), F(n)
+
+ 
+
+         call Sistema(U, t, F) 
+      
+         U = U + dt * F  
+
+         t = t + dt  
+
+
+    end subroutine 
+ \end{verbatim} }    
+
+
+
+Un pa
+
+El abordaje de la formulación diferencial pasa por definir una malla estructurada y aproximar las derivadas espaciales 
+mediante esquemas en diferencias. 
+Si consideramos una malla equiespaciada cartesiana, las derivadas primeras se pueden aproximar por
+diferencias finitas centradas de tres puntos, 
+\begin{equation} 
+  \left( \frac{ \partial v } { \partial y } \right)_{ij}  = \frac{ v_{i,j+1} - v_{i,j-1} }{ 2 \Delta y } +  O(\Delta y ^2 ) 
+ \end{equation}  
+
+Consideramos el problema en un dominio infinito bidimensional con la condición inicial $ { \bf v } = 0  $ y  $ P = 0 $. 
+Para el problema que nos ocupa  podemos distinguir tres tipos de condición de contorno: 
+contorno del infinito, superficies reflexivas y foco emisor.  
+En el infinito las ondas sonoras deben salir sin que se produzca rebote alguno lo que implica extrapolar tanto la velocidad como la presión. 
+El suelo y la pantalla acústica se consideran medios perfectamente reflexivos por lo que 
+$ { \bf v } \cdot { \bf n }  = 0 $  y $ \nabla P  \cdot { \bf n } = 0 $.
+El foco emisor es un punto del contorno cuya velocidad perpendicular al contorno es $ { \bf v } \cdot { \bf n } = f(t) $ 
+y $  \nabla P \cdot { \bf n } = - \rho_0 \dot f(t)  $.     
+
+Si utilizamos un esquema en diferencias finitas, la condición de contorno en la velocidad normal se impone de forma automática cuando se plantean las ecuaciones discretizadas para puntos próximos al contorno. 
+Sin embargo, la condición de contorno en la derivada normal de la presión no se puede poner de forma automática 
+y se debe discretizar mediante un esquema descentrado, 
+\begin{equation} 
+  \left( \frac{ \partial P } { \partial x } \right) _0 = \frac{ 3 P_0 - 4 P_1 + P_2 } { 2 \Delta x }  + O( \Delta x ^2),   
+\end{equation} 
+donde $ P_0  $ es la presión en el contorno y $ P_1 , P_2 $ son las presiones en los nodos vecinos de la perpendicular al contorno.  
+De esta forma, podemos despejar la presión $ P_0 $ del contorno en función de la presión en los puntos interiores y 
+sustituirla en las ecuaciones discretizadas próximas al contorno.  
+  
+
+Si se pretende abordar el problema volúmenes finitos, es necesario plantear la formulación integral, 
+\begin{equation}
+     \frac{d}{dt} \int_{\Omega} P d\Omega +
+     \int_{\partial \Omega} \rho_0  c^2 { \bf v} \cdot { \bf n} ds  = 0
+\end{equation}
+\begin{equation}
+     \frac{d}{dt} \int_{\Omega} \rho_0 { \bf v } d\Omega +
+     \int_{\partial \Omega} P { \bf n } ds = 0
+\end{equation}
+Todo lo expuesto con anterioridad en cuanto a condiciones de contorno para los esquemas en diferencias finitas 
+es igualmente aplicable para los esquemas en volúmenes finitos. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\ucaja}[3]{
+                \begin{center}
+                    \begin{tabular}{c}
+
+                       \framebox{  \parbox[t]{#1}{ #3 } }
+
+                    \end{tabular}
+                \end{center}
+                    \vspace{#2}
+                  }
+\newcommand{\grupos}[3]{
+                \begin{center}
+                    \begin{tabular}{c}
+                       \framebox{  \parbox[t]{#1}{ #3 } }
+                    \end{tabular}
+                \end{center}
+                    \vspace{#2}
+                  }
+
+
+
+\newcommand{\dcajas}[2]{
+
+                \begin{center}
+                    \begin{tabular}{cc}
+
+                       \framebox{  \parbox[t]{4cm}{ #1 } }
+                       \hspace{10ex}
+                       \framebox{  \parbox[t]{4cm}{ #2 } }
+
+                    \end{tabular}
+                \end{center}
+
+                    \vspace{1cm}
+                  }
+\newcommand{\tcajas}[3]{
+
+                \begin{center}
+                    \begin{tabular}{ccc}
+
+                       \framebox{  \parbox[t]{2cm}{ #1 } }
+                       \hspace{10ex}
+                       \framebox{  \parbox[t]{2cm}{ #2 } }
+                       \hspace{10ex}
+                       \framebox{  \parbox[t]{2cm}{ #3 } }
+
+                    \end{tabular}
+                \end{center}
+
+                    \vspace{1cm}
+                  }
+     
+
+
+
+\newcommand{\ccajas}[4]{
+
+                \begin{center}
+                    \begin{tabular}{cccc}
+
+                       \framebox{  \parbox[t]{2.5cm}{ #1 } }
+                       \hspace{4ex}
+                       \framebox{  \parbox[t]{2.5cm}{ #2 } }
+                       \hspace{4ex}
+                       \framebox{  \parbox[t]{2.5cm}{ #3 } }
+                       \hspace{4ex}
+                       \framebox{  \parbox[t]{2.5cm}{ #4 } }
+
+                    \end{tabular}
+                \end{center}
+
+                    \vspace{1cm}
+                  }
+\newcommand{\cgcajas}[4]{
+
+                \begin{center}
+                    \begin{tabular}{cccc}
+
+                       \framebox{  \parbox[t]{2.8cm}{ #1 } }
+                       \hspace{1ex}
+                       \framebox{  \parbox[t]{2.8cm}{ #2 } }
+                       \hspace{1ex}
+                       \framebox{  \parbox[t]{2.8cm}{ #3 } }
+                       \hspace{1ex}
+                       \framebox{  \parbox[t]{2.8cm}{ #4 } }
+
+                    \end{tabular}
+                \end{center}
+
+                    \vspace{1cm}
+                  }
+
+
+
+%******************************************************************************
+% cajas para la sintaxis oct 2000
+%******************************************************************************
+\newcommand{\ucajas}[1]{
+                \begin{center}
+                  %  \begin{tabular}{c}
+                       \framebox{   \parbox[t]{13.4cm}{ #1 } }
+                                  %\begin{minipage}{13.4cm} #1 \end{minipage} } 
+                   % \end{tabular}
+                \end{center}
+  %             \vspace{1cm}
+  }
+
+
+\newcommand{\ucajita}[1]{
+                     \begin{tabular}{c}
+                       \framebox{  \parbox[t]{5cm}{ #1 } }
+                    \end{tabular}
+                       }
+
+\newcommand{\ucajin}[1]{
+                     \begin{tabular}{c}
+                       \framebox{  \parbox[t]{4cm}{ #1 } }
+                    \end{tabular}
+                       }
+
+\newcommand{\ucajon}[1]{
+                     \begin{tabular}{c}
+                       \framebox{  \parbox[t]{7cm}{ #1 } }
+                    \end{tabular}
+                       }      
+
+\newcommand{\tcaja}[6]{
+   \begin{center}
+       \begin{tabular}{ccc}
+
+          \parbox[t]{#1}{ \begin{center} #4 \end{center} }
+          \hspace{#2}
+          \framebox{ \parbox[t]{#1}{ \begin{center} #5 \end{center} } }
+          \hspace{#2}
+          \parbox[t]{#1}{ \begin{center} #6 \end{center} }
+
+                    \end{tabular}
+                \end{center}
+
+                    \vspace{#3}
+                  }
+            
+%************************************************************************
+% Blackboard fonts
+%************************************************************************
+\newcommand{\BBR}{{\sf R\hspace*{-0.9ex}\rule{0.15ex}{1.5ex}\hspace*{0.9ex}}}
+\newcommand{\BBC}{{\sf C\hspace*{-0.9ex}\rule{0.15ex}{1.3ex}\hspace*{0.9ex}}}
+
+%**********************************************************************
+% font para los fuentes FORTRAN 
+ %\def\source{\footnotesize}
+\def\source{\small}
+
+
+
+La llamada a una subrutina  con etiqueta {\sl nombre} tiene la siguiente sintaxis:
+        \begin{center}
+                \fbox{ {\bf call} {\sl nombre}
+                       [ ({\sl lista de variables}) ] }
+       \end{center}
+\index{CALL sentencia} 
+
+
+\index{especificación!argumentos!explícita}
+\index{especificación!argumentos!implícita}
+El interfaz de un procedimiento puede ser implícito o explícito. 
+El interfaz es explícito cuando en la unidad desde donde se llama se conoce toda 
+la información de los argumentos de  procedimiento llamado. 
+El interfaz es implícito cuando no se conoce esta información. 
+La forma de que el interfaz sea explícito es bien mediante una especificación explícita de 
+interfaz anteriormente descrita 
+o mediante la asociación de una unidad de programa {\bf module} que contenga 
+las subrutinas o funciones que queremos llamar. 
+El problema de la especificación explícita del interfaz en la unidad de programa desde 
+donde se llama es el código redundante. Es decir, 
+si escribimos en diez unidades diferentes el interfaz de un mismo procedimiento y   
+modificamos los argumentos del procedimiento, tendremos que modificar en diez lugares 
+diferentes el interfaz de ese procedimiento.
+Mediante el uso de un {\bf module} que contenga los procedimientos deseados evitamos 
+escribir código redundante. 
+En el caso particular en que los argumentos de una subrutina o función sean 
+procedimientos, la única forma de hacer explícitos los interfaces 
+de los argumentos que son procedimientos es mediante una especificación de interfaces. 
+
+En ocasiones en las que no sea necesaria la especificación del interface y un 
+parámetro o argumento sea una subrutina o una función,  
+la sentencia  { \bf external } se debe usar para especificar que el parámetro es una 
+unidad de programa.  
+\index{EXTERNAL especificación} 
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+Las especificaciones de todas las funciones se agrupan en el siguiente módulo
+
+\fuente
+ module interfaces_capa_matematica
+
+      interface     !  especificaciones de argumentos
+ 
+         ! *** norma_L2 
+               function norma_L2( vector ) 
+                               real :: vector(:)
+                               real :: norma_L2
+               end function 
+\end{verbatim} \fin 
+
+\fuente 
+
+               function norma_L2e( n, vector )
+                             integer :: n   
+                             real :: vector(1:n)
+                             real :: norma_L2e 
+               end function  
+  
+               function norma_L2t( n, vector)
+                                integer ::  n
+                                real :: vector(*)
+                                real :: norma_L2t 
+               end function  
+\end{verbatim} \fin 
+
+\fuente 
+      
+         ! *** norma sup  
+               function norma_sup(vector)
+                               real :: vector(:)
+                               real :: norma_sup 
+               end function  
+             
+      end interface
+
+end module 
+\end{verbatim} \fin  
+
+
+La  parte de especificaciones de una unidad de programa puede tener las siguientes componentes:  
+%*******************************************************
+ \begin{enumerate}
+ \item  Especificación de variables. 
+ \item  Especificación de argumentos.  
+\end{enumerate} 
+
+
+
+Si queremos que un conjunto de ciertas  variables puedan ser compartidas 
+por un procedimiento o unidad de programa,  se pueden  agrupar en una unidad de 
+programa { \bf module } y más adelante  asociar mediante la sentencia {\bf use}
+el conjunto de variables.  
+%Las especificaciones de variables locales pueden ir en cualquier unidad de programa.
+
+
+
+Cuando en una unidad de programa vayamos a utilizar variables externas y nuevos tipos 
+de variables,  es una buena metodología agrupar y organizar  las nuevas definiciones de tipo 
+y las variables externas en una o varias unidades de  programa { \bf module }.  
+
+
+
+
+
+En el siguiente ejemplo definimos un nuevo tipo llamado \verb|color| 
+formado por tres datos reales y en el programa principal 
+creamos un vector de colores (nuevo tipo).  
+
+\fuente
+    module nuevos_tipos  
+
+           type color 
+                         real :: x, y, z 
+           end type color  
+        
+    end  module
+
+    program colores
+    
+             use nuevos_tipos 
+
+             type (color) vector(10) 
+
+   end 
+  \end{verbatim} \fin
+
+
+
+ 
+Especificación de las variables externas mediante la sentencia {\bf use}. 
+El uso de las variables externas está restringido a casos muy concretos.
+ \item  Especificación de  nuevos tipos que utilice el procedimiento mediantela sentencia {\bf la unidad de programa.
+%Por otra parte, la llamada a una subrutina permite 
+%reformatear las variables mediante la 
+%asociación de un sector de la variable al argumento del procedimiento. 
+%Mientras que el tipo del argumento y de su variable asociada deben ser los mismos, 
+%la forma puede diferir. 
+%Así, el argumento puede ser una matriz de reales de 10 $\times $  10 y la variable
+%asociada un vector  de reales de 100 elementos. 
+%Aunque el  reformateo de datos mediante el uso de llamadas a subrutinas  con 
+%argumentos es conceptualmente complicado, 
+%es una de las tareas más potentes que se puede realizar en un programa. 
+%y se analizará en detalle en el capítulo 5 dedicado a las unidades de programa y su conexión funcional. 
+
+
+
+
+Los a
+
+con una determinada func
+
+  existen pro
+
+
+Generalmente, la comunicación entre unidades de programa se realiza a través de los 
+argumentos de las subrutinas o funciones que encapsulan tareas.   
+Como resultado se obtiene un código con conexión funcional pero sin
+estructura y el flujo de datos resulta asociado a todas las unidades de programa.
+
+
+
+
+
+ con una única entrada y una única salida.
+
+
+
+El programador posee conocimientos medios de programación.
+
+
+De esta forma, aunque el flujo de datos resulta ser más ordenado dentro de cada unidad de programa,  
+la comunicación  a través de variables externas oscurece  en gran medida  el flujo de datos.
+
+
+
+

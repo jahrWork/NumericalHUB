@@ -1,0 +1,238 @@
+\chapter{Systems of equations}
+\section{Overview}
+
+This is a library designed to solve systems of equations. The module \verb|Linear_systems| has functions and subroutines related to linear algebra. 
+
+ \renewcommand{\home}{../libraries/Numerical_Methods/System_of_Equations}
+  \listings{\home/sources/Linear_systems.f90}
+       {module Linear_systems}
+       {contains}{Linear_systems.f90}
+\vspace{-0.3cm}       
+
+
+\newpage
+
+
+\section{Linear systems module}
+
+
+\subsection*{LU factorization}
+
+
+\begin{lstlisting}[frame=trBL]
+call LU_factorization( A )
+\end{lstlisting}
+The subroutine \verb|LU_factorization| finds the LU factorization 
+of the input matrix $ A$. The results is given in the same argument. 
+The arguments of the subroutine are described in the following table.
+
+\btable
+A & two-dimensional array of reals & inout & Square matrix.\\ \hline
+\etable{Description of \texttt{LU\_factorization} arguments}
+
+%***********************************************************************************
+\subsection*{Solve LU}
+\begin{lstlisting}[frame=trBL]
+x = Solve_LU( A , b )
+\end{lstlisting}
+The function \verb|Solve_LU| finds the solution to the linear system of equations $ 	A \ \vect{x}=\vect{b}, $  
+where the matrix ${A}$ has been previously $ L \ U $ factorized and $\vect{b}$ is a  given vector. 
+The arguments of the function are described in the following table.
+\btable
+A & two-dimensional array of reals & inout & Square matrix ${A}$ previously factorized by \verb|LU_factorization|.\\ \hline
+b & vector of reals & in & Independent term  $\vect{b}$. \\ \hline
+\etable{Description of \texttt{Solve\_LU} arguments}
+
+%***********************************************************************************
+\subsection*{Inverse}
+\begin{lstlisting}[frame=trBL]
+B = Inverse( A )
+\end{lstlisting}
+The function \verb|Inverse| finds the inverse of the square matrix $ A$ 
+by means of a  $ L \ U $ factorization. 
+
+
+%***********************************************************************************
+\subsection*{Gauss}
+\begin{lstlisting}[frame=trBL]
+x = Gauss( A , b )
+\end{lstlisting}
+The function \verb|Gauss| finds the solution of the linear system of equations $ 	A \ \vect{x}=\vect{b} $  
+by means of a classical Gaussian elimination.
+The arguments of the function are described in the following table.
+\btable
+A & two-dimensional array of reals & inout & Square matrix ${A}$.\\ \hline
+b & vector of reals & in & Independent term $\vect{b}$. \\ \hline
+\etable{Description of \texttt{Gauss} arguments}
+
+%***********************************************************************************
+\subsection*{Condition number}
+\begin{lstlisting}[frame=trBL]
+kappa = Condition_number(A) 
+\end{lstlisting}
+The function \verb|Condition_number| determines the condition number   $ \kappa = ||A||_2 \ || A^{-1} ||_2  $  
+where $ A $ is a square matrix. 
+
+%***********************************************************************************
+\subsection*{Tensor product}
+\begin{lstlisting}[frame=trBL]
+A = Tensor_product(u, v) 
+\end{lstlisting}
+The function \verb|Tensor_product| determines the matrix   $ A_{ij} = u_i \ v_j   $.  
+The arguments of the function are described in the following table.
+\btable
+u & vector of reals & in & Vector $\vect{u}$.\\ \hline
+v & vector of reals & in & Vector $\vect{v}$. \\ \hline
+\etable{Description of \texttt{Tensor\_product} arguments}
+
+
+\newpage 
+%***********************************************************************************
+\subsection*{Power method}
+\begin{lstlisting}[frame=trBL]
+call Power_method(A, lambda, U) 
+\end{lstlisting}
+The function \verb|Power_method| finds the largest eigenvalue of  $ 	A  $  
+by the power method. 
+The arguments of the function are described in the following table.
+\btable
+A &  array of reals & inout & Square matrix ${A}$.\\ \hline
+lambda & real & out & Largest eigenvalue. \\ \hline
+U & vector of reals & out & Associated eigenvector. \\ \hline
+\etable{Description of \texttt{Power\_method} arguments}
+
+
+%***********************************************************************************
+\subsection*{Inverse Power method}
+\begin{lstlisting}[frame=trBL]
+call Inverse_Power_method(A, lambda, U) 
+\end{lstlisting}
+The function \verb|Power_method| finds the smallest eigenvalue of  $ 	A  $  
+by the inverse power method. 
+The arguments of the function are described in the following table.
+\btable
+A & array of reals & inout & Square matrix ${A}$.\\ \hline
+lambda & real & out & Smallest eigenvalue. \\ \hline
+U & vector of reals & out & Associated eigenvector. \\ \hline
+\etable{Description of \texttt{Inverse\_power\_method} arguments}
+
+
+
+\newpage 
+%***********************************************************************************
+\subsection*{Eigenvalues by means of the power method}
+\begin{lstlisting}[frame=trBL]
+call Eigenvalues_PM(A, lambda, U, lambda_min)  
+\end{lstlisting}
+The function \verb|Eigenvalues_PM| calculates 
+the eigenvalues of a symmetric matrix $ A$. 
+Since the power method obtains the greatest eigenvalue, 
+eigenvalues are calculated sequentially until the minimum value 
+\verb|lambda_min| is reached. 
+The arguments of this subroutine are described in the following table.
+\btable
+A &  array of reals & in & symmetric matrix ${A}$.\\ \hline
+lambda & vector of reals & out & eigenvalues of $ A $.  \\ \hline
+U & array of reals & out & $U_{ik}$ is the associated  eigenvector of $ A $.   \\ \hline
+lambda\_min &  real, optional &  in &  min value of calculated eigenvalues.  \\ \hline
+\etable{Description of \texttt{Eigenvalues\_PM} arguments}
+
+
+
+
+
+%***********************************************************************************
+\subsection*{SVD}
+\begin{lstlisting}[frame=trBL]
+call SVD(A, sigma, U, V, sigma_min)  
+\end{lstlisting}
+The subroutine  \verb|SVD| finds the decomposition   $ A  = U \ S \ V^{T} $
+of a non-square matrix $A$.  
+The singular values \verb|sigma| 
+are calculated sequentially until the minimum value 
+\verb|sigma_min| is reached. 
+If the rank of matrix $ A $ is $ r < \min(N,M) $,
+eigenvalues are completed by means of Gram--Schmidt orthonormalization.
+The arguments of the function are described in the following table.
+\btable
+A & two-dimensional array of reals & in & Square matrix ${A}$.\\ \hline
+sigma & vector of reals & out & $\sigma^2_k$ eigenvalues of $ A^T  A $  \\ \hline
+U & two-dimensional array of reals & out & $U_{ik}$ is the associated  eigenvector of $ A \ A^T $   \\ \hline
+V & two-dimensional array of reals & out & $V_{ik}$ is the associated  eigenvector of $ A^T A $   \\ \hline
+\etable{Description of \texttt{SVD} arguments}
+
+
+
+
+
+
+
+
+\newpage 
+\section{Non Linear Systems module}
+
+
+ The module \verb|Non_Linear_Systems| is used to solve non linear system of equations. 
+
+
+ \renewcommand{\home}{../libraries/Numerical_Methods/System_of_equations}
+  \listings{\home/sources/Non_Linear_Systems.f90}
+       {module Non_Linear_Systems}
+       {contains}{Non_Linear_Systems.f90}
+\vspace{-0.3cm}       
+
+
+
+
+
+\subsection*{Newton}
+\begin{lstlisting}[frame=trBL]
+call Newton( F , x0 )
+\end{lstlisting}
+
+The subroutine \verb|Newton| returns the solution of a non-linear system of equations. The arguments of the subroutine are described in the following table.
+
+\btable	
+			F & vector function $ F : \mathbb{R}^{N} \rightarrow \mathbb{R}^{N}$ & in & System of equations to be solved. \\ \hline
+			x0 & vector of reals & inout & Initial iteration point. When the iteration reaches convergence,  this vector contains the solution of the problem.  \\ \hline
+			
+\etable{Description of \texttt{Newton} arguments}
+
+
+
+
+
+
+\newpage 
+\subsection*{Newtonc}
+\begin{lstlisting}[frame=trBL]
+call Newtonc( F , x0 )
+\end{lstlisting}
+
+The subroutine \verb|Newtonc| returns the solution of implicit and explicit equations packed in the same function $ F(x)$.
+Hence, the function $F(x)$  has internally the following form: 
+\begin{eqnarray*}
+     &  x_1  = & g_1( x_2, x_3, \ldots x_N), \\ 
+     & x_2   =& g_2( x_1, x_3, \ldots x_N), \\ 
+     & \vdots &  \vdots \\
+     & x_m   =& g_m( x_1, x_2, \ldots x_N), \\ 
+     &        & \\
+     & F_1   =& 0, \\
+     & F_2  =& 0, \\
+     & \vdots & \vdots \\
+     & F_m  =& 0, \\
+     & & \\
+     & F_{m+1}   =& g_{m+1}( x_1, x_2, \ldots x_N), \\
+      & \vdots & \vdots \\
+      & F_{N}   =& g_N( x_1, x_2, \ldots x_N). \\
+\end{eqnarray*}
+
+The arguments of the subroutine are described in the following table.
+
+\btable
+			F & vector function & in & System of implicit and explicit equations to be solved. \\ \hline
+			x0 & vector of reals & inout & Initial iteration point. When the iteration reaches convergence,  this vector contains the solution of the problem.  \\ \hline
+			
+\etable{Description of \texttt{Newtonc} arguments}
+
+

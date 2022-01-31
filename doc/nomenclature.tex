@@ -1,0 +1,173 @@
+\chapter*{\textbf{Nomenclature}}
+
+\begin{tabular}{ll}
+	 $\R{N}$   & :  $N$-dimensional real numbers field. \\ 
+	
+	 $\M{N}{N}$ & :  Set of all square matrices of dimension $N\times N$. \\
+	
+	 $I$ & :  Identity matrix. \\
+	
+	 $ \det(A)$ & :  Determinant of a square matrix $A$. \\
+	
+	 $\vect{e}_i$ & :  Base vector of a vectorial space. \\
+	
+	 $\vect{e}_i \otimes \vect{e}_j $ & :  Base tensor of a tensorial space. \\
+	
+	 $\delta_{ij}$ & :  Delta Kronecker function. \\
+	
+	 $L$ & :  Lower triangular matrix on a LU factorization. \\
+	
+	 $U$ & :  Upper triangular matrix on a LU factorization. \\
+	
+	 $\vect{f}$ & :  Application $\application{\vect{f}}{\R{p}}{\R{p}}$. \\
+	
+	 $J_f$ & :  Jacobian matrix of an application $\vect{f}$. \\
+	
+	 $\nabla$ & :  Nabla operator $\pdv*{}{x_i}\vect{e}_i$.\\
+	
+%m $\C{}$ & :  complex numbers field.
+	
+%	 $\C{N}$ & :  $N$-dimensional complex numbers field.\\
+	
+	 $\lambda$ & :  Eigenvalue of a square matrix.\\
+	
+	 $\phi$ & :  Eigenvector of a square matrix.\\
+	
+	
+	 $\Lambda(A)$ & :  Spectra of a matrix $A$.\\
+
+	 $\kappa(A)$ & :  Condition number of a matrix $A$.\\
+	
+	 $\ell_j$ & :  Lagrange polynomial centered at $x_j$ for global interpolation.\\
+	 $\ell_{jk}$ & :  $k$ grade Lagrange polynomial centered at $x_j$ for piecewise interpolation.\\
+	 $\vect{\ell}_x$ & :  Interpolation vector along $OX$ $\vect{\ell}_x = \ell_i(x) \vect{e}_i $.\\
+	 $\vect{\ell}_y$ & :  Interpolation vector along $OY$ $\vect{\ell}_y = \ell_j(y) \vect{e}_j $.\\
+	 $\mathcal{F}$ & :  Second order tensor for 2-dimensional interpolation.\\
+	
+	 $\dv*{\vect{u}}{t} $ & :  Temporal derivative for a function $\application{\vect{u}}{\R{}}{\R{p}}$.\\
+	
+	 $ \vect{F}(\vect{u},t)$ & :  Differential operator $\application{\vect{F}}{\R{p}\times\R{}}{\R{p}}$ for a Cauchy problem.\\
+	
+	 $\vect{u}_0$ & :  Initial condition for a Cauchy problem.\\
+	
+	 $t_n$ & :  $n$-th instant of the temporal mesh.\\
+	
+	 $\vect{u}^n$ & :  Discrete solution of the Cauchy problem, $\vect{u}^n \in \R{p}$.\\
+	
+	 $s$ & :  Number of time steps for any numerical scheme. \\
+	
+	
+	 $\vect{G}$ & :  Temporal scheme $\application{ \vect{G}}{\R{p}\times \R{p}\times\ldots\times\R{p} \times\R{}\times\R{} }{\R{p}}$.\\
+	
+	 $\vect{\tilde{G}}$ & :  Restricted temporal scheme,
+	 $\eval{\vect{G}}_{(\vect{u}^{n}, \ldots \vect{u}^{n+1-s};t_n, \Delta t )}$,       $\application{\vect{\tilde{G}}}{\R{p}}{\R{p}}$.\\
+	
+	 $\vect{\tilde{G}}^{-1}$ & :  Restricted temporal scheme inverse, $\application{\vect{\tilde{G}}^{-1}}{\R{p}}{\R{p}}$.\\
+	
+  
+
+\end{tabular}
+
+\begin{tabular}{ll}	
+	
+	
+	 $\Omega$ & :  Interior of the spatial domain of PDE problem.\\
+	
+	 $\partial\Omega$ & :  Boundary of the spatial domain of a PDE problem. \\
+	
+	 $D$ & :  Domain of a PDE problem, $D\equiv \{\Omega\cup \partial\Omega\}$.\\
+
+
+     $\vect{\mathcal{L}}(\vect{x},\vect{u})$ & :  Differential operator of a BVP,    
+     $\application{\vect{\mathcal{L}}}{D\times \R{N_v}}{\R{N_v}}$.\\
+    
+     $\eval{\vect{h}(\vect{x},\vect{u})}_{\partial\Omega}$ & :  Boundary conditions operator for a BVP.\\
+  
+    
+     $U$ & :  Discrete solution of a BVP.\\
+    
+     $F(U)$ & :  Inner points difference operator for a BVP.\\
+    
+     $\eval{H(U)}_{\partial\Omega}$ & :  Boundary points difference operator for a BVP.\\
+    
+     $S(U)$ & :  Inner and boundary points difference operator for a BVP.\\
+    
+     $\pdv*{\vect{u}}{t}$ & :  Temporal partial derivative of an IVBP 
+     $\application{\vect{u}}{\R{}}{\R{N_v}}$.\\
+    
+     $\vect{\mathcal{L}}(\vect{x},t,\vect{u})$ & :  Differential operator of an IVBP,  
+     $\application{\vect{\mathcal{L}}}{D\times\R{}\times \R{N_v} }{\R{N_v}}$.\\
+    
+ 
+     $\eval{\vect{h}(\vect{x},t,\vect{u})}_{\partial\Omega}$ & :  Boundary conditions operator of an IVBP.\\
+     
+      $\vect{u}_0(\vect{x})$ & :  Initial condition for an IVBP.\\
+     
+      $U$ & :  Spatially discretized solution of an IVBP, $\application{U}{\R{}}{\R{N}}$\\
+     
+      $U_{\Omega}$ & :  Inner points, $\application{U}{\R{}}{\R{N-N_C}}$\\
+     
+      $\eval{U}_{\partial\Omega}$ & :  Boundary points, $\application{U}{\R{}}{\R{N-N_C}}$\\
+     
+      $\dv*{U_{\Omega}}{t}$ & :  Temporal derivative  for inner points.\\
+     
+      $F(U;t)$ & :  Difference operator for a spatially discretized IVBP  \\ % $\application{F}{\R{N}\times \R{}}{\R{N-N_C}}$\\
+     
+      $ \eval{H(U;t)}_{\partial\Omega} $ & :  Difference operator for boundary points conditions. \\
+      % of a spatially discretized IVBP, $\application{H}{\R{N}\times \R{}}{\R{N_c}}$
+     
+      $U^n$ & :  Discretized solution of an IVBP solution at the instant $t_n$.\\
+     
+      $U_{\Omega}^n$ & : Inner points of a discretized solution.\\
+     
+      $U_{\partial\Omega}^n$ & :  Boundary points of a discretized solution. \\
+     
+     
+    
+      $E^n$ & :  Temporal discretization error for an IVBP.\\
+     
+      $E$ & :  Spatial discretization  error for an IVBP.\\
+     
+      $\vect{\varepsilon}_{i}$ & :  Spatial discretization error at $\vect{x}_i$, $\application{\vect{\varepsilon}_i}{\R{}}{\R{}}$.\\
+     
+      $\vect{\varepsilon}_{i}^n$ & :  Temporal discretization error at $\vect{x}_i$.\\
+     
+      $\vect{\varepsilon}_{T,i}^n$ & :  Total error at $\vect{x}_i$.\\
+     
+      $E_T$ & :  Total error on the resolution of a linear IVBP.\\
+     
+      $\vect{r}_i$ & :  Truncation error at $\vect{x}_i$, $\application{\vect{r}_i}{\R{}}{\R{N_v}}$\\
+     
+      $R$ & :  Truncation error for an IVBP, $\application{R}{ \R{} }{ \R{N-N_C} }$.\\
+     
+      $\Phi$ & :  Fundamental matrix, $\application{\Phi}{\R{}}{\M{N-N_C}{N-N_C}}$.\\
+     
+  %  m $I_A$ & :  Primitive of a matrix function $\application{A}{\R{}}{\M{N-N_C}{N-N_C}}$, $\int_{t_0}^{t} A(s)\dd s$.
+     
+      $\exp(A)$ & :  Exponential of the matrix $A$.\\
+     
+      $\sup K$ & :  Supreme element of a set $K$.\\
+     
+      $\alpha(A)$ & :  Spectral abscissa of a matrix $A$.\\
+     
+      $T^n$ & :  Truncation temporal error at instant $t_n$.\\
+     
+      $\rho( A) $ & :  Spectral radius of a matrix $ A$.\\
+      
+      $\vect{\mathcal{L}}_u$ & : Differential operator for an evolution variable $\application{\vect{u}}{D\times\R{}}{\R{N_u}}$ \\ &  of an IVBP and BVP mixed problem,\\ &   $\application{\vect{\mathcal{L}}_u}{D\times\R{}\times\R{N_u}\times\R{N_v}}{\R{N_u}}$. \\
+      
+      $\vect{\mathcal{L}}_v$ & : Differential operator for a variable $\application{\vect{v}}{D\times\R{}}{\R{N_v}}$ of an \\ & IVBP and BVP mixed problem,\\ &   $\application{\vect{\mathcal{L}}_v}{D\times\R{}\times\R{N_v}\times\R{N_u}}{\R{N_v}}$. \\
+      
+      $\vect{h}_u$ & : Boundary conditions operator for a mixed problem. \\
+  
+      $\vect{h}_v$ & : Boundary conditions operator for a mixed problem. \\
+      
+      
+     
+\end{tabular}
+
+
+
+
+
+

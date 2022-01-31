@@ -1,0 +1,778 @@
+     
+       %*************************************************************************
+       \chapter{Initial Value Boundary Problems}\label{Dev:IVBP}
+       %*************************************************************************  
+       \section{Overview}
+       
+       In this chapter, a resolution method for initial value boundary problems will be exposed. First, a brief mathematical presentation shall be given, followed by an algorithm which solves the kind of problem presented. To end, how this algorithm is implemented in Fortran language is described. With this, it is intended for the reader to be able to understand and assimilate the necessary concepts which permit to solve initial value boundary problems.
+       
+       
+       %*************************************************************************  
+       \newpage
+       \section{Initial Value Boundary Problems}
+       
+       Whenever in the considered physical model, the magnitudes vary not only along the spatial dimension but also along time, the equations that result are usually partial differential equations that involve temporal derivatives. In this case, not only boundary conditions are required for the resolution of the problem but also an initial value for the unknown variable shall be provided. The set of differential equation, boundary conditions and initial value is called \textit{Initial Value Boundary Problem}, and more rigorously can be defined as follows:\\
+       
+       Let us be $\Omega \subset \mathbb{ R}^p$ an open and connected set, and $\partial \Omega$ its boundary set. The spatial domain $D$ is defined as its closure, $D \equiv \{\Omega \cup \partial \Omega\}$. Each element of the spatial domain is called  $\vect{x} \in D $. The temporal dimension is defined as $t \in \mathbb{R} $.\\ 
+       
+       An Initial Value Boundary Problem for a vectorial function $\vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$ of $N_v$ variables, is defined as:
+       
+       \begin{align*}
+         &\frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}} (\vect{x},t,\vect{u}(\vect{x},t)) , & \forall \ \ \vect{x} \in  \Omega, \\
+         &\vect{h} (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 ,  & \forall \ \ \vect{x} \in \partial \Omega,\\
+         & \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}), 
+       \end{align*}
+       where $\vect{\mathcal{L}}$ is the spatial dif{}ferential operator, $\vect{u}_0(\vect{x})$ is the initial value and $\vect{h}$ is the boundary conditions operator for the solution at the boundary points $\vect{u} \big\rvert_{\partial \Omega}$.\\
+       
+       If the spatial domain $D$ is discretized in $N_D$ points, the problem extends from vectorial to tensorial, as a tensorial system of equations of order $p$ appears from each variable of $\vect{u}$. The order of the complete tensorial system is $p +1$ and its number of elements $N$ is $N= {N_v} \times N_D$. The number of points in the spatial domain $N_D$ can be divided on inner points $N_{\Omega}$ and on boundary points $N_{\partial\Omega}$, satisfying: $N_D = N_{\Omega} + N_{\partial\Omega} $. Thus, the number of elements of the tensorial system evaluated on the boundary points is $N_C= {N_v} \times N_{\partial\Omega}$. Once the spatial discretization is done, even though the system emerges as a tensorial Cauchy Problem, it can be rearranged into a vectorial system of $N$ equations. Particularly two systems appear: one of $N-N_C$ equations from the differential operator and another of $N_C$ equations from the boundary conditions. The Cauchy Problem, this way results:
+       $$\dv{{U}_{\Omega}}{t} = {F}({U};t) , \qquad {H}({U};t)\big\rvert_{\partial \Omega}=0, $$ $$ {U}(t_0)={U}^0,$$
+       where $U \in \mathbb{ R}^{N}$ is the solution in all domain, $U_{\Omega}\in \mathbb{ R}^{N-N_C}$ is the solution on the inner points of the grid, $U \big\rvert_{\partial \Omega} \in \mathbb{ R}^{N_C}$ is the solution on the boundary points of the grid, $U^0 \in \mathbb{ R}^{N}$ is the discretized initial value, ${F}: \mathbb{ R}^{N} \times \mathbb{ R}\rightarrow \mathbb{R}^{N-N_C} $ is the difference operator associated to the dif{}ferential operator and ${H}: \mathbb{ R}^{N} \times \mathbb{ R}\rightarrow \mathbb{R}^{N_C}$ is the difference operator of the boundary conditions. 
+       
+       Hence, the dif{}ferential equations system is transformed into a Cauchy Problem of $N$ equations that in general is not linear. 
+       
+       To solve the Cauchy Problem the time is discretized in $t=t_n \vect{e}_n$.
+       The term $n \in \mathbb{Z}$ is the index of every temporal step that runs over $[0,N_t]$, where $N_t$ is the number of temporal steps. As the solution is evaluated only in these points, from now on we will use the notation for every temporal step $t_n$: $U_{\Omega}(t_n)=U^n_{\Omega}$ and $U(t_n)=U^n$.
+       The Cauchy Problem transforms into a difference equation system introducing a $s$-steps temporal scheme:
+       $$G({U}_{\Omega}^{n+1}, \underbrace{ {U}^{n}, \ldots {U}^{n+1-s}}_{s \ steps};t_n, \Delta t)={F}({U}^n;t_n) ,$$
+       $${H}({U}^n;t_n)\big\rvert_{\partial \Omega}=0, \qquad {U}(t_0)=U^0,$$
+       where  
+       $${G}: \mathbb{ R}^{N-N_C} \times \underbrace{\mathbb{ R}^{N} \times  \ldots \times \mathbb{ R}^{N}}_{s \ steps} \times\mathbb{ R} \times \mathbb{ R}\rightarrow \mathbb{R}^{N-N_C}, $$ is the difference operator associated to the temporal derivative for the temporal scheme and $\Delta t$ is the temporal step. Thus, at each temporal step two systems of $N_C$ and $N-N_C$ equations appear.
+       
+       Once the temporal discretization is done, the problem reduces to two difference equations systems, that in total sum $N$ equations at each temporal step.
+       
+       \IVBPmethodlines
+       
+       \FloatBarrier
+       \subsection{Algorithm.}
+       
+       The algorithm solves for a function $\vect{u}: D \times \mathbb{R}\rightarrow \mathbb{R}^{N_v}$, the evolution problems of the type:
+       $$\frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}} (\vect{x},t,\vect{u}(\vect{x},t)) ,  \qquad \ \forall \ \ \vect{x} \in  \Omega, $$
+       $$ \vect{h} (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 ,  \qquad \ \forall \ \ \vect{x} \in \partial \Omega,$$ 
+       $$ \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}), $$
+       
+       This problem will be solved numerically, hence, a distinction between spatial and temporal dependence and their discretizations shall be done. Starting from the spatial discretization, the dif{}ferential equations systems transforms into:
+       
+       $$\dv{{U}_{\Omega}}{t}= {F}({U};t) , \qquad {H}({U};t)\big\rvert_{\partial \Omega}=0, $$ $$ {U}(t_0)={U}^0 .$$
+       
+       The spatially discretized problem behaves as a Cauchy Problem system of $N-N_C$ equations for $U_{\Omega}(t)$ and a system of $N_C$ equations for $U(t)\big\rvert_{\partial \Omega}$ .
+       
+       Discretizing temporarily the problem using a $s$-step scheme, it transforms in a difference equations system of $N$ equations for each temporal step:
+       $$G({U}_{\Omega}^{n+1}, { {U}^{n}, \ldots {U}^{n+1-s}};t_n, \Delta t)={F}({U}^n;t_n),$$
+       $${H}({U}^n;t_n)\big\rvert_{\partial \Omega}=0, \qquad {U}(t_0)=U^0 .$$
+       
+       The main idea of the resolution algorithm is first to discretize the spatial domain with the initial value $U^0$. Then construct the difference operator $F$. Finally, using a temporal scheme obtain the value of the next temporal step $U_{\Omega}(t_1)=U_{\Omega}^1$. Hence, recursively the problem can be solved introducing $U_{\Omega}^1$ as the initial value for the next iteration. As the algorithm works recursively it shall be explained for a generic step, taking $U_{\Omega}^n$ as initial value.
+       
+       The algorithm can be explained in three steps:
+       \begin{enumerate}
+       	\item {\textbf{Boundary points from inner points.}}
+       \end{enumerate}	
+       In first place, the known initial value at the inner points, $U^n_{\Omega}$, is used to calculate the solution for the boundary conditions. That is, solving the system of equations: $${H}({U}^n;t_n)\big\rvert_{\partial \Omega}=0, $$ which gives back the value of the solution at boundaries ${U}^{n}\big\rvert_{\partial \Omega}$. 
+       
+       Even though this might look redundant for the initial value $U^0$(is supposed to satisfy the boundary conditions), it is not for every other temporal step as the Cauchy Problem is defined only for the inner points $U^{n}_{\Omega}$. This means that to construct the solution $U^n$ its value at the boundaries ${U}^{n}\big\rvert_{\partial \Omega}$ must be calculated.
+       
+       \begin{enumerate}[resume]	
+       	\item {\textbf{Dif{}ference operator for inner points.}} 
+       \end{enumerate}		
+       Next, using the previous solution ${U}^{n}\big\rvert_{\partial \Omega}$ at the boundary points and the initial value $U_{\Omega}^n$ the derivatives at the inner points are calculated. These derivatives are used to construct the difference operator ${F}({U}^n;t_n)$ for the inner points.  
+       \begin{enumerate}[resume]		
+       	\item {\textbf{Temporal step.}}	
+       \end{enumerate}	
+   
+       Finally, the difference operator previously obtained, $F$, is used to calculate the solution at inner points at the next temporal step $U_{\Omega}^{n+1}$. This means solving the system: 
+       
+       \begin{equation*}
+       G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)=  {F}({U}^n;t_n).
+       \end{equation*}
+       
+       In this system, the values of the solution at the $s$ steps are known and therefore, the unknown quantity of the system is the solution at the next temporal step $U_{\Omega}^{n+1}$. However, the temporal scheme $G$ in general is a function that needs to be restricted in order to be invertible. In particular a restricted function $\tilde{G}$ must be obtained:
+       
+       $$\tilde{G}({U}_{\Omega}^{n+1}) = \eval{G({U}_{\Omega}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}_{({U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)}$$
+       such that, 
+       
+       $$ \tilde{G}:\mathbb{ R}^{N-N_{C}} \rightarrow \mathbb{R}^{N - N_{C}}. $$
+       
+       Hence, the solution at the next temporal step for the inner points results:
+       
+       $$ U_{\Omega}^{n+1} = \tilde{G}^{-1}(F(U^n; t_n)) .$$
+       
+       For example, if it is used an explicit Euler scheme over an equispace domain with temporal step $\Delta t$ the problem transforms into:
+       $${ U^{n+1}_{\Omega} } = U^{n}_{\Omega} + {F}({U}^n;t_n){\Delta t},$$
+       which gives the value of the solution at the next temporal step ${ U^{n+1}_{\Omega} }$. This value, will be used as an initial value for the next iteration, closing the loop of the algorithm. The philosophy for other temporal schemes is the same, the result is the solution at the next temporal step. \\
+       
+       The sequence of the algorithm is represented on figure \ref{fig:IVBPalgorithm}, with the inputs and outputs of each step.
+       
+       
+       \IVBPalgorithm
+       
+       
+       \FloatBarrier
+       
+       \subsection{Algorithm implementation}
+       
+       In the following pages the implementation of the algorithm previously presented will be explained. The scheme followed in the explanation shall be the same as in the algorithm, following it step by step.
+       
+       \subsubsection{Initial value boundary problems 1D}
+       
+       \begin{enumerate}
+       	\item {\textbf{Boundary points from inner points.}}
+       \end{enumerate}
+       
+       The first step is to solve the values of the solution at the boundary points $\eval{U^n}_{\partial \Omega}$ known the inner points $U_{\Omega}^n$. For this, the boundary conditions must be introduced by the user as a function which satisfy a certain interface given by the procedure:
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {function BC1D}
+       {end function}{Initial_Value_Boundary_Problem1D.f90}
+       
+       %\lstinputlisting[language=Fortran, firstline=28, lastline=30, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       On the function defined by the user, the boundary conditions can be specified through the operator $\vect{h} (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}$ written explicitly or by means of the keywords \texttt{FREE\_BOUNDARY\_CONDITION} and \texttt{PERIODIC\_BOUNDARY\_CONDITION} which correspond to open and periodic boundary condition respectively.\\
+       
+       %\newpage
+       Once introduced the resolution of the boundary conditions must distinguish between these three situations by a conditional sentence. In the case in which the boundary conditions are periodic there is no need of computing any resolution as is imposed the equality of the solution value at the extremes. In the rest of cases the solution is yielded on an allocatable vector \texttt{Ub}. \\
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {solve two equations}
+       {end if}{Initial_Value_Boundary_Problem1D.f90}
+       
+       
+       %\lstinputlisting[language=Fortran, firstline=113, lastline=137, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       In the case in which there is an open boundary in $x=x_f$ there is a defined function called \texttt{BCs1} which receives the procedure. In this function, the array which will yield the solution $U$, called \texttt{Solution} must point the automatic variable of the function and the derivative at the boundary must be computed. 
+       
+       \newpage
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {function BCs1}
+       {end function}{Initial_Value_Boundary_Problem1D.f90}
+       %\lstinputlisting[language=Fortran, firstline=173, lastline=186, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       Whenever the boundary conditions are given explicitly by a function a function called \texttt{BCs2} which receives the procedure is defined. Again the solution must be pointed and the derivative computed.
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {function BCs2}
+       {end function}{Initial_Value_Boundary_Problem1D.f90}
+       %\lstinputlisting[language=Fortran, firstline=155, lastline=170, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       At this point, the solution $U^n$ in all spatial domain is known, which will permit the calculation of the difference operator.
+       
+       \newpage
+       \begin{enumerate}[resume]	
+       	\item {\textbf{Dif{}ference operator for inner points.}} 
+       \end{enumerate}	
+   
+       Once known $U^n$ the difference operator can be computed from an user defined function for the differential operator which must suit the interface:
+       
+       %\lstinputlisting[language=Fortran, firstline=24, lastline=26, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {function DifferentialOperator1D}
+       {end function}{Initial_Value_Boundary_Problem1D.f90}
+       
+       Before receiving it, in order to save memory and optimize the functioning of the code a logical array \texttt{dU} is checked in order to calculate only the derivatives present on the differential operator. Once done, the value of the difference operator $F^n$ is yielded at the array \texttt{F}.
+       
+       %\lstinputlisting[language=Fortran, firstline=140, lastline=148, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {inner grid points}
+       {enddo}{Initial_Value_Boundary_Problem1D.f90}
+       
+       \newpage
+       The first two steps of this algorithm are contained in a higher level subroutine called \texttt{Space\_Discretization1D}, which will be called recursively for each temporal step. 
+       
+       %\lstinputlisting[language=Fortran, firstline=101, lastline=140]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       %\newpage
+       %\lstinputlisting[language=Fortran, firstline=141, lastline=152, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {subroutine Space_discretization1D}
+       {end subroutine}{Initial_Value_Boundary_Problem1D.f90}
+       
+       \begin{enumerate}[resume]		
+       	\item {\textbf{Temporal step.}}	
+       \end{enumerate}
+       
+       Once known the difference operator, it is possible to calculate the solution at the next step for the inner points $U_{\Omega}^{n+1}$. For this we will reuse the subroutine \texttt{Cauchy\_Problems} explained on \ref{Dev:Cauchy_Problem}. In order to do it, is necessary to define a function which restricts the subroutine \texttt{Space\_Discretization1D} to satisfy the interface of \texttt{Cauchy\_Problems}. This function is written as follows and called \texttt{Space\_Discretization}:\\
+       
+       
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {function Space_discretization}
+       {end function}{Initial_Value_Boundary_Problem1D.f90}
+       %\lstinputlisting[language=Fortran, firstline=92, lastline=99, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       
+       Hence, the next step solution is computed by calling  \texttt{Cauchy\_Problems} with the temporal domain and \texttt{Space\_Discretization} as input arguments:
+       
+       %\lstinputlisting[language=Fortran, firstline=86, lastline=88, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}\vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {call Cauchy_ProblemS}
+       {Scheme}{Initial_Value_Boundary_Problem1D.f90}
+      
+       This will give back the solution at the next step $U_{\Omega}^{n+1}$ yielded on \texttt{Solution}. This value will be the new initial condition that closes the loop of the algorithm.\\
+       
+       \newpage
+       In order to structure all this operations the previous functions and subroutines are contained on a higher level subroutine called \texttt{IVBP1D}:
+       
+%       \lstinputlisting[language=Fortran, firstline=55, lastline=75]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+%       \newpage
+%       \lstinputlisting[language=Fortran, firstline=76, lastline=91, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+%       \vspace{0.5cm}
+       \vspace{0.5cm} 
+       \listings{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       {subroutine IVBP1D}
+       {contains}{Initial_Value_Boundary_Problem1D.f90}
+       
+       
+       
+       
+       %\lstinputlisting[language=Fortran, firstline=101, lastline=149, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       
+       
+       %\lstinputlisting[language=Fortran, firstline=152, lastline=167, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       
+       
+       %\lstinputlisting[language=Fortran, firstline=92, lastline=99, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       
+       %\lstinputlisting[language=Fortran, firstline=56, lastline=90, caption=\mycap{Initial_Value_Boundary_Problem1D.f90}]{\home/sources/Initial_Value_Boundary_Problem1D.f90}
+       
+       
+       
+       
+  %    \subsubsection{Initial value boundary problems 2D}
+   %    
+   %    Previously in this section the algorithm has been presented conceptually. This pages will explain how this algorithm has been implemented into Fortran language. This implementation is meant not only to execute the algorithm but also to make it more ef{}ficient. The implementation will be explained using the code for two dimensional evolution problems. In order to carry out the three steps of the algorithm in the most ef{}ficient manner, it must be taken in consideration some issues from each one of them:
+   %    \begin{enumerate}
+   %    	\item {\textbf{Boundary points from inner points.}}
+   %    \end{enumerate}		
+   %    This step requires solving the system of equations ${G}({U}^n;t_n)\big\rvert_{\partial \Omega}=0 $, that in general is not linear. Resolution which implies the use of an iterative method. There is available a subroutine that executes the Newton method given a system of equations. Therefore, in order to re-use it, its interface must be respected.	
+   %    
+   %    This subroutine has an interface of the form:
+   %    \begin{lstlisting}
+   %    call Newton(F,x)
+   %    \end{lstlisting}
+   %    In which the input  ${F}: \mathbb{ R}^a \rightarrow \mathbb{ R}^a$   where $a \in \mathbb{ N}$ is a vectorial function that contains the system of equations that needs to be solved. The output $x \in \mathbb{ R}^a$ is the initial approximation for the solver in which the final solution will be yielded.
+   %    
+   %    When the algorithm was presented it was mentioned that the operator $G$ in general depends on all the points of the domain $D$. That means that the function $G$ is defined  ${G}: \mathbb{ R}^{N} \times \mathbb{ R}\rightarrow \mathbb{R}^{N_C}$ which can be seen is not the shape required by the subroutine. This means that a restriction on the dependence domain of the function has to be done. This is done introducing the inner points $U^{n}_{\Omega} \in \mathbb{ R}^{N-N_C}$ and the discrete time $t_n \in \mathbb{ R}$ as known parameters. Doing this a new function $${G}_r: \mathbb{ R}^{N_C} \rightarrow \mathbb{R}^{N_C}, $$ is defined, which is coherent with the interface of the subroutine. This function corresponds to the restriction of $G$.
+       
+%       Therefore, to solve the boundary conditions it is necessary to introduce $G_r$ in the Newton subroutine. This restriction is implemented in Fortran using properly the contains command.
+       
+%       Besides this restriction, the values have to be yielded on a vector $U_C \in \mathbb{ R}^{N_C} $. Once the values are calculated, they have to unloaded on the solution to obtain $U^n \big \rvert_{\partial \Omega}$.
+       
+%       To illustrate and clarify what has be done to resolute the requirements of the code we shall examine several examples. The example will show how the Newton and the command contains work to have a better understanding of the process. After the example, the code that used to solve the boundary conditions shall be exposed.
+       
+%       \begin{itemize}
+%       	\item \textbf{Example: Restricted Sphere Intersection.}
+%       \end{itemize}
+%       Let us be an sphere given by the equation $f(x,y,z)=x^2 + y^2 +z^2 -1 =0$. The function $f$ is such that $f: \mathbb{ R}^3 \rightarrow \mathbb{ R}$. Imagine we would like to know in which points the sphere intersects the OX axis, that is, solving the equation $f(x,0,0)=0$. As the Newton subroutine interface only accepts functions ${F}: \mathbb{ R}^n \rightarrow \mathbb{ R}^n$ we have to define a new function ${g}: \mathbb{ R} \rightarrow \mathbb{ R}$ such that $g(x)=f(x,0,0)$. Let's see how this could be implemented on Fortran language.
+%       
+%       \lstinputlisting[language=Fortran, firstline=462, lastline=492,
+%       caption =
+%       \mycap{API_Example_Systems_of_Equations.f90}]
+%       {../../libraries/Numerical_Methods/System_of_Equations/examples/API_Example_Systems_of_Equations.f90} 
+%       
+%       It can be seen that to call the function $g$ in the subroutine, it has to be defined below the contains commmand. 
+%       
+%       It is time to analyse the code used to solve the boundary conditions.
+%       \newpage
+%       \begin{itemize}
+%       	\item \textbf{Boundary Conditions Resolution.}
+%       \end{itemize}
+%       After the examples have been explained, it can be seen how the algorithm to solve the boundary conditions is implemented. From now on, the pieces of code exposed correspond to the two dimensional initial value boundary problem in cartesian coordinates. 
+%       Before explaining the steps to follow, two subroutines have to be presented. These subroutines will be used as a tool for the boundary conditions resolution. All the code (functions, subroutines and calls) exposed in this step of the algorithm is defined below the contains command of the whole algorithm implementation code. 
+%       
+%       The subroutine $Asign\_$$BVs$ divides the elements of a vector $Y\in \mathbb{ R}^{M_1+M_2+M_3+M_4}$ into four vectors  $U_1 \in \mathbb{ R}^{M_1}$, $U_2 \in \mathbb{ R}^{M_2}$, $U_3 \in \mathbb{ R}^{M_3}$, $U_4 \in \mathbb{ R}^{M_4}$. It carries out the inverse operation that the subroutine $Asign\_$$BV2s$ does.
+%       
+%       \lstinputlisting[language=Fortran, firstline=726, lastline=744]{\home/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       The subroutine $Asign\_$$BV2s$ that constructs a vector $U_C \in \mathbb{ R}^{M_1+M_2+M_3+M_4}$ from four vectors $U_1 \in \mathbb{ R}^{M_1}$, $U_2 \in \mathbb{ R}^{M_2}$, $U_3 \in \mathbb{ R}^{M_3}$, $U_4 \in \mathbb{ R}^{M_4}$ :
+%       
+%       %\lstinputlisting[language=Fortran, firstline=716, lastline=724]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       The integer values $M_1$, $M_2$, $M_3$ and $M_4$ correspond to the number of points of every boundary of the domain. These integers are defined over the contains command. 
+%       
+%       This said, lets see how the boundary points are obtained from the initial value for the inner points.
+%       
+%       First, the initial approximation for the iterative method is assigned, extracted from the initial value at the inner points $U_{\Omega}^n$.
+%       %\lstinputlisting[language=Fortran, firstline=671, lastline=673]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       In this call, it can be seen a breach on the TKR compatibility (Type, Kind, Rank) in the call of the subroutine. This breach in the rank compatibility is permitted as the vectors $U_1$, $U_2$, $U_3$ and $U_4$ are defined in explicit shape form.
+%       
+%       
+%       Secondly, the values at the boundaries are calculated over $U_C$ using the Newton subroutine. The inputs are $U_C$ as initial approximation and $BCs$ as the function.
+%       %\lstinputlisting[language=Fortran, firstline=674, lastline=675]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       The function $BCs$ results on a vector $G$ that represents the restricted difference operator for the boundary points $G_r$. For this, first uses the subroutine $Asign\_$$BVs$ to define the boundary points of an array $Solution$ at each temporal step as the input of $BCs$ starting from the initial value. The array $Solution$, defined above the contains command, contains the value of the final solution of the problem:  
+%       $$ U = {U}_{ijk}^n(\vec{e}_n \otimes \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k) ,$$ where the indices $(n,i,j,k) \in \mathbb{Z}^3$ go over the interval $[0,N_t] \times [0,N_x] \times [0,N_y] \times [1,N_v] $. Thus, the function $BCs$ is implemented as:
+       %\lstinputlisting[language=Fortran, firstline=698, lastline=713]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+%       The next step of the function $BCs$ is constructing the result vector $G_r$. For this, it is used the subroutine $Asign\_$$BCs$. 
+%       
+%       
+%       This subroutine stores the values of the boundary conditions (four edges) in four vectors $G_1$, $G_2$, $G_3$ and $G_4$ which compound $G_r$. These are constructed calculating the derivatives of the solution at boundaries from the initial value. The derivatives are calculated using an available subroutine. Its interface requires the solution $U^n$ to be expressed as a third order tensor to be consistent with the computational cell of the grid. This tensor can be expressed for a two dimensional problem as:
+%       $$ U^n = {U}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k) ,$$ where the indices $(i,j,k) \in \mathbb{Z}^3$ go over the interval $[0,N_x] \times [0,N_y] \times [1,N_v] $. The subroutine can calculate the derivatives if $k$ is fixed.
+%       
+%       \newpage
+%       To store in the array $Solution$ the solution at each instant of time it is used the subroutine $Binary\_$ $search$.
+       
+       %\lstinputlisting[language=Fortran, firstline=93, lastline=122]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90} 
+%       This subroutine reads a real number $x$ and a vector of real numbers $V(N)$ and returns the integer $ix$ that satisfies $V(ix)=x$ if it exists. In the case that none integer $1<i<N$ verifies that $V(i)=x$, then returns the value $ix=-1$. To search among the dif{}ferent elements of $V$ the method used is the binary search. This method consists on dividing the interval in which we look for $ix$ in halves, reducing it with each iteration until finding the solution or discarding the existence of such $ix$.
+       
+%       Hence, when the subroutine is called for $t\_BC$, the discrete time domain $Time\_$ $Domain$ and $it$, $t\_BC$ stores the value of time at the temporal step $it$. The idea is use this index to implement the solution $U$ in Fortran as:
+%       
+%       \begin{lstlisting}
+%       Solution(it,0:N_x,0:N_y,1:N_v)
+%       \end{lstlisting}    
+%       For this to be possible, $it$ must have the same value in most of the subroutines and functions involved in the algorithm. That means that $it, t\_BC$ and  $Time\_$ $Domain$ have to be defined above the contains command.
+%       
+%       The call for the subroutine $Binary\_$$search$, must be done below the contains command to store at every temporal step the value of the time $t\_BC$, before the Newton subroutine is called.
+       
+       %\lstinputlisting[language=Fortran, firstline=669, lastline=669]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+       
+       
+%       Then, using the interface for boundary conditions $Boundary\_$$conditions$ presented at the section Extension to systems, the vectors are defined. These interfaces must be defined above the contains command to be possible its call.
+%       
+%       %\lstinputlisting[language=Fortran, firstline=749, lastline=774]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       As $Solution$ varies with time, the values of the boundary conditions adapt to the pass of time, which in the future will permit to construct the dif{}ferential operator for each instant of time $F$ over a single third order tensor.
+       
+%       Thus, the function $BCs$ gives back the restricted difference operator $G_r$ to be introduced in the Newton subroutine. 
+%       
+%       At this point, the vector $U_C$ yields the values of the solution at the boundary points calculated by the Newton subroutine.
+%       
+%       Finally, the values of the boundary points $U^n \big\rvert_{\partial \Omega}$ are assigned to the solution at that temporal step $U^n$ using the subroutine $Asign\_$$BVs$
+%       
+%       %\lstinputlisting[language=Fortran, firstline=678, lastline=680]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       
+%       
+%       Thus, the boundary conditions are imposed to the solution $U^n$ from the initial value $U_{\Omega}^n$.
+       
+%       \newpage
+%       \begin{enumerate}[resume]		
+%       	\item {\textbf{Dif{}ference operator for inner points.}} 
+%       \end{enumerate}	
+%       Constructing the dif{}ferential operator $F(U^n;t_n)=F^n $, where $F^n$ is the image of $F$ at each temporal step, implies calculating the derivatives of the solution $U^n$. These will be calculated using an available subroutine. Its interface requires the solution $U^n$ to be expressed as a third order tensor to be consistent with the computational cell of the grid. This tensor can be expressed for a two dimensional problem as:
+%       $$ U^n = {U}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k) ,$$ where the indices $(i,j,k) \in \mathbb{Z}^3$ go over the interval $[0,N_x] \times [0,N_y] \times [1,N_v] $. The subroutine can calculate the derivatives if $k$ is fixed. The subroutine $Derivative$ calculates the finite differences of $U^n$ and is called as follows :
+       
+       %\lstinputlisting[language=Fortran, firstline=681, lastline=686]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+%       With this derivatives, using the interfaces defined in the section Extension to systems the difference operator is obtained. 
+       
+       %\lstinputlisting[language=Fortran, firstline=688, lastline=693]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+%\begin{flushright}
+%	       Thus, the difference operator calculated will have the same shape:$$ F^n = {F}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k) ,$$ 
+%       \begin{enumerate}[resume]			
+%       	\item {\textbf{Temporal step.}}	
+%       \end{enumerate}	
+%       The difference operator now has to be used to calculate the solution at the next temporal step $U^{n+1}$. For this task there is a subroutine that solves Cauchy Problems systems. The interface of this subroutine requires the difference operator to be ordered as before. With this subroutine we intend to construct the solution at all time as a fourth order tensor: $$ U=\vec{e}_n \otimes U^n = {U}_{ijk}^n(\vec{e}_n \otimes  \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$$, where $n\in \mathbb{Z}$ goes over the interval $[0,N_t]$ and $N_t $ is the number of temporal steps.
+%\end{flushright}
+       
+     %  However, the interface of the Cauchy Problems tool takes an array in which yield the solution at all time in the form:
+  %     $$ U= {U}_{r}^n(\vec{e}_n \otimes  \vec{e}_r ),$$ where $r\in \mathbb{Z}$ goes over the interval $[1,M]$. Hence, to introduce the solution it must be in this form for $M=(N_x+1)(N_y+1)N_v$.
+       
+   %    Thus, introducing the solution into the subroutine at a certain time step $U^n$ in the form: $$ U^n= {U}_{r}^n \vec{e}_r ,$$ gives back its value at the next temporal step $$ U^{n+1}= {U}_{r}^{n+1} \vec{e}_r .$$ To construct the fourth order tensor solution it is necessary a rearrangement or linking between it and the solution expressed as a second order tensor. 
+       
+     %  Before this paper was written, the code used an extra global array to solve the issues at the step 2 and 3. This extra array resulted on an unnecessary waste of memory, to illustrate this lets take an example case. For $N_x+1=N_y+1=100$, $N_t=1000$ and $N_v=5$ the global variable requires $50$ Mb of memory during the compilation, which in systems like this can entail a relevant increase in the computation time. In particular, this example could correspond to the case of non linear vibrations of a plate.
+       
+     %  A solution to these two issues with a better use of memory can be defining in Fortran a pointer data structure:  $$ P= {P}_{r}^n(\vec{e}_n \otimes  \vec{e}_r ), $$
+       
+    %   which targets the solution: $U= {U}_{ijk}^n(\vec{e}_n \otimes  \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$. Doing this, links the values of both arrays in the Fortran environment as they share the memory spaces in which their components are yielded. Mathematically, this means that a bijective application between $P$ and $U$ is defined in such a manner that assigns to each component of $P$ a component of $U$.
+       
+     %  To explain how is this implemented on Fortran first we have to describe a subroutine involved in the process.
+       
+     %  The subroutine $Data\_Pointer$ reads two integer values $N1,N2$ and an array $U(N1,N2)$ and assigns a pointer array $pU(N1,N2)$ that targets every element on the array $U$.
+       
+       %\lstinputlisting[language=Fortran, firstline=78, lastline=85]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+     %  This subroutine will be used to target the solution $U$ with a pointer $P$. If we notice the interface of $Data\_pointer$ we can see that the pointer and the target must both be second order tensors. However $U$ is a fourth order tensor, and the assignation seems to be impossible. To solve this issue a breach on Type, Kind, Rank compatibility will be used. 
+       
+  %     Fortran language permits a breach on the Rank compatibility for variables defined in explicit shape. In the subroutine $Data\_Pointer$ the input variable $U(N1,N2)$ is defined with explicit shape. The TKR rule breach permits the subroutine to treat the target as a data structure without taking in account its defined rank:
+       
+       %\lstinputlisting[language=Fortran, firstline=635, lastline=637]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+      % In this call, $Solution$ which yields $U$, is targeted by the pointer data structure $pSolution$ that yields $P$. This call is equivalent to say that there is a bijective application $A$ that relates every element of $$U= {U}_{ijk}^n(\vec{e}_n \otimes  \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k),$$ with each component of $$ P= {P}_{r}^n(\vec{e}_n \otimes  \vec{e}_r ) $$, by the identity function. The ordenation of the elements in $P$ is done by the subroutine and does not influence on the resolution.
+       
+     %  When stored in such manner, the pointer is in the rank needed for the subroutine $Cauchy\_$$Problems$, permitting us to re-use it easily. Hence, the subroutine can be called as follows:
+       
+       %\lstinputlisting[language=Fortran, firstline=638, lastline=638]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+    %  The inputs are: a vector for the time $Time\_$$Domain$ that yields the values $t_n$, the pointer data structure $pSolution$ which yields the solution $P$ and a function $Space\_$ $Discretization$ whose result is the difference operator $F^n$ in vectorial form. It constructs recursively for each $t_n$ the solution $P$ using the dif{}ferential operator at that time $F^n$. The number of iterations equals to the number of temporal steps $N_t$.
+       
+    %   This function is constructed just to fit $ F^n = {F}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$ to the interface of the subroutine $Cauchy\_$$ProblemS$. It rearranges the elements of $U^n$ and $F$ defining them in assume shape form as vectors and calls the subroutine that constructs the difference operator as a third order tensor.
+       
+       %\lstinputlisting[language=Fortran, firstline=644, lastline=654]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+       
+   %    \newpage
+   %    The subroutine in charge of constructing the difference operator $F^n= {F}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$ is $Space\_ $ $ Discretization\_ $ $ 2D\_$$system$. The inputs for it are the solution at the temporal step $U^n= {U}_{ijk}^n( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$, the time $t_n$ and the difference operator $F^n$.
+   %    
+   %    %\lstinputlisting[language=Fortran, firstline=657, lastline=695]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+   %    
+   %    It can be seen that the inputs $U^n$ and $F^n$ are third order tensors, and when called in the function $Space\_$$Discretization$ they were treated as vectors. This is possible as they are defined in explicit shape form and a breach in rank compatibility is permitted. 
+   %    
+   %    In this subroutine the steps 1 and 2 of the algorithm are included as they are necessary to construct the difference operator.
+   %    
+   %    \newpage
+       
+       
+    %   To sum up, calling the subroutine $Cauchy\_$$ProblemS$ at each temporal step gives us the solution at the next temporal step $ P^{n+1}= {P}_{r}^{n+1} \vec{e}_r $ and therefore gives also $U^{n+1}= {U}_{ijk}^{n+1}( \vec{e}_i \otimes \vec{e}_j\otimes \vec{e}_k)$. However, only the inner points of these tensors have the definitive values. The values of the boundary points have to be calculated introducing $U^{n+1}$ as the new initial value for the algorithm, closing the loop that conforms it.
+       
+%  %     \subsection{Code Structure.}
+  %     In order to carry out the algorithm implementation, three subroutines inside the module Initial Value Boundary Problems have been defined. The first two are the tools previously explained $Data\_$ $Pointer$ and $Binary\_$ $Search$. The third is the subroutine that will perform the three steps of the algorithm using the other two subroutines. This subroutine is structured in two parts: the interface and the contained functions and subroutines. 
+  %     
+  %     The main idea is that the interface $IVBP2D\_system$ contains the functions and subroutines used to implement the three steps of the algorithm.
+  %     %\lstinputlisting[language=Fortran, firstline=594, lastline=641]{API_Manual/Numerical_Methods/Boundary_Initial_Value_Problem/sources/Initial_Value_Boundary_Problem.f90}
+  %     
+  %     As the variables $Time\_$$Domain$, $t\_BC$ and $it$ are defined in the interface its value is the same in all the functions and subroutines involved in the algorithm. Thus permitting to relate $Solution$ to the third order tensor that yields the solution at each temporal step $U^n$ as explained in the Algorithm Implementation section. The integers that define the size of the edges $M_1$, $M_2$, $M_3$ and $M_4$, are also stated in the interface.
+  %     The call for the function $Data\_pointer$ is done at this level, necessarily before the call for the $Cauchy\_$ $ProblemS$ subroutine.
+       
+   %    Finally, the call for $Cauchy\_$$ProblemS$ subroutine is done. This call involves the function $Space\_$$Discretization$, which at the same time calls the subroutine that carries out steps 1 and 2 of the algorithm, $Space\_ $$Discretization\_ $ $ 2D\_$$system$. The ef{}fect of this is recursively execute the algorithm for every temporal step. The hierarchy on calls can be seen in the following diagram:
+       
+       \newpage
+       \section{Error on linear problems}
+       
+       Whenever an initial value boundary problem is discretized spatially and temporarily, two kinds of error appear in the resolution.
+       
+       
+       \begin{enumerate}
+       	\item An error associated to the spatial discretization $E$.
+       	\item An error associated to the temporal discretization $E^n$.
+       \end{enumerate}
+   
+       If it is defined $\vect{u}(\vect{x}_i,t)$ as the exact value of the solution on the point $\vect{x}_i$ and $u_i(t)$ is the approximated value. Then,
+       
+       \begin{equation*}
+       \vect{\varepsilon}_i(t) = \vect{u}(\vect{x}_i,t) - \vect{u}_i(t).
+       \end{equation*}
+       
+       is the spatial error at the point $\vect{x}_i$.
+       
+       Besides, if $\vect{u}_i(t)$ is the exact solution of an ordinary differential equations system and $\vect{u}_i^n$ represents the value of the approximated solution in a point $\vect{x}_i$ of the grid at an instant $t=t_n$, the error of both spatial and temporal discretization is defined as:
+       
+       \begin{equation*}
+       	\vect{\varepsilon}_{T,i}^n = \vect{u}(\vect{x}_i,t_n) - \vect{u}_i^n,
+       \end{equation*}
+       which can be written as
+       
+       \begin{equation*}
+       \vect{\varepsilon}_{T,i}^n = \underbrace{\vect{u}(\vect{x}_i,t_n)- \vect{u}_i(t_n) }_{\vect{\varepsilon}_i(t_n)} + \underbrace{\vect{u}_i(t_n) - \vect{u}_i^n}_{\vect{\varepsilon}_{i}^n},
+       \end{equation*}
+       
+       or written in vectorial form:
+       
+       \begin{equation*}
+       	E_T = E + E^n,
+       \end{equation*}
+       where $E$ is the spatial error and $E^n$ is the temporal error.\\
+       
+       Once defined is interesting analysing the behaviour of both $E$ and $E^n$.
+       In the case in which the operators $\vect{\mathcal{L}}$ and $\vect{h}$ are linear, the initial value boundary problem can be spatially discretized as a linear Cauchy Problem. As before, starting from an initial value boundary problem with Dirichlet boundary conditions of the shape:
+       
+       $$\frac{\partial \vect{u} }{\partial t}(\vect{x},t) =\vect{\mathcal{L}} (\vect{x},t,\vect{u}(\vect{x},t)) ,  \qquad \ \forall \ \ \vect{x} \in  \Omega, $$
+       $$ \vect{h} (\vect{x},t,\vect{u}(\vect{x},t))\big\rvert_{\partial \Omega}=0 ,  \qquad \ \forall \ \ \vect{x} \in \partial \Omega,$$ 
+       $$ \vect{u}(\vect{x},t_0)=\vect{u}_0(\vect{x}), $$
+           
+       when the spatial domain is discretized in $N_D=N_{\Omega} + N_{\partial\Omega} $ a linear Cauchy Problem results:
+       
+       $$\dv{{\vect{u}}_{i}}{t} = A_i(t) [\vect{u}_{j}]  , \qquad {\vect{u}_{i}}(t_0)=\vect{u}_{i}^0, \quad \mbox{for} \quad i = 1,2,.. .,N_\Omega$$ 
+       
+          
+        where $\vect{u}_i: \mathbb{R} \rightarrow \mathbb{R}^{N_v }$, $ [\vect{u}_{j}]  = \left[\vect{u}_{1}^T|...|\vect{u}_{N_D}^T\right]^T$ with $[\vect{u}_{j}]: \mathbb{R} \rightarrow \mathbb{R}^{N_D \times N_v}$ and $A_i: \mathbb{R} \rightarrow \mathcal{M}_{N_v \times N_v N_D}$. If the exact partial differential equations system is evaluated at $\vect{x}_i$ and subtracting to its the Cauchy Problem for $\vect{u}_1$, it results:
+        
+        \begin{equation*}
+        	\pdv{(\vect{u}(\vect{x}_i,t) - \vect{u}_i(t))}{t} =  \dv{\vect{\varepsilon}_i }{t} = \vect{\mathcal{L}} (\vect{x}_i,t,\vect{u}(\vect{x}_i,t)) - A_i(t) [\vect{u}_{j}] ,
+        \end{equation*}
+        
+        by adding and substracting the exact solution evaluated at the inner points $[\vect{u}(\vect{x}_j,t)]= \left({\vect{u}^T(\vect{x}_1,t)}|...|{\vect{u}^T(\vect{x}_{N_D},t)}\right)^T$ multiplied by $A_i(t)$ we can write: 
+        
+        \begin{align*}
+        \dv{\vect{\varepsilon}_i }{t} 
+        &= \vect{\mathcal{L}} (\vect{x}_i,t,\vect{u}(\vect{x}_i,t)) - A_i(t) [\vect{u}_{j}]  + A_i(t) [\vect{u}(\vect{x}_j,t)] - A_i(t) [\vect{u}(\vect{x}_j,t)],
+        \\
+        & =  A_i(t) [\vect{u}(\vect{x}_j,t)] - A_i(t) [\vect{u}_{j}] + \underbrace{\vect{\mathcal{L}} (\vect{x}_i,t,\vect{u}(\vect{x}_i,t)) - A_i(t) [\vect{u}(\vect{x}_j,t)]}_{\vect{r}_i(t)},
+        \end{align*}
+        where $\vect{r}_i(t)$ is the truncation error, associated to the error on the finite differences. The terms of this error are of order $\order{1/\Delta x ^q}$, where $q$ is the finite difference scheme order. Thus, the spatial error can be written:
+        
+        \begin{equation*}
+        \dv{\vect{\varepsilon}_i}{t} =  A_i(t)\cdot [\vect{\varepsilon}_{j}]  + \vect{r}_i(t),
+        \end{equation*}
+        
+        which can be written as vectors of $\mathbb{ R}^{N - N_C}$, where $N=N_v \cdot N_D$ and $N_C=N_v \cdot N_{\partial\Omega}$:
+        
+        \begin{equation*}
+        	\dv{E}{t} = A(t)\cdot E(t) + R(t).
+        \end{equation*}
+        where $E: \mathbb{R} \rightarrow \mathbb{R}^{N - N_C }$ is the spatial error, $R: \mathbb{R} \rightarrow \mathbb{R}^{N - N_C }$ is the truncation error and $A: \mathbb{R} \rightarrow \mathcal{M}_{N - N_C \times N - N_C}$. \\
+        
+        
+        Thus, a linear system of ordinary differential equations appears for the spatial error $E$, whose solution is: 
+        
+        \begin{equation*}
+        	E(t) = \Phi(t)\cdot E(t_0) + \Phi(t) \int_{t_0}^{t} {\Phi(s)}^{-1}\cdot R(s) \dd s, 
+        \end{equation*}
+        
+        where $\Phi(t)$ is the fundamental matrix, which satisfies:
+        
+        \begin{equation*}
+        	\dv{\Phi}{t} = A(t) \Phi(t), \qquad \Phi(t_0) = I.
+        \end{equation*}
+        
+         From the general solution for $E(t)$ an upper bound for its norm $\norm{E(t)}$ can be stablished:
+        
+        \begin{align*}
+        \norm{E} & = \norm{\Phi(t)\cdot E(t_0) + \Phi(t) \int_{t_0}^{t} {\Phi(s)}^{-1} R(s) \dd s} \leq \\
+        & \leq \norm{\Phi(t)}\norm{ E(t_0)} + \norm{ \Phi(t) }\norm{ \int_{t_0}^{t} {\Phi(s)}^{-1}\cdot  R(s) \dd s}  \\
+        & \leq \norm{\Phi(t)}\norm{ E(t_0)} + \norm{ \Phi(t) }\sup_{\forall \, t_0\leq s \leq t }\norm{R(s)}   \int_{t_0}^{t} \norm{ {\Phi(s)}^{-1}   }\dd s .
+        \end{align*}
+        
+        It can be proven that in the case in which the matrix $A(t)$ commutes with its primitive\footnote{ In general, the exponential of a matrix function $\exp(B(t))=\sum_{n=0}^{\infty} {B(t)}^n / n!$ does not satisfy $\dv*{(\exp(B))}{t} = \dv*{B}{t}\exp(B)$ as the matricial product is not commutative. For example: $\dv*{({B}^2)}{t} = \dv*{{B}}{t}B + B\dv*{{B}}{t}\neq 2B\dv*{B}{t}$ if $B$ and $\dv*{B}{t}$ do not commute.} $I_A(t)=\int_{t_0}^{t}A(s)\dd s$, that is $A\cdot I_A = I_A \cdot A $, the fundamental matrix takes the form:
+        
+        \begin{equation*}
+        	\Phi(t) = \exp\left( \int_{t_0}^{t} A(s) \dd s \right) = \exp\left( I_A(t) \right).
+        \end{equation*}
+        
+       
+      
+        
+        In the case in which the matrix $I_A(t)$ is normal, that is $I_A I_A^T = I_A^T I_A$, then the exponential matrix norm can be written:
+        
+        \begin{equation}
+        	\norm{\exp\left( I_A(t)\right)} = e^{\alpha(I_A(t))},
+        \end{equation}
+        
+        where $\alpha(I_A(t))$ is the spectral abscissa of $I_A(t)$,
+        
+        \begin{equation}
+        	\alpha(I_A(t)) = \sup_{z\,\in \Lambda(I_A(t))} \Re(z),
+        \end{equation}
+        in which $\Lambda(I_A(t))$ is the spectrum or set of all eigenvalues of $I_A(t)$. Even though this is the most general case that can be considered to study the error, it is not very common that such matrices appear as a result of a spatial discretization. Nevertheless the previous equation is stated as a warning for the general considerations. In practice, the vast majority of the problems that appear on mathematical modelling of physical phenomena satisfy that the differential operator $\vect{\mathcal{L}}$ does not depend explicitly of $t$. In these problems the matrix $A$ merges as a constant function of $t$, which means:
+%        Hence, the upper bound for $E$ can be written:
+%        
+%        
+%        \begin{equation*}
+%        	\norm{E} \leq \norm{E(t_0)} e^{\alpha(I_A(t))}  + \sup_{t_0\leq s \leq t }\norm{R(s)}  \left( \int_{t_0}^{t} e^{\alpha\left(I_A(t-s) \right) } \dd s \right).
+%        \end{equation*}
+%        
+%        This means that in the case in which $\alpha\left(I_A(t)\right)<0$, $\forall$ $ t \in \mathbb{R}$, then, the error on the initial conditions tends to zero when $t\rightarrow\infty$, in other words:
+%        
+%        \begin{equation*}
+%        	\lim_{t\rightarrow \infty} \norm{E(t_0)} e^{\alpha(I_A(t))} = 0.
+%        \end{equation*}
+%        
+%        Besides, the spatial error is upperly bounded by
+%        
+%        \begin{equation*}
+%        	\norm{E} \leq \sup_{t_0\leq s \leq t}\norm{R}  \left( \int_{t_0}^{t} e^{\alpha\left(I_A(t-s) \right) } \dd s \right).
+%        \end{equation*}
+%        
+%        Whenever $\alpha\left(I_A(t)\right)>0$, $\forall$ $ t \in \mathbb{R}$, then, any error on the initial conditions  however small is, amplifies exponentially over time, that is, the spatial error diverges when $t\rightarrow\infty$, masking any truncation error. \\
+        
+        
+        
+        \begin{equation*}
+        	I_A(t) = A(t-t_0).
+        \end{equation*}
+        
+        In these problems, the fundamental matrix is takes the form of the exponential\footnote{Note that a matrix $A$ always commutes with itself.} of $A(t-t_0)$:
+        
+        \begin{equation*}
+        \Phi(t) = \exp \left( A (t-t_0) \right) .
+        \end{equation*}
+        
+        Therefore, the solution for $E(t)$ results as \footnote{Whenever $A$ and $B$ commute, $\exp(A+B)= \exp(A)\exp(B)$ and $\exp(A^{-1}) = \exp(-A)$}: 
+        
+        \begin{equation}\label{eq:Error_constant}
+        	E(t) = \exp \left( A (t-t_0) \right) \cdot E(t_0) + \int_{t_0}^{t} \exp \left( A (t-s) \right) \cdot R(s)\dd s. 
+        \end{equation}
+        
+        And the norm of it is upperly bounded by:
+        
+        \begin{align*}
+        \norm{E} & = \norm{\exp \left( A (t-t_0) \right) \cdot E(t_0) + \int_{t_0}^{t} \exp \left( A (t-s) \right) \cdot R(s)\dd s} \leq \\
+        & \leq \norm{\exp \left( A (t-t_0) \right)}\norm{ E(t_0)} + \norm{\int_{t_0}^{t} \exp \left( A (t-s) \right) \cdot R(s)\dd s}  \\
+        & \leq \norm{\exp \left( A (t-t_0) \right)}\norm{ E(t_0)} + \sup_{\forall \, t_0\leq s \leq t }\norm{R(s)}    \int_{t_0}^{t}\norm{ \exp \left( A (t-t_0) \right) } \dd s  .
+        \end{align*}
+        
+        Supposing that $A$ is normal, then 
+     
+        \begin{equation*}
+        	\norm{\exp\left( A(t-t_0)\right)} = e^{\alpha(A)(t-t_0)},
+        \end{equation*}
+        
+        and 
+        
+        \begin{equation}
+        	\int_{t_0}^{t} \norm{\exp\left(A(t-s) \right) } \dd s = \int_{t_0}^{t} e^{\alpha\left(A \right)(t-s) } \dd s = \dfrac{1}{|\alpha|} \left[ e^{\alpha(t-t_0) } -1 \right] .
+        \end{equation}
+        
+        Hence, the bound for $E$ is written:
+        
+        \begin{equation}
+        	\norm{E} \leq  \norm{E(t_0)} e^{\alpha(t-t_0) } +  \dfrac{1}{|\alpha|} \left[ e^{\alpha(t-t_0) } -1 \right]\sup_{t_0\leq s \leq t}\norm{R(s)}   .
+        \end{equation}\\
+        
+        From equation (\ref{eq:Error_constant}) several conclusions about the error behaviour can be extracted for the different values that can have $\alpha$. Whenever $\alpha <0$ the spatial error is bounded by $({1}/{\alpha}) [ e^{\alpha(t-t_0) } -1 ]\sup_{t_0\leq t \leq t_f}\norm{R} $ and if $\alpha >0$ the spatial error amplifies indefinitely along time. For this reason, it is crucial to ensure that the spatial discretization preserves the stability nature of the differential problem. Generally, when discretizing hyperbollic problems such as the waves equation (which posseses pure imaginary eigenvalues), by means of centered high order finite differences over equispaced grids, leads to eigenvalues with positive real parts. These schemes or formulas of finite differences are not appropriated for the spatial discretization. This issue is associated to the bad behaviour of high order interpolants nearby the boundaries. Evidence suggests that this problem can be mitigated concentrating points in the surroundings of the boundaries as in the case of Chebyshev grids.\\
+        
+        Once studied the spatial error, in order to analyse the temporal error lets consider the constant coefficient system of ordinary equations resultant of the discretization of an initial value boundary problem ($\pdv*{\vect{\mathcal{L}}}{t}= \vect{0}$) with a scheme of finite differences of order $q$:
+        
+        \begin{equation}
+        	\dv{U}{t} = A U + b, \qquad U = \begin{pmatrix}
+        	 U_1 \\
+        	 \vdots \\
+        	 U_{N+1}
+        	\end{pmatrix}, 	 \qquad 
+        	b = \begin{pmatrix}
+        	\frac{1}{{\Delta x}^q} \\
+        	\vdots \\
+        	\frac{1}{{\Delta x}^q}.
+        	\end{pmatrix} \label{eq:ODE_temporal_error}
+        \end{equation}
+        
+        If an explicit Euler scheme is introduced to approximate the derivative, results:
+        
+        \begin{align}
+        	U^{n+1} & = U^{n} + AU \Delta t + b \Delta t \nonumber \\
+        	& =  \underbrace{(I + A \Delta t)}_{B} U^{n}+ b \Delta t,\nonumber \\ 
+        	& = {B} U^{n}+ b \Delta t.
+        \end{align}
+        
+        From introducing the analytical solution $U(t)$ of \ref{eq:ODE_temporal_error} on the temporal scheme, the truncation error $T^{n+1}$ can be defined as:
+        
+        \begin{align}
+        	T^{n+1} ={\left( U(t_{n+1}) - U(t_{n}) \right)} - \left( {B} U(t_{n})+ b \Delta t \right). \label{eq:truncation_error}
+        \end{align}
+        
+        Adding (\ref{eq:ODE_temporal_error}) to (\ref{eq:truncation_error}) a difference equation for the temporal error merges:
+        
+        \begin{align}
+        	E^{n+1} & = U(t_{n+1}) - U^{n+1}, \nonumber \\
+        	& = B E^n + T^{n+1}. \label{eq:Difference_error}
+        \end{align}
+        
+        The solution of \ref{eq:Difference_error}, is:
+        
+        \begin{equation}
+        	E^n = {B}^{n} E^0 + \sum_{k=0}^{n} B^{n-k} T^k,
+        \end{equation}
+        
+        in which the term ${B}^{n} E^0$ is the initial condition error and $\sum_{k=0}^{n} B^{n-k} T^k$ is the temporal discretization error.\\
+        
+        Hence, an upper bound can be calculated for $E^n$:
+        
+        \begin{equation}
+        	\norm{E^n} \leq \norm{B^n} \norm{E^0}  + \sup_{0 \leq k \leq n } \norm{T^k} \sum_{k=0}^{n} \norm{B^{n-k}} .\label{eq:temporal_upper}
+        \end{equation}
+        
+        If $B$ is normal ($BB^T =B^T B$) there exist an orthonormal set of eigenvectors and eigenvalues which diagonalize $B$ and the norm:
+        
+        \begin{equation}
+        	\norm{B^n} = \rho^n, \qquad \mbox{with} \quad \rho = \sup_{z \,\in\,\Lambda(B)} z, 
+        \end{equation}
+        where $\rho$ is the spectral radius and $\Lambda(B)$ is the set of all eigenvalues of $B$ or spectra. Using the definition of this norm:
+        
+        \begin{equation}
+        	 \norm{B^{n}} = \rho^{n}, \qquad \qquad \sum_{k=0}^{n} \norm{B^{n-k}} = \sum_{k=0}^{n} \rho^{n-k}.  
+        \end{equation}
+        
+        And the upper bound for temporal error can be written
+        \footnote
+        { Taking in account the solution of the geometric sum, given by $S_n = \sum_{k=0}^{n} \rho^{n-k} = 1 + \rho + \dots + \rho^{n}$ and $\rho S_n = \sum_{k=0}^{n} \rho^{n-k+1} = \rho + \rho^2 + \dots + \rho^{n+1} = S_n - 1 + \rho^{n+1}$ $\Rightarrow$ $S_n = {(1 - {\rho}^{n+1})}/{(1 - \rho)}$.
+        	
+        }: 
+        
+        
+        \begin{align}
+        \norm{E^n} & \leq \rho^{n} \norm{E^0}  + \sup_{0 \leq k \leq n } \norm{T^k} \sum_{k=0}^{n} \rho^{n-k}, \nonumber \\
+                   & \leq \rho^{n} \norm{E^0}  + \sup_{0 \leq k \leq n } \norm{T^k} \frac{(1 - {\rho}^{n+1})}{(1 - \rho)}.
+        \label{eq:temporal_upper_bound}
+        \end{align}
+        
+        From \ref{eq:temporal_upper_bound} it can be inferred that if $\rho<1$ the error on the initial condition annuls when $t\rightarrow\infty$ and the temporal error is bounded by the error of the temporal discretization
+    
+        \begin{equation}
+        	\norm{E^n} \leq \sup_{0 \leq k \leq n} \norm{T^k}  \frac{ 1}{(1 - \rho)}.
+        \end{equation}
+        
+        In the case in which $\rho>1$ any error on the initial conditions amplifies as a power of grade $n$ when $t \rightarrow\infty$, masking any truncation error.\\
+        
+        The interrogant that now arises is to determine under which circumstances $\rho <1$. In order to analyse the eigenvalues of $B$ in terms of the eigenvalues of $A$ and therefore calculating the spectral radius it is used the spectral transformation theorem.\\
+        
+        A $s$ steps linear temporal scheme $G$ can be written:
+        
+        \begin{align}
+        	  G({U}^{n+1}, {U}^{n}, \ldots {U}^{n+1-s};t_n,  \Delta t)\, \Delta t & = \sum_{j=0}^{s} \alpha_j {U}^{n+1-j} \nonumber \\ 
+        	  & = \Delta t\sum_{j=0}^{s} \beta_j {F}(U^{n+1-j};t_{n+1-j}) \nonumber \\ 
+        	  & = \sum_{j=0}^{s} \beta_j \Delta t{A} U^{n+1-j},
+        \end{align}
+         which means that 
+         
+         \begin{align}
+          \sum_{j=0}^{s} \left(\alpha_j I - \beta_j \Delta t{A}\right) {U}^{n+1-j} = 0,
+         \end{align}
+        \begin{definition}
+        	The stability characteristic polynomial of a linear $s$ steps temporal scheme is defined as:
+        	\begin{equation}
+        		\pi(r,w) = \sum_{j=0}^{s}(\alpha_j - w \beta_j) r^{s-j}. \label{eq:stability_polynomial}
+        	\end{equation}
+        \end{definition}
+    
+        \begin{definition}
+        	The stability characteristic polynomial of a linear $1$ step temporal scheme is defined as:
+        	\begin{equation}
+        	\pi(r,w) = r - k w. \label{eq:stability_polynomial_one_step}
+        	\end{equation}
+        \end{definition}
+    
+         The spectral decomposition theorem stablishes that if $\lambda \Delta t$ $\in \Lambda(\Delta t A)$, then each root of the stability characteristic polynomial with $w=\lambda  \Delta t $ belongs to the spectra of $B$.
+         
+         \begin{definition}
+         	The absolute stability region $\mathcal{R}_A$ of a numerical scheme is the set of number $w\in\mathbb{C}$ for which all roots of the stability characteristic polynomial satisfy that $|w|\leq 1$ and those roots which verify $|w|= 1$ are simple.
+         \end{definition}
+     
+     Therefore, if $\lambda  \Delta t$  $\in \mathcal{R}_A$, then the eigenvalue $r$ $\in\Lambda(B)$ verifies $|r|\leq 1$ and hence, the temporal error is bounded.\\
+     
+     To summarize the general idea of this section, on the figure \ref{fig:IVBPerrors} is represented the errors which are produced during the numerical resolution of an initial value boundary problem.
+       \IVBPerrors
+       
+       
+%       \section{Spectral abscissa and spectral radius}
+%       
+%       In the previous section, two concepts have been mentioned: spectral abscissa and spectral radius. Both of them have appeared when dealing with normal matrices that appear on the spatial and temporal discretization. To illustrate how these values are calculated, an example shall be given. Lets consider the one dimensional heat equation for a scalar variable $u$, over a spatial domain $D:{x \, \in [0,1]}$ with homogeneous Dirichlet boundary conditions. In other words, let us be the problem:
+%       
+%       \begin{align}
+%       &	\pdv{u}{t} = \pdv[2]{u}{x}, \qquad u(x,0)=u_0(x), \\ \nonumber \\
+%       &     u(0,t) = u(1,t) = 0.
+%       \end{align}
+%       
+%       If the problem is spatially discretized in $N+1$ equispaced points $x_i$, using centered finite differences of order $q=2$, the resultant matrix $A$ of the associated Cauchy problem is normal, and the equations resultant can be written:
+%       
+%       \begin{align}
+%       	& \dv{u_j}{t} = \frac{u_{j+1}-2u_{j}+u_{j-1}}{{\Delta x}^2}, \qquad \mbox{for}\quad j = 1,2 \ldots, N-1 \label{eq:sturm_liouville_1}\\
+%       	& u_0 = 0, \qquad u_N = 0. \label{eq:sturm_liouville_2}
+%       \end{align}
+%       
+%       If the problem is temporarily discretized using an explicit Euler the matrix $B= I + \Delta t A$ is also normal. The eigenvalues of (\ref{eq:sturm_liouville_1}) and (\ref{eq:sturm_liouville_2}) can be calculated from the system
+%       
+%       \begin{align}
+%       & \lambda{u_j} = \frac{u_{j+1}-2u_{j}+u_{j-1}}{{\Delta x}^2}, \qquad \mbox{for}\quad j = 1,2 \ldots, N-1 \label{eq:heat_eigenvalues_1}\\
+%       & u_0 = 0, \qquad u_N = 0. \label{eq:heat_eigenvalues_2}
+%       \end{align}
+%       
+%       The difference equations system given by (\ref{eq:heat_eigenvalues_1}) and (\ref{eq:heat_eigenvalues_2}) is the discretized problem of the Sturm-Liouville problem
+%       
+%       \begin{align}
+%       &	\dv[2]{u}{x} = \lambda u
+%       	\\
+%       	& u(0) = u(1) = 0,
+%       \end{align}
+%       
+%       whose set of non trivial solutions is given by $u^k(x) = \sin(k \pi x) $ for $k\in \mathbb{ N}$. There exist aswell solutions of (\ref{eq:heat_eigenvalues_1}) and (\ref{eq:heat_eigenvalues_2}) of the shape:
+%       
+%       \begin{equation}
+%       	u_j = \sin(k \pi x_j) .
+%       \end{equation}
+%       
+%       Introducing this expression for $u_j$ on (\ref{eq:heat_eigenvalues_1})\footnote{Note that if $u_j = \sin(k \pi x_j) $, then $u_0 = u_N=0$.}

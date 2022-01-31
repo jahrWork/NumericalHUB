@@ -1,0 +1,147 @@
+\chapter{Plotting graphs with Latex }
+
+\section{Overview}
+
+This library is designed to plot $x-y$ and contour graphs on the screen or to create automatically Latex files with graphs and figures. 
+The  module:  \verb|Plots| has two subroutines:  \verb|plot_parametrics| and \verb|plot_contour|.
+
+
+
+\section{Plot parametrics}
+
+\begin{lstlisting}[frame=trBL]
+  call plot_parametrics(x, y, legends, x_label, y_label, title, & 
+                        path, graph_type)
+                      
+\end{lstlisting}   
+
+  
+This subroutine plots a given number of parametric curves $(x,y)$ on the screen and creates a Latex file for optimum quality results. 
+This subroutine is overloaded allowing to plot parametric curves sharing $ x$--axis for all curves or with different data booth for $ x $ and $y$ axis. That is, $ x $ can be a vector the same for all parametric curves or a matrix. In this case, $( x_{ij}, y_{ij})$ represents the the point
+ $ i $  of the parametric curve $ j$.  The last three arguments are optional. If they are given, this subroutine creates a plot data file (\verb|path.plt|)  and a latex file (\verb|path.tex|) to show the same graphics results by compiling a latex document.
+
+\btable
+	x & vector or matrix of reals & in &   First index is the point and second index is the parametric curve.  \\ \hline
+	
+	y & matrix of reals & in &  First index is the point and second index is the parametric curve.  \\ \hline
+	
+	legends &  vector of  char strings  & in & These are the legends of the parametric curves.  \\ \hline
+	
+	x\_label &  character string & in  & $x$ label of the graph.   \\ \hline
+	
+	y\_label &  character string & in  & $y$ label of the graph.   \\ \hline
+	
+	title & character string & optional in  &  title of the graph.   \\ \hline
+	
+	path  &  character string & optional in  & path of Latex and data files.  \\ \hline
+	
+	graph\_type  &  character string &  optional, in  & graph type   \\ \hline
+\etable{Description of \texttt{plot\_parametrics} arguments for Latex graphs}
+
+
+\vspace{-0.3cm}
+  \listings{./sources/my_examples.f90}
+  {subroutine myexampleC}
+  {end subroutine}{my_examples.f90}
+  
+The above Fortran example creates automatically four plot files and four latex files. 
+By compiling  the following Latex file, the same plots showed on the screen can be included in any latex manuscript. 
+ 
+\vspace{0.5cm} 
+\listings{./latex.tex}{documentclass}{exampleCad}{Latex.tex}
+
+\newpage
+After compiling the above Latex code, the plot of figure \ref{fig:exampleCad} is obtained. 
+\vspace{1cm} 
+
+\fourgraphs
+      {\input{./results/myexampleCa.tex} }
+      {\input{./results/myexampleCb.tex} }
+      {\input{./results/myexampleCc.tex} }
+      {\input{./results/myexampleCd.tex} }
+      {Heinon-Heiles system solution. 
+      (a) Trajectory of the star $(x,y)$. 
+      (b) Projection $(x,\dot{x})$ of the solution. 
+      (c) Projection $(y,\dot{y})$ of the solution. 
+      (d) Projection $(\dot{x},\dot{y})$.}
+      {fig:exampleCad}   
+      
+    
+\newpage     
+\section{Plot contour} 
+\begin{lstlisting}[frame=trBL]
+  call plot_contour(x, y, z, x_label, y_label, levels, legend, & 
+                    path, graph_type)
+                      
+\end{lstlisting}   
+
+  
+This subroutine plots a contour map of  $z = z(x,y)$ on the screen and creates a Latex file for optimum quality results. 
+Given a set of values $ x_i $ and $ y_j $ where some function $ z(x,y)$ is evaluated, this subroutine plot a contour map. 
+The last three arguments are optional. If they are given, this subroutine creates a plot data file (\verb|path.plt|)  and a latex file (\verb|path.tex|) to show the same graphics results by compiling a latex document.
+
+\btable 
+	x & vector  of reals & in &  $x_i$ grid values.  \\ \hline
+	
+	y & vector of reals & in &  $y_j$ grid values.   \\ \hline
+	
+	z & matrix of reals & in &  $z_{ij}$ different evaluations of  $z(x,y)$.  \\ \hline
+	
+	x\_label &  character string & in  & $x$ label of the graph.   \\ \hline
+	
+	y\_label &  character string & in  & $y$ label of the graph.   \\ \hline
+	
+	levels &  vector of  reals  & optional in & Levels for the iso--lines.  \\ \hline
+	
+	legend & character string & optional in  &  title of the graph.   \\ \hline
+	
+	path  &  character string & optional in  &  Latex and data files.  \\ \hline
+	
+	graph\_type  &  character string &  optional in  & "color" or "isolines"   \\ \hline
+\etable{Description of \texttt{plot\_contour} arguments}
+
+
+  \newpage
+  \listings{./sources/my_examples.f90}
+  {subroutine myexampleD}
+  {end subroutine}{my_examples.f90}
+The above Fortran example creates the following  data files and latex files: 
+ 
+  \verb|./results/myexampleDa.plt|,  \  \verb|./results/myexampleDa.tex|,
+  
+  \verb|./results/myexampleDb.plt|, \ \verb|./results/myexampleDb.tex|.
+  
+By compiling  the following Latex file, the same plots showed on the screen are included in any latex manuscript. 
+ 
+\vspace{0.5cm} 
+\listings{./latex.tex}{twographs}{:exampleDa}{Latex.tex}
+
+To compile successfully the above code,  \verb|gnuplot| must be installed in the computer. Besides,  during installation, the path environmental variable
+should be added. If \verb|TexStudio| is used to compile the Latex file, the \verb|lualatex| and \verb|PDFLatex| orders should be modified as follows: 
+
+\verb|pdflatex -synctex=1 -interaction=nonstopmode -shell-escape %.tex|
+
+\verb|lualatex.exe -synctex=1 -interaction=nonstopmode -shell-escape %.tex|
+
+
+
+
+The results are shown in figure  \ref{fig:exampleDad2}. 
+\vspace{1cm} 
+
+%\twographs
+%      {\input{./results/myexampleDa.tex} }
+%      {\input{./results/myexampleDa.tex} }
+%      {Color map. 
+%      (a) $ z = \sin x \sin y$. 
+%      (a) $ z = \sin x \sin y$. 
+%      }
+%      {fig:exampleDad1}  
+\twographs
+      {\input{./results/myexampleDb.tex} }
+      {\input{./results/myexampleDb.tex} }
+      {Isolines. 
+      (a) $ z = \sin x \sin y$. 
+      (a) $ z = \sin x \sin y$. 
+      }
+      {fig:exampleDad2}      

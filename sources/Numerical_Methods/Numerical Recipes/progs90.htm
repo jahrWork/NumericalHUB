@@ -1,0 +1,908 @@
+<html><head><title>NRcdrom Progs. Internet/Server Use Prohibited.</title>
+</head>
+<body><h1>Numerical Recipes Routines by Chapter and Section</h1>
+
+Chapter number links jump to the corresponding place in the
+book Table of Contents.  (Click on the Chapter number to get back.)
+Routine name links jump to the listing
+of the program.  Example links jump to an example program that
+shows the use of the routine.<p>
+<h3><a name="C1"></A><A HREF="toc.htm#C1">Chapter 1</a></h3>
+<menu>
+<li>[1.0]
+<a href="recipes/flmoon.f90"><b>flmoon</b></a> calculate phases of the moon by date 
+ (<a href="examples/xflmoon.f90">example</a>)
+<li>[1.1]
+<a href="recipes/julday.f90"><b>julday</b></a> Julian Day number from calendar date 
+ (<a href="examples/xjulday.f90">example</a>)
+<li>[1.1]
+<a href="recipes/badluk.f90"><b>badluk</b></a> Friday the 13th when the moon is full 
+<li>[1.1]
+<a href="recipes/caldat.f90"><b>caldat</b></a> calendar date from Julian day number 
+ (<a href="examples/xcaldat.f90">example</a>)
+</menu>
+<h3><a name="C2"></A><A HREF="toc.htm#C2">Chapter 2</a></h3>
+<menu>
+<li>[2.1]
+<a href="recipes/gaussj.f90"><b>gaussj</b></a> Gauss-Jordan matrix inversion and linear equation solution 
+ (<a href="examples/xgaussj.f90">example</a>)
+<li>[2.3]
+<a href="recipes/ludcmp.f90"><b>ludcmp</b></a> linear equation solution, LU decomposition 
+ (<a href="examples/xludcmp.f90">example</a>)
+<li>[2.3]
+<a href="recipes/lubksb.f90"><b>lubksb</b></a> linear equation solution, backsubstitution 
+ (<a href="examples/xlubksb.f90">example</a>)
+<li>[2.4]
+<a href="recipes/tridag.f90"><b>tridag</b></a> solution of tridiagonal systems 
+ (<a href="examples/xtridag.f90">example</a>)
+<li>[2.4]
+<a href="recipes/banmul.f90"><b>banmul</b></a> multiply vector by band diagonal matrix 
+ (<a href="examples/xbanmul.f90">example</a>)
+<li>[2.4]
+<a href="recipes/bandec.f90"><b>bandec</b></a> band diagonal systems, decomposition 
+ (<a href="examples/xbandec.f90">example</a>)
+<li>[2.4]
+<a href="recipes/banbks.f90"><b>banbks</b></a> band diagonal systems, backsubstitution 
+<li>[2.5]
+<a href="recipes/mprove.f90"><b>mprove</b></a> linear equation solution, iterative improvement 
+ (<a href="examples/xmprove.f90">example</a>)
+<li>[2.6]
+<a href="recipes/svbksb.f90"><b>svbksb</b></a> singular value backsubstitution 
+ (<a href="examples/xsvbksb.f90">example</a>)
+<li>[2.6]
+<a href="recipes/svdcmp.f90"><b>svdcmp</b></a> singular value decomposition of a matrix 
+ (<a href="examples/xsvdcmp.f90">example</a>)
+<li>[2.6]
+<a href="recipes/pythag.f90"><b>pythag</b></a> calculate (a^2+b^2)^\{1/2\} without overflow 
+<li>[2.7]
+<a href="recipes/cyclic.f90"><b>cyclic</b></a> solution of cyclic tridiagonal systems 
+ (<a href="examples/xcyclic.f90">example</a>)
+<li>[2.7]
+<a href="recipes/sprsin.f90"><b>sprsin</b></a> convert matrix to sparse format 
+<li>[2.7]
+<a href="recipes/sprsax.f90"><b>sprsax</b></a> product of sparse matrix and vector 
+<li>[2.7]
+<a href="recipes/sprstx.f90"><b>sprstx</b></a> product of transpose sparse matrix and vector 
+<li>[2.7]
+<a href="recipes/sprstp.f90"><b>sprstp</b></a> transpose of sparse matrix 
+<li>[B2]
+<a href="recipes/sprsdiag.f90"><b>sprsdiag</b></a> extract diagonal of sparse matrix
+<li>[2.7]
+<a href="recipes/linbcg.f90"><b>linbcg</b></a> biconjugate gradient solution of sparse systems 
+ (<a href="examples/xlinbcg.f90">example</a>)
+<li>[2.7]
+<a href="recipes/snrm.f90"><b>snrm</b></a> used by <a href="recipes/linbcg.f90"><b>linbcg</b></a> for vector norm 
+<li>[2.7]
+<a href="recipes/atimes.f90"><b>atimes</b></a> used by <a href="recipes/linbcg.f90"><b>linbcg</b></a> for sparse multiplication 
+<li>[2.7]
+<a href="recipes/asolve.f90"><b>asolve</b></a> used by <a href="recipes/linbcg.f90"><b>linbcg</b></a> for preconditioner 
+<li>[2.8]
+<a href="recipes/vander.f90"><b>vander</b></a> solve Vandermonde systems 
+ (<a href="examples/xvander.f90">example</a>)
+<li>[2.8]
+<a href="recipes/toeplz.f90"><b>toeplz</b></a> solve Toeplitz systems 
+ (<a href="examples/xtoeplz.f90">example</a>)
+<li>[2.9]
+<a href="recipes/choldc.f90"><b>choldc</b></a> Cholesky decomposition 
+<li>[2.9]
+<a href="recipes/cholsl.f90"><b>cholsl</b></a> Cholesky backsubstitution 
+ (<a href="examples/xcholsl.f90">example</a>)
+<li>[2.10]
+<a href="recipes/qrdcmp.f90"><b>qrdcmp</b></a> QR decomposition 
+ (<a href="examples/xqrdcmp.f90">example</a>)
+<li>[2.10]
+<a href="recipes/qrsolv.f90"><b>qrsolv</b></a> QR backsubstitution 
+ (<a href="examples/xqrsolv.f90">example</a>)
+<li>[2.10]
+<a href="recipes/rsolv.f90"><b>rsolv</b></a> right triangular backsubstitution 
+<li>[2.10]
+<a href="recipes/qrupdt.f90"><b>qrupdt</b></a> update a QR decomposition 
+ (<a href="examples/xqrupdt.f90">example</a>)
+<li>[2.10]
+<a href="recipes/rotate.f90"><b>rotate</b></a> Jacobi rotation used by <a href="recipes/qrupdt.f90"><b>qrupdt</b></a> 
+</menu>
+<h3><a name="C3"></A><A HREF="toc.htm#C3">Chapter 3</a></h3>
+<menu>
+<li>[3.1]
+<a href="recipes/polint.f90"><b>polint</b></a> polynomial interpolation 
+ (<a href="examples/xpolint.f90">example</a>)
+<li>[3.2]
+<a href="recipes/ratint.f90"><b>ratint</b></a> rational function interpolation 
+ (<a href="examples/xratint.f90">example</a>)
+<li>[3.3]
+<a href="recipes/spline.f90"><b>spline</b></a> construct a cubic spline 
+ (<a href="examples/xspline.f90">example</a>)
+<li>[3.3]
+<a href="recipes/splint.f90"><b>splint</b></a> cubic spline interpolation 
+ (<a href="examples/xsplint.f90">example</a>)
+<li>[3.4]
+<a href="recipes/locate.f90"><b>locate</b></a> search an ordered table by bisection 
+ (<a href="examples/xlocate.f90">example</a>)
+<li>[3.4]
+<a href="recipes/hunt.f90"><b>hunt</b></a> search a table when calls are correlated 
+ (<a href="examples/xhunt.f90">example</a>)
+<li>[3.5]
+<a href="recipes/polcoe.f90"><b>polcoe</b></a> polynomial coefficients from table of values 
+ (<a href="examples/xpolcoe.f90">example</a>)
+<li>[3.5]
+<a href="recipes/polcof.f90"><b>polcof</b></a> polynomial coefficients from table of values 
+ (<a href="examples/xpolcof.f90">example</a>)
+<li>[3.6]
+<a href="recipes/polin2.f90"><b>polin2</b></a> two-dimensional polynomial interpolation 
+ (<a href="examples/xpolin2.f90">example</a>)
+<li>[3.6]
+<a href="recipes/bcucof.f90"><b>bcucof</b></a> construct two-dimensional bicubic 
+ (<a href="examples/xbcucof.f90">example</a>)
+<li>[3.6]
+<a href="recipes/bcuint.f90"><b>bcuint</b></a> two-dimensional bicubic interpolation 
+ (<a href="examples/xbcuint.f90">example</a>)
+<li>[3.6]
+<a href="recipes/splie2.f90"><b>splie2</b></a> construct two-dimensional spline 
+ (<a href="examples/xsplie2.f90">example</a>)
+<li>[3.6]
+<a href="recipes/splin2.f90"><b>splin2</b></a> two-dimensional spline interpolation 
+ (<a href="examples/xsplin2.f90">example</a>)
+</menu>
+<h3><a name="C4"></A><A HREF="toc.htm#C4">Chapter 4</a></h3>
+<menu>
+<li>[4.2]
+<a href="recipes/trapzd.f90"><b>trapzd</b></a> trapezoidal rule 
+ (<a href="examples/xtrapzd.f90">example</a>)
+<li>[4.2]
+<a href="recipes/qtrap.f90"><b>qtrap</b></a> integrate using trapezoidal rule 
+<li>[4.2]
+<a href="recipes/qsimp.f90"><b>qsimp</b></a> integrate using Simpson's rule 
+<li>[4.3]
+<a href="recipes/qromb.f90"><b>qromb</b></a> integrate using Romberg adaptive method 
+<li>[4.4]
+<a href="recipes/midpnt.f90"><b>midpnt</b></a> extended midpoint rule 
+ (<a href="examples/xmidpnt.f90">example</a>)
+<li>[4.4]
+<a href="recipes/qromo.f90"><b>qromo</b></a> integrate using open Romberg adaptive method 
+ (<a href="examples/xqromo.f90">example</a>)
+<li>[4.4]
+<a href="recipes/midinf.f90"><b>midinf</b></a> integrate a function on a semi-infinite interval 
+<li>[4.4]
+<a href="recipes/midsql.f90"><b>midsql</b></a> integrate a function with lower square-root singularity 
+<li>[4.4]
+<a href="recipes/midsqu.f90"><b>midsqu</b></a> integrate a function with upper square-root singularity 
+<li>[4.4]
+<a href="recipes/midexp.f90"><b>midexp</b></a> integrate a function that decreases exponentially 
+<li>[4.5]
+<a href="recipes/gauleg.f90"><b>gauleg</b></a> Gauss-Legendre weights and abscissas 
+ (<a href="examples/xgauleg.f90">example</a>)
+<li>[4.5]
+<a href="recipes/gaulag.f90"><b>gaulag</b></a> Gauss-Laguerre weights and abscissas 
+ (<a href="examples/xgaulag.f90">example</a>)
+<li>[4.5]
+<a href="recipes/gauher.f90"><b>gauher</b></a> Gauss-Hermite weights and abscissas 
+ (<a href="examples/xgauher.f90">example</a>)
+<li>[4.5]
+<a href="recipes/gaujac.f90"><b>gaujac</b></a> Gauss-Jacobi weights and abscissas 
+ (<a href="examples/xgaujac.f90">example</a>)
+<li>[4.5]
+<a href="recipes/gaucof.f90"><b>gaucof</b></a> quadrature weights from orthogonal polynomials 
+ (<a href="examples/xgaucof.f90">example</a>)
+<li>[4.5]
+<a href="recipes/orthog.f90"><b>orthog</b></a> construct nonclassical orthogonal polynomials 
+ (<a href="examples/xorthog.f90">example</a>)
+<li>[4.6]
+<a href="recipes/quad3d.f90"><b>quad3d</b></a> integrate a function over a three-dimensional space 
+ (<a href="examples/xquad3d.f90">example</a>)
+</menu>
+<h3><a name="C5"></A><A HREF="toc.htm#C5">Chapter 5</a></h3>
+<menu>
+<li>[5.1]
+<a href="recipes/eulsum.f90"><b>eulsum</b></a> sum a series by Euler--van Wijngaarden algorithm 
+ (<a href="examples/xeulsum.f90">example</a>)
+<li>[5.3]
+<a href="recipes/ddpoly.f90"><b>ddpoly</b></a> evaluate a polynomial and its derivatives 
+ (<a href="examples/xddpoly.f90">example</a>)
+<li>[5.3]
+<a href="recipes/poldiv.f90"><b>poldiv</b></a> divide one polynomial by another 
+ (<a href="examples/xpoldiv.f90">example</a>)
+<li>[5.3]
+<a href="recipes/ratval.f90"><b>ratval</b></a> evaluate a rational function 
+<li>[B5]
+<a href="recipes/recur1.f90"><b>recur1</b></a> evaluate first order linear recurrence 
+<li>[B5]
+<a href="recipes/recur2.f90"><b>recur2</b></a> evaluate second order linear recurrence
+<li>[5.7]
+<a href="recipes/dfridr.f90"><b>dfridr</b></a> numerical derivative by Ridders' method 
+ (<a href="examples/xdfridr.f90">example</a>)
+<li>[5.8]
+<a href="recipes/chebft.f90"><b>chebft</b></a> fit a Chebyshev polynomial to a function 
+ (<a href="examples/xchebft.f90">example</a>)
+<li>[5.8]
+<a href="recipes/chebev.f90"><b>chebev</b></a> Chebyshev polynomial evaluation 
+ (<a href="examples/xchebev.f90">example</a>)
+<li>[5.9]
+<a href="recipes/chder.f90"><b>chder</b></a> derivative of a function already Chebyshev fitted 
+ (<a href="examples/xchder.f90">example</a>)
+<li>[5.9]
+<a href="recipes/chint.f90"><b>chint</b></a> integrate a function already Chebyshev fitted 
+ (<a href="examples/xchint.f90">example</a>)
+<li>[5.10]
+<a href="recipes/chebpc.f90"><b>chebpc</b></a> polynomial coefficients from a Chebyshev fit 
+ (<a href="examples/xchebpc.f90">example</a>)
+<li>[5.10]
+<a href="recipes/pcshft.f90"><b>pcshft</b></a> polynomial coefficients of a shifted polynomial 
+ (<a href="examples/xpcshft.f90">example</a>)
+<li>[5.11]
+<a href="recipes/pccheb.f90"><b>pccheb</b></a> inverse of chebpc; use to economize power series 
+ (<a href="examples/xpccheb.f90">example</a>)
+<li>[5.12]
+<a href="recipes/pade.f90"><b>pade</b></a> Pade approximant from power series coefficients 
+ (<a href="examples/xpade.f90">example</a>)
+<li>[5.13]
+<a href="recipes/ratlsq.f90"><b>ratlsq</b></a> rational fit by least-squares method 
+</menu>
+<h3><a name="C6"></A><A HREF="toc.htm#C6">Chapter 6</a></h3>
+<menu>
+<li>[6.1]
+<a href="recipes/gammln.f90"><b>gammln</b></a> logarithm of gamma function 
+<li>[6.1]
+<a href="recipes/factrl.f90"><b>factrl</b></a> factorial function 
+<li>[6.1]
+<a href="recipes/bico.f90"><b>bico</b></a> binomial coefficients function 
+<li>[6.1]
+<a href="recipes/factln.f90"><b>factln</b></a> logarithm of factorial function 
+<li>[6.1]
+<a href="recipes/beta.f90"><b>beta</b></a> beta function 
+<li>[6.2]
+<a href="recipes/gammp.f90"><b>gammp</b></a> incomplete gamma function 
+<li>[6.2]
+<a href="recipes/gammq.f90"><b>gammq</b></a> complement of incomplete gamma function 
+<li>[6.2]
+<a href="recipes/gser.f90"><b>gser</b></a> series used by <a href="recipes/gammp.f90"><b>gammp</b></a> and <a href="recipes/gammq.f90"><b>gammq</b></a> 
+<li>[6.2]
+<a href="recipes/gcf.f90"><b>gcf</b></a> continued fraction used by <a href="recipes/gammp.f90"><b>gammp</b></a> and <a href="recipes/gammq.f90"><b>gammq</b></a> 
+<li>[6.2]
+<a href="recipes/erf.f90"><b>erf</b></a> error function 
+<li>[6.2]
+<a href="recipes/erfc.f90"><b>erfc</b></a> complementary error function 
+<li>[6.2]
+<a href="recipes/erfcc.f90"><b>erfcc</b></a> complementary error function, concise routine 
+<li>[6.3]
+<a href="recipes/expint.f90"><b>expint</b></a> exponential integral E_n 
+<li>[6.3]
+<a href="recipes/ei.f90"><b>ei</b></a> exponential integral Ei 
+<li>[6.4]
+<a href="recipes/betai.f90"><b>betai</b></a> incomplete <a href="recipes/beta.f90"><b>beta</b></a> function 
+<li>[6.4]
+<a href="recipes/betacf.f90"><b>betacf</b></a> continued fraction used by <a href="recipes/betai.f90"><b>betai</b></a> 
+<li>[6.5]
+<a href="recipes/bessj0.f90"><b>bessj0</b></a> Bessel function J_0 
+<li>[6.5]
+<a href="recipes/bessy0.f90"><b>bessy0</b></a> Bessel function Y_0 
+<li>[6.5]
+<a href="recipes/bessj1.f90"><b>bessj1</b></a> Bessel function J_1 
+<li>[6.5]
+<a href="recipes/bessy1.f90"><b>bessy1</b></a> Bessel function Y_1 
+<li>[6.5]
+<a href="recipes/bessy.f90"><b>bessy</b></a> Bessel function Y of general integer order 
+<li>[6.5]
+<a href="recipes/bessj.f90"><b>bessj</b></a> Bessel function J of general integer order 
+<li>[6.6]
+<a href="recipes/bessi0.f90"><b>bessi0</b></a> modified Bessel function I_0 
+<li>[6.6]
+<a href="recipes/bessk0.f90"><b>bessk0</b></a> modified Bessel function K_0 
+<li>[6.6]
+<a href="recipes/bessi1.f90"><b>bessi1</b></a> modified Bessel function I_1 
+<li>[6.6]
+<a href="recipes/bessk1.f90"><b>bessk1</b></a> modified Bessel function K_1 
+<li>[6.6]
+<a href="recipes/bessk.f90"><b>bessk</b></a> modified Bessel function K of integer order 
+<li>[6.6]
+<a href="recipes/bessi.f90"><b>bessi</b></a> modified Bessel function I of integer order 
+<li>[6.7]
+<a href="recipes/bessjy.f90"><b>bessjy</b></a> Bessel functions of fractional order 
+<li>[6.7]
+<a href="recipes/beschb.f90"><b>beschb</b></a> Chebyshev expansion used by <a href="recipes/bessjy.f90"><b>bessjy</b></a> 
+ (<a href="examples/xbeschb.f90">example</a>)
+<li>[6.7]
+<a href="recipes/bessik.f90"><b>bessik</b></a> modified Bessel functions of fractional order 
+ (<a href="examples/xbessik.f90">example</a>)
+<li>[6.7]
+<a href="recipes/airy.f90"><b>airy</b></a> Airy functions 
+ (<a href="examples/xairy.f90">example</a>)
+<li>[6.7]
+<a href="recipes/sphbes.f90"><b>sphbes</b></a> spherical Bessel functions j_n and y_n 
+<li>[6.8]
+<a href="recipes/plgndr.f90"><b>plgndr</b></a> Legendre polynomials, associated (spherical harmonics) 
+<li>[6.9]
+<a href="recipes/frenel.f90"><b>frenel</b></a> Fresnel integrals S(x) and C(x) 
+ (<a href="examples/xfrenel.f90">example</a>)
+<li>[6.9]
+<a href="recipes/cisi.f90"><b>cisi</b></a> cosine and sine integrals Ci and Si 
+ (<a href="examples/xcisi.f90">example</a>)
+<li>[6.10]
+<a href="recipes/dawson.f90"><b>dawson</b></a> Dawson's integral 
+<li>[6.11]
+<a href="recipes/rf.f90"><b>rf</b></a> Carlson's elliptic integral of the first kind 
+<li>[6.11]
+<a href="recipes/rd.f90"><b>rd</b></a> Carlson's elliptic integral of the second kind 
+<li>[6.11]
+<a href="recipes/rj.f90"><b>rj</b></a> Carlson's elliptic integral of the third kind 
+<li>[6.11]
+<a href="recipes/rc.f90"><b>rc</b></a> Carlson's degenerate elliptic integral 
+<li>[6.11]
+<a href="recipes/ellf.f90"><b>ellf</b></a> Legendre elliptic integral of the first kind 
+<li>[6.11]
+<a href="recipes/elle.f90"><b>elle</b></a> Legendre elliptic integral of the second kind 
+<li>[6.11]
+<a href="recipes/ellpi.f90"><b>ellpi</b></a> Legendre elliptic integral of the third kind 
+<li>[6.11]
+<a href="recipes/sncndn.f90"><b>sncndn</b></a> Jacobian elliptic functions 
+ (<a href="examples/xsncndn.f90">example</a>)
+<li>[6.12]
+<a href="recipes/hypgeo.f90"><b>hypgeo</b></a> complex hypergeometric function 
+ (<a href="examples/xhypgeo.f90">example</a>)
+<li>[6.12]
+<a href="recipes/hypser.f90"><b>hypser</b></a> complex hypergeometric function, series evaluation 
+<li>[6.12]
+<a href="recipes/hypdrv.f90"><b>hypdrv</b></a> complex hypergeometric function, derivative of 
+</menu>
+<h3><a name="C7"></A><A HREF="toc.htm#C7">Chapter 7</a></h3>
+<menu>
+<li>[B7]
+<a href="recipes/ran.f90"><b>ran</b></a> random deviate, minimum standard plus shuffle
+ (<a href="examples/xran.f90">example</a>)
+<li>[B7]
+<a href="recipes/ran_state.f90"><b>ran_state</b></a> supporting module for random number routines
+<li>[B7]
+<a href="recipes/ran0.f90"><b>ran0</b></a> random deviate by lagged Fibonacci plus Marsaglia shift
+<li>[B7]
+<a href="recipes/ran1.f90"><b>ran1</b></a> random deviate by lagged Fibonacci plus two Marsaglia shifts
+<li>[B7]
+<a href="recipes/ran2.f90"><b>ran2</b></a> random deviate by Fibonacci, Marsalglia shift, and LCG
+<li>[B7]
+<a href="recipes/ran3.f90"><b>ran3</b></a> random deviate by DES-like hashing
+<li>[7.2]
+<a href="recipes/expdev.f90"><b>expdev</b></a> exponential random deviates 
+ (<a href="examples/xexpdev.f90">example</a>)
+<li>[7.2]
+<a href="recipes/gasdev.f90"><b>gasdev</b></a> normally distributed random deviates 
+ (<a href="examples/xgasdev.f90">example</a>)
+<li>[7.3]
+<a href="recipes/gamdev.f90"><b>gamdev</b></a> gamma-law distribution random deviates 
+ (<a href="examples/xgamdev.f90">example</a>)
+<li>[7.3]
+<a href="recipes/poidev.f90"><b>poidev</b></a> Poisson distributed random deviates 
+ (<a href="examples/xpoidev.f90">example</a>)
+<li>[7.3]
+<a href="recipes/bnldev.f90"><b>bnldev</b></a> binomial distributed random deviates 
+ (<a href="examples/xbnldev.f90">example</a>)
+<li>[B7]
+<a href="recipes/psdes.f90"><b>psdes</b></a> "pseudo-DES'' hashing of 64 bits (safe arithmetic)
+ (<a href="examples/xpsdes.f90">example</a>)
+<li>[7.4]
+<a href="recipes/irbit1.f90"><b>irbit1</b></a> random bit sequence 
+ (<a href="examples/xirbit1.f90">example</a>)
+<li>[7.4]
+<a href="recipes/irbit2.f90"><b>irbit2</b></a> random bit sequence 
+ (<a href="examples/xirbit2.f90">example</a>)
+<li>[7.7]
+<a href="recipes/sobseq.f90"><b>sobseq</b></a> Sobol's quasi-random sequence 
+ (<a href="examples/xsobseq.f90">example</a>)
+<li>[7.8]
+<a href="recipes/vegas.f90"><b>vegas</b></a> adaptive multidimensional Monte Carlo integration 
+ (<a href="examples/xvegas.f90">example</a>)
+<li>[7.8]
+<a href="recipes/miser.f90"><b>miser</b></a> recursive multidimensional Monte Carlo integration 
+ (<a href="examples/xmiser.f90">example</a>)
+</menu>
+<h3><a name="C8"></A><A HREF="toc.htm#C8">Chapter 8</a></h3>
+<menu>
+<li>[8.1]
+<a href="recipes/sort_pick.f90"><b>sort_pick</b></a> sort an array by straight insertino 
+<li>[8.1]
+<a href="recipes/sort_shell.f90"><b>sort_shell</b></a> sort an array by Shell's method 
+<li>[B8]
+<a href="recipes/sort_byreshape.f90"><b>sort_byreshape</b></a> sort an array by parallel bubble sort 
+<li>[8.2]
+<a href="recipes/sort.f90"><b>sort</b></a> sort an array by quicksort method 
+<li>[8.2]
+<a href="recipes/sort2.f90"><b>sort2</b></a> sort two arrays by quicksort, using an index 
+ (<a href="examples/xsort2.f90">example</a>)
+<li>[B8]
+<a href="recipes/sort_bypack.f90"><b>sort_bypack</b></a> sort an array by parallel quicksort 
+<li>[8.3]
+<a href="recipes/sort_heap.f90"><b>sort_heap</b></a> sort an array by heapsort method 
+<li>[B8]
+<a href="recipes/sort_radix.f90"><b>sort_radix</b></a> sort an array by radix sort 
+<li>[8.4]
+<a href="recipes/indexx.f90"><b>indexx</b></a> construct an index for an array 
+<li>[8.4]
+<a href="recipes/sort3.f90"><b>sort3</b></a> sort three arrays by quicksort, using an index 
+ (<a href="examples/xsort3.f90">example</a>)
+<li>[8.4]
+<a href="recipes/rank.f90"><b>rank</b></a> construct a rank table for an array 
+ (<a href="examples/xrank.f90">example</a>)
+<li>[B8]
+<a href="recipes/index_bypack.f90"><b>index_bypack</b></a> construct an index for an array using pack intrinsic 
+<li>[8.5]
+<a href="recipes/select.f90"><b>select</b></a> find the Nth largest in an array 
+<li>[8.5]
+<a href="recipes/select_inplace.f90"><b>select_inplace</b></a> find the Nth largest without altering the array 
+<li>[B8]
+<a href="recipes/select_bypack.f90"><b>select_bypack</b></a> find the Nth largest using pack intrinsic 
+<li>[8.5]
+<a href="recipes/select_heap.f90"><b>select_heap</b></a> find M largest values without altering an array 
+<li>[8.6]
+<a href="recipes/eclass.f90"><b>eclass</b></a> determine equivalence classes from list 
+ (<a href="examples/xeclass.f90">example</a>)
+<li>[8.6]
+<a href="recipes/eclazz.f90"><b>eclazz</b></a> determine equivalence classes from procedure 
+ (<a href="examples/xeclazz.f90">example</a>)
+</menu>
+<h3><a name="C9"></A><A HREF="toc.htm#C9">Chapter 9</a></h3>
+<menu>
+<li>[9.0]
+<a href="recipes/scrsho.f90"><b>scrsho</b></a> graph a function to search for roots 
+ (<a href="examples/xscrsho.f90">example</a>)
+<li>[9.1]
+<a href="recipes/zbrac.f90"><b>zbrac</b></a> outward search for brackets on roots 
+ (<a href="examples/xzbrac.f90">example</a>)
+<li>[9.1]
+<a href="recipes/zbrak.f90"><b>zbrak</b></a> inward search for brackets on roots 
+ (<a href="examples/xzbrak.f90">example</a>)
+<li>[9.1]
+<a href="recipes/rtbis.f90"><b>rtbis</b></a> find root of a function by bisection 
+<li>[9.2]
+<a href="recipes/rtflsp.f90"><b>rtflsp</b></a> find root of a function by false-position 
+<li>[9.2]
+<a href="recipes/rtsec.f90"><b>rtsec</b></a> find root of a function by secant method 
+<li>[9.2]
+<a href="recipes/zriddr.f90"><b>zriddr</b></a> find root of a function by Ridders' method 
+<li>[9.3]
+<a href="recipes/zbrent.f90"><b>zbrent</b></a> find root of a function by Brent's method 
+<li>[9.4]
+<a href="recipes/rtnewt.f90"><b>rtnewt</b></a> find root of a function by Newton-Raphson 
+<li>[9.4]
+<a href="recipes/rtsafe.f90"><b>rtsafe</b></a> find root of a function by Newton-Raphson and bisection 
+<li>[9.5]
+<a href="recipes/laguer.f90"><b>laguer</b></a> find a root of a polynomial by Laguerre's method 
+ (<a href="examples/xlaguer.f90">example</a>)
+<li>[9.5]
+<a href="recipes/zroots.f90"><b>zroots</b></a> roots of a polynomial by Laguerre's method with deflation 
+ (<a href="examples/xzroots.f90">example</a>)
+<li>[9.5]
+<a href="recipes/zrhqr.f90"><b>zrhqr</b></a> roots of a polynomial by eigenvalue methods 
+ (<a href="examples/xzrhqr.f90">example</a>)
+<li>[9.5]
+<a href="recipes/qroot.f90"><b>qroot</b></a> complex or double root of a polynomial, Bairstow 
+ (<a href="examples/xqroot.f90">example</a>)
+<li>[9.6]
+<a href="recipes/mnewt.f90"><b>mnewt</b></a> Newton's method for systems of equations 
+ (<a href="examples/xmnewt.f90">example</a>)
+<li>[9.7]
+<a href="recipes/lnsrch.f90"><b>lnsrch</b></a> search along a line, used by <a href="recipes/newt.f90"><b>newt</b></a> 
+<li>[9.7]
+<a href="recipes/newt.f90"><b>newt</b></a> globally convergent multi-dimensional Newton's method 
+ (<a href="examples/xnewt.f90">example</a>)
+<li>[9.7]
+<a href="recipes/fdjac.f90"><b>fdjac</b></a> finite-difference Jacobian, used by <a href="recipes/newt.f90"><b>newt</b></a> 
+<li>[9.7]
+<a href="recipes/fmin.f90"><b>fmin</b></a> norm of a vector function, used by <a href="recipes/newt.f90"><b>newt</b></a> 
+<li>[9.7]
+<a href="recipes/broydn.f90"><b>broydn</b></a> secant method for systems of equations 
+ (<a href="examples/xbroydn.f90">example</a>)
+</menu>
+<h3><a name="C10"></A><A HREF="toc.htm#C10">Chapter 10</a></h3>
+<menu>
+<li>[10.1]
+<a href="recipes/mnbrak.f90"><b>mnbrak</b></a> bracket the minimum of a function 
+ (<a href="examples/xmnbrak.f90">example</a>)
+<li>[10.1]
+<a href="recipes/golden.f90"><b>golden</b></a> find minimum of a function by golden section search 
+ (<a href="examples/xgolden.f90">example</a>)
+<li>[10.2]
+<a href="recipes/brent.f90"><b>brent</b></a> find minimum of a function by Brent's method 
+ (<a href="examples/xbrent.f90">example</a>)
+<li>[10.3]
+<a href="recipes/dbrent.f90"><b>dbrent</b></a> find minimum of a function using derivative information 
+ (<a href="examples/xdbrent.f90">example</a>)
+<li>[10.4]
+<a href="recipes/amoeba.f90"><b>amoeba</b></a> minimize in N-dimensions by downhill simplex method 
+ (<a href="examples/xamoeba.f90">example</a>)
+<li>[10.5]
+<a href="recipes/powell.f90"><b>powell</b></a> minimize in N-dimensions by  Powell's method 
+ (<a href="examples/xpowell.f90">example</a>)
+<li>[10.5]
+<a href="recipes/linmin.f90"><b>linmin</b></a> minimum of a function along a ray in N-dimensions 
+ (<a href="examples/xlinmin.f90">example</a>)
+<li>[B10]
+<a href="recipes/dlinmin.f90"><b>dlinmin</b></a> minimum of a function along a ray, using derivative 
+<li>[10.6]
+<a href="recipes/frprmn.f90"><b>frprmn</b></a> minimize in N-dimensions by conjugate gradient 
+ (<a href="examples/xfrprmn.f90">example</a>)
+<li>[10.7]
+<a href="recipes/dfpmin.f90"><b>dfpmin</b></a> minimize in N-dimensions by variable metric method 
+ (<a href="examples/xdfpmin.f90">example</a>)
+<li>[10.8]
+<a href="recipes/simplx.f90"><b>simplx</b></a> linear programming maximization of a linear function 
+<li>[10.9]
+<a href="recipes/anneal.f90"><b>anneal</b></a> traveling salesman problem by simulated annealing 
+ (<a href="examples/xanneal.f90">example</a>)
+<li>[10.9]
+<a href="recipes/amebsa.f90"><b>amebsa</b></a> simulated annealing in continuous spaces 
+ (<a href="examples/xamebsa.f90">example</a>)
+</menu>
+<h3><a name="C11"></A><A HREF="toc.htm#C11">Chapter 11</a></h3>
+<menu>
+<li>[11.1]
+<a href="recipes/jacobi.f90"><b>jacobi</b></a> eigenvalues and eigenvectors of a symmetric matrix 
+ (<a href="examples/xjacobi.f90">example</a>)
+<li>[11.1]
+<a href="recipes/eigsrt.f90"><b>eigsrt</b></a> eigenvectors, sorts into order by eigenvalue 
+ (<a href="examples/xeigsrt.f90">example</a>)
+<li>[11.2]
+<a href="recipes/tred2.f90"><b>tred2</b></a> Householder reduction of a real, symmetric matrix 
+ (<a href="examples/xtred2.f90">example</a>)
+<li>[11.3]
+<a href="recipes/tqli.f90"><b>tqli</b></a> eigensolution of a symmetric tridiagonal matrix 
+ (<a href="examples/xtqli.f90">example</a>)
+<li>[11.5]
+<a href="recipes/balanc.f90"><b>balanc</b></a> balance a nonsymmetric matrix 
+ (<a href="examples/xbalanc.f90">example</a>)
+<li>[11.5]
+<a href="recipes/elmhes.f90"><b>elmhes</b></a> reduce a general matrix to Hessenberg form 
+ (<a href="examples/xelmhes.f90">example</a>)
+<li>[11.6]
+<a href="recipes/hqr.f90"><b>hqr</b></a> eigenvalues of a Hessenberg matrix 
+ (<a href="examples/xhqr.f90">example</a>)
+</menu>
+<h3><a name="C12"></A><A HREF="toc.htm#C12">Chapter 12</a></h3>
+<menu>
+<li>[B12]
+<a href="recipes/fourrow.f90"><b>fourrow</b></a> fast Fourier transform of rows of a matrix 
+<li>[B12]
+<a href="recipes/fourrow_3d.f90"><b>fourrow_3d</b></a> fast Fourier transform on 3rd index of a 3-d matrix 
+<li>[B12]
+<a href="recipes/fourcol.f90"><b>fourcol</b></a> fast Fourier transform of columns of a matrix 
+<li>[B12]
+<a href="recipes/fourcol_3d.f90"><b>fourcol_3d</b></a> fast Fourier transform on 1st index of a 3-d matrix 
+<li>[B12]
+<a href="recipes/four1.f90"><b>four1</b></a> fast Fourier transform in one dimension 
+ (<a href="examples/xfour1.f90">example</a>)
+<li>[B12]
+<a href="recipes/four1_alt.f90"><b>four1_alt</b></a> fast Fourier transform in one dimension, using fourcol 
+<li>[B12]
+<a href="recipes/four2.f90"><b>four2</b></a> fast Fourier transform in two dimensions 
+<li>[B12]
+<a href="recipes/four2_alt.f90"><b>four2_alt</b></a> fast Fourier transform in two dimensions, using fourcol 
+<li>[12.3]
+<a href="recipes/twofft.f90"><b>twofft</b></a> fast Fourier transform of two real functions 
+ (<a href="examples/xtwofft.f90">example</a>)
+<li>[12.3]
+<a href="recipes/realft.f90"><b>realft</b></a> fast Fourier transform of a single real function 
+ (<a href="examples/xrealft.f90">example</a>)
+<li>[12.3]
+<a href="recipes/sinft.f90"><b>sinft</b></a> fast sine transform 
+ (<a href="examples/xsinft.f90">example</a>)
+<li>[12.3]
+<a href="recipes/cosft1.f90"><b>cosft1</b></a> fast cosine transform with endpoints 
+ (<a href="examples/xcosft1.f90">example</a>)
+<li>[12.3]
+<a href="recipes/cosft2.f90"><b>cosft2</b></a> "staggered'' fast cosine transform 
+ (<a href="examples/xcosft2.f90">example</a>)
+<li>[B12]
+<a href="recipes/four3.f90"><b>four3</b></a> fast Fourier transform in three dimensions 
+<li>[B12]
+<a href="recipes/four3_alt.f90"><b>four3_alt</b></a> fast Fourier transform in three dimensions, using fourcol 
+<li>[12.5]
+<a href="recipes/rlft2.f90"><b>rlft2</b></a> FFT of real data in two dimensions 
+<li>[12.5]
+<a href="recipes/rlft3.f90"><b>rlft3</b></a> FFT of real data in three dimensions 
+ (<a href="examples/xrlft3.f90">example</a>)
+<li>[B12]
+<a href="recipes/four1_gather.f90"><b>four1_gather</b></a> FFT in one dimension, using gather-scatter 
+<li>[B12]
+<a href="recipes/fourn_gather.f90"><b>fourn_gather</b></a> FFT in multi-dimensions, using gather-scatter 
+</menu>
+<h3><a name="C13"></A><A HREF="toc.htm#C13">Chapter 13</a></h3>
+<menu>
+<li>[13.1]
+<a href="recipes/convlv.f90"><b>convlv</b></a> convolution or deconvolution of data using FFT 
+ (<a href="examples/xconvlv.f90">example</a>)
+<li>[13.2]
+<a href="recipes/correl.f90"><b>correl</b></a> correlation or autocorrelation of data using FFT 
+ (<a href="examples/xcorrel.f90">example</a>)
+<li>[13.4]
+<a href="recipes/spctrm.f90"><b>spctrm</b></a> power spectrum estimation using FFT 
+ (<a href="examples/xspctrm.f90">example</a>)
+<li>[13.6]
+<a href="recipes/memcof.f90"><b>memcof</b></a> evaluate maximum entropy (MEM) coefficients 
+ (<a href="examples/xmemcof.f90">example</a>)
+<li>[13.6]
+<a href="recipes/fixrts.f90"><b>fixrts</b></a> reflect roots of a polynomial into unit circle 
+ (<a href="examples/xfixrts.f90">example</a>)
+<li>[13.6]
+<a href="recipes/predic.f90"><b>predic</b></a> linear prediction using MEM coefficients 
+ (<a href="examples/xpredic.f90">example</a>)
+<li>[13.7]
+<a href="recipes/evlmem.f90"><b>evlmem</b></a> power spectral estimation from MEM coefficients 
+ (<a href="examples/xevlmem.f90">example</a>)
+<li>[13.8]
+<a href="recipes/period.f90"><b>period</b></a> power spectrum of unevenly sampled data 
+ (<a href="examples/xperiod.f90">example</a>)
+<li>[13.8]
+<a href="recipes/fasper.f90"><b>fasper</b></a> power spectrum of unevenly sampled larger data sets 
+ (<a href="examples/xfasper.f90">example</a>)
+<li>[13.9]
+<a href="recipes/dftcor.f90"><b>dftcor</b></a> compute endpoint corrections for Fourier integrals 
+<li>[13.9]
+<a href="recipes/dftint.f90"><b>dftint</b></a> high-accuracy Fourier integrals 
+ (<a href="examples/xdftint.f90">example</a>)
+<li>[13.10]
+<a href="recipes/wt1.f90"><b>wt1</b></a> one-dimensional discrete wavelet transform 
+ (<a href="examples/xwt1.f90">example</a>)
+<li>[13.10]
+<a href="recipes/daub4.f90"><b>daub4</b></a> Daubechies 4-coefficient wavelet filter 
+<li>[13.10]
+<a href="recipes/pwtset.f90"><b>pwtset</b></a> initialize coefficients for <a href="recipes/pwt.f90"><b>pwt</b></a> 
+<li>[13.10]
+<a href="recipes/pwt.f90"><b>pwt</b></a> partial wavelet transform 
+<li>[13.10]
+<a href="recipes/wtn.f90"><b>wtn</b></a> multidimensional discrete wavelet transform 
+ (<a href="examples/xwtn.f90">example</a>)
+</menu>
+<h3><a name="C14"></A><A HREF="toc.htm#C14">Chapter 14</a></h3>
+<menu>
+<li>[14.1]
+<a href="recipes/moment.f90"><b>moment</b></a> calculate moments of a data set 
+ (<a href="examples/xmoment.f90">example</a>)
+<li>[14.2]
+<a href="recipes/ttest.f90"><b>ttest</b></a> Student's t-test for difference of means 
+ (<a href="examples/xttest.f90">example</a>)
+<li>[14.2]
+<a href="recipes/avevar.f90"><b>avevar</b></a> calculate mean and variance of a data set 
+ (<a href="examples/xavevar.f90">example</a>)
+<li>[14.2]
+<a href="recipes/tutest.f90"><b>tutest</b></a> Student's t-test for means, case of unequal variances 
+ (<a href="examples/xtutest.f90">example</a>)
+<li>[14.2]
+<a href="recipes/tptest.f90"><b>tptest</b></a> Student's t-test for means, case of paired data 
+ (<a href="examples/xtptest.f90">example</a>)
+<li>[14.2]
+<a href="recipes/ftest.f90"><b>ftest</b></a> F-test for difference of variances 
+ (<a href="examples/xftest.f90">example</a>)
+<li>[14.3]
+<a href="recipes/chsone.f90"><b>chsone</b></a> chi-square test for difference between data and model 
+ (<a href="examples/xchsone.f90">example</a>)
+<li>[14.3]
+<a href="recipes/chstwo.f90"><b>chstwo</b></a> chi-square test for difference between two data sets 
+ (<a href="examples/xchstwo.f90">example</a>)
+<li>[14.3]
+<a href="recipes/ksone.f90"><b>ksone</b></a> Kolmogorov-Smirnov test of data against model 
+ (<a href="examples/xksone.f90">example</a>)
+<li>[14.3]
+<a href="recipes/kstwo.f90"><b>kstwo</b></a> Kolmogorov-Smirnov test between two data sets 
+ (<a href="examples/xkstwo.f90">example</a>)
+<li>[14.3]
+<a href="recipes/probks.f90"><b>probks</b></a> Kolmogorov-Smirnov probability function 
+ (<a href="examples/xprobks.f90">example</a>)
+<li>[14.4]
+<a href="recipes/cntab1.f90"><b>cntab1</b></a> contingency table analysis using chi-square 
+ (<a href="examples/xcntab1.f90">example</a>)
+<li>[14.4]
+<a href="recipes/cntab2.f90"><b>cntab2</b></a> contingency table analysis using entropy measure 
+ (<a href="examples/xcntab2.f90">example</a>)
+<li>[14.5]
+<a href="recipes/pearsn.f90"><b>pearsn</b></a> Pearson's correlation between two data sets 
+ (<a href="examples/xpearsn.f90">example</a>)
+<li>[14.6]
+<a href="recipes/spear.f90"><b>spear</b></a> Spearman's rank correlation between two data sets 
+ (<a href="examples/xspear.f90">example</a>)
+<li>[14.6]
+<a href="recipes/kendl1.f90"><b>kendl1</b></a> correlation between two data sets, Kendall's tau 
+ (<a href="examples/xkendl1.f90">example</a>)
+<li>[14.6]
+<a href="recipes/kendl2.f90"><b>kendl2</b></a> contingency table analysis using Kendall's tau 
+ (<a href="examples/xkendl2.f90">example</a>)
+<li>[14.7]
+<a href="recipes/ks2d1s.f90"><b>ks2d1s</b></a> K--S test in two dimensions, data vs. model 
+ (<a href="examples/xks2d1s.f90">example</a>)
+<li>[14.7]
+<a href="recipes/quadct.f90"><b>quadct</b></a> count points by quadrants, used by <a href="recipes/ks2d1s.f90"><b>ks2d1s</b></a> 
+<li>[14.7]
+<a href="recipes/quadvl.f90"><b>quadvl</b></a> quadrant probabilities, used by <a href="recipes/ks2d1s.f90"><b>ks2d1s</b></a> 
+<li>[14.7]
+<a href="recipes/ks2d2s.f90"><b>ks2d2s</b></a> K--S test in two dimensions, data vs. data 
+ (<a href="examples/xks2d2s.f90">example</a>)
+<li>[14.8]
+<a href="recipes/savgol.f90"><b>savgol</b></a> Savitzky-Golay smoothing coefficients 
+ (<a href="examples/xsavgol.f90">example</a>)
+</menu>
+<h3><a name="C15"></A><A HREF="toc.htm#C15">Chapter 15</a></h3>
+<menu>
+<li>[15.2]
+<a href="recipes/fit.f90"><b>fit</b></a> least-squares fit data to a straight line 
+ (<a href="examples/xfit.f90">example</a>)
+<li>[15.3]
+<a href="recipes/fitexy.f90"><b>fitexy</b></a> fit data to a straight line, errors in both x and y 
+ (<a href="examples/xfitexy.f90">example</a>)
+<li>[15.3]
+<a href="recipes/chixy.f90"><b>chixy</b></a> used by <a href="recipes/fitexy.f90"><b>fitexy</b></a> to calculate a chi-square 
+<li>[15.4]
+<a href="recipes/lfit.f90"><b>lfit</b></a> general linear least-squares fit by normal equations 
+ (<a href="examples/xlfit.f90">example</a>)
+<li>[15.4]
+<a href="recipes/covsrt.f90"><b>covsrt</b></a> rearrange covariance matrix, used by <a href="recipes/lfit.f90"><b>lfit</b></a> 
+ (<a href="examples/xcovsrt.f90">example</a>)
+<li>[15.4]
+<a href="recipes/svdfit.f90"><b>svdfit</b></a> linear least-squares fit by singular value decomposition 
+ (<a href="examples/xsvdfit.f90">example</a>)
+<li>[15.4]
+<a href="recipes/svdvar.f90"><b>svdvar</b></a> variances from singular value decomposition 
+ (<a href="examples/xsvdvar.f90">example</a>)
+<li>[15.4]
+<a href="recipes/fpoly.f90"><b>fpoly</b></a> fit a polynomial using <a href="recipes/lfit.f90"><b>lfit</b></a> or <a href="recipes/svdfit.f90"><b>svdfit</b></a> 
+ (<a href="examples/xfpoly.f90">example</a>)
+<li>[15.4]
+<a href="recipes/fleg.f90"><b>fleg</b></a> fit a Legendre polynomial using <a href="recipes/lfit.f90"><b>lfit</b></a> or <a href="recipes/svdfit.f90"><b>svdfit</b></a> 
+ (<a href="examples/xfleg.f90">example</a>)
+<li>[15.5]
+<a href="recipes/mrqmin.f90"><b>mrqmin</b></a> nonlinear least-squares fit, Marquardt's method 
+ (<a href="examples/xmrqmin.f90">example</a>)
+<li>[15.5]
+<a href="recipes/fgauss.f90"><b>fgauss</b></a> fit a sum of Gaussians using <a href="recipes/mrqmin.f90"><b>mrqmin</b></a> 
+ (<a href="examples/xfgauss.f90">example</a>)
+<li>[15.7]
+<a href="recipes/medfit.f90"><b>medfit</b></a> fit data to a straight line robustly, least absolute deviation 
+ (<a href="examples/xmedfit.f90">example</a>)
+</menu>
+<h3><a name="C16"></A><A HREF="toc.htm#C16">Chapter 16</a></h3>
+<menu>
+<li>[16.1]
+<a href="recipes/rk4.f90"><b>rk4</b></a> integrate one step of ODEs, fourth-order Runge-Kutta 
+ (<a href="examples/xrk4.f90">example</a>)
+<li>[16.1]
+<a href="recipes/rkdumb.f90"><b>rkdumb</b></a> integrate ODEs by fourth-order Runge-Kutta 
+ (<a href="examples/xrkdumb.f90">example</a>)
+<li>[16.2]
+<a href="recipes/rkqs.f90"><b>rkqs</b></a> integrate one step of ODEs with accuracy monitoring 
+ (<a href="examples/xrkqs.f90">example</a>)
+<li>[16.2]
+<a href="recipes/rkck.f90"><b>rkck</b></a> Cash-Karp-Runge-Kutta step used by <a href="recipes/rkqs.f90"><b>rkqs</b></a> 
+<li>[16.2]
+<a href="recipes/odeint.f90"><b>odeint</b></a> integrate ODEs with accuracy monitoring 
+ (<a href="examples/xodeint.f90">example</a>)
+<li>[16.3]
+<a href="recipes/mmid.f90"><b>mmid</b></a> integrate ODEs by modified midpoint method 
+ (<a href="examples/xmmid.f90">example</a>)
+<li>[16.4]
+<a href="recipes/bsstep.f90"><b>bsstep</b></a> integrate ODEs, Bulirsch-Stoer step 
+ (<a href="examples/xbsstep.f90">example</a>)
+<li>[16.4]
+<a href="recipes/pzextr.f90"><b>pzextr</b></a> polynomial extrapolation, used by <a href="recipes/bsstep.f90"><b>bsstep</b></a> 
+ (<a href="examples/xpzextr.f90">example</a>)
+<li>[16.4]
+<a href="recipes/rzextr.f90"><b>rzextr</b></a> rational function extrapolation, used by <a href="recipes/bsstep.f90"><b>bsstep</b></a> 
+ (<a href="examples/xrzextr.f90">example</a>)
+<li>[16.5]
+<a href="recipes/stoerm.f90"><b>stoerm</b></a> integrate conservative second-order ODEs 
+ (<a href="examples/xstoerm.f90">example</a>)
+<li>[16.6]
+<a href="recipes/stiff.f90"><b>stiff</b></a> integrate stiff ODEs by fourth-order Rosenbrock 
+ (<a href="examples/xstiff.f90">example</a>)
+<li>[16.6]
+<a href="recipes/jacobn.f90"><b>jacobn</b></a> sample Jacobian routine for <a href="recipes/stiff.f90"><b>stiff</b></a> 
+<li>[16.6]
+<a href="recipes/simpr.f90"><b>simpr</b></a> integrate stiff ODEs by semi-implicit midpoint rule 
+ (<a href="examples/xsimpr.f90">example</a>)
+<li>[16.6]
+<a href="recipes/stifbs.f90"><b>stifbs</b></a> integrate stiff ODEs, Bulirsch-Stoer step 
+ (<a href="examples/xstifbs.f90">example</a>)
+</menu>
+<h3><a name="C17"></A><A HREF="toc.htm#C17">Chapter 17</a></h3>
+<menu>
+<li>[17.1]
+<a href="recipes/shoot.f90"><b>shoot</b></a> solve two point boundary value problem by shooting 
+<li>[17.2]
+<a href="recipes/shootf.f90"><b>shootf</b></a> ditto, by shooting to a fitting point 
+<li>[17.3]
+<a href="recipes/solvde.f90"><b>solvde</b></a> two point boundary value problem, solve by relaxation 
+<li>[17.4]
+<a href="recipes/sfroid.f90"><b>sfroid</b></a> spheroidal functions by method of SOLVDE 
+<li>[17.4]
+<a href="recipes/difeq.f90"><b>difeq</b></a> spheroidal matrix coefficients, used by <a href="recipes/sfroid.f90"><b>sfroid</b></a>
+<li>[17.4]
+<a href="recipes/sphoot.f90"><b>sphoot</b></a> spheroidal functions by method of <a href="recipes/shoot.f90"><b>shoot</b></a> 
+<li>[17.4]
+<a href="recipes/sphfpt.f90"><b>sphfpt</b></a> spheroidal functions by method of <a href="recipes/shootf.f90"><b>shootf</b></a> 
+ (<a href="examples/xsphfpt.f90">example</a>)
+</menu>
+<h3><a name="C18"></A><A HREF="toc.htm#C18">Chapter 18</a></h3>
+<menu>
+<li>[18.1]
+<a href="recipes/fred2.f90"><b>fred2</b></a> solve linear Fredholm equations of the second kind 
+ (<a href="examples/xfred2.f90">example</a>)
+<li>[18.1]
+<a href="recipes/fredin.f90"><b>fredin</b></a> interpolate solutions obtained with <a href="recipes/fred2.f90"><b>fred2</b></a> 
+ (<a href="examples/xfredin.f90">example</a>)
+<li>[18.2]
+<a href="recipes/voltra.f90"><b>voltra</b></a> linear Volterra equations of the second kind 
+ (<a href="examples/xvoltra.f90">example</a>)
+<li>[18.3]
+<a href="recipes/wwghts.f90"><b>wwghts</b></a> quadrature weights for an arbitrarily singular kernel 
+<li>[18.3]
+<a href="recipes/kermom.f90"><b>kermom</b></a> sample routine for moments of a singular kernel 
+<li>[18.3]
+<a href="recipes/quadmx.f90"><b>quadmx</b></a> sample routine for a quadrature matrix 
+<li>[18.3]
+<a href="recipes/fredex.f90"><b>fredex</b></a> example of solving a singular Fredholm equation 
+</menu>
+<h3><a name="C19"></A><A HREF="toc.htm#C19">Chapter 19</a></h3>
+<menu>
+<li>[19.5]
+<a href="recipes/sor.f90"><b>sor</b></a> elliptic PDE solved by successive overrelaxation method 
+ (<a href="examples/xsor.f90">example</a>)
+<li>[19.6]
+<a href="recipes/mglin.f90"><b>mglin</b></a> linear elliptic PDE solved by multigrid method 
+ (<a href="examples/xmglin.f90">example</a>)
+<li>[19.6]
+<a href="recipes/rstrct.f90"><b>rstrct</b></a> half-weighting restriction, used by <a href="recipes/mglin.f90"><b>mglin</b></a>, <a href="recipes/mgfas.f90"><b>mgfas</b></a> 
+<li>[19.6]
+<a href="recipes/interp.f90"><b>interp</b></a> bilinear prolongation, used by <a href="recipes/mglin.f90"><b>mglin</b></a>, <a href="recipes/mgfas.f90"><b>mgfas</b></a> 
+<li>[19.6]
+<a href="recipes/slvsml.f90"><b>slvsml</b></a> solve on coarsest grid, used by <a href="recipes/mglin.f90"><b>mglin</b></a> 
+<li>[19.6]
+<a href="recipes/relax.f90"><b>relax</b></a> Gauss-Seidel relaxation, used by <a href="recipes/mglin.f90"><b>mglin</b></a>
+<li>[19.6]
+<a href="recipes/resid.f90"><b>resid</b></a> calculate residual, used by <a href="recipes/mglin.f90"><b>mglin</b></a>
+<li>[19.6]
+<a href="recipes/mgfas.f90"><b>mgfas</b></a> nonlinear elliptic PDE solved by multigrid method 
+ (<a href="examples/xmgfas.f90">example</a>)
+<li>[19.6]
+<a href="recipes/relax2.f90"><b>relax2</b></a> Gauss-Seidel relaxation, used by <a href="recipes/mgfas.f90"><b>mgfas</b></a> 
+<li>[19.6]
+<a href="recipes/slvsm2.f90"><b>slvsm2</b></a> solve on coarsest grid, used by <a href="recipes/mgfas.f90"><b>mgfas</b></a> 
+<li>[19.6]
+<a href="recipes/lop.f90"><b>lop</b></a> applies nonlinear operator, used by <a href="recipes/mgfas.f90"><b>mgfas</b></a> 
+</menu>
+<h3><a name="C20"></A><A HREF="toc.htm#C20">Chapter 20</a></h3>
+<menu>
+<li>[20.1]
+<a href="recipes/machar.f90"><b>machar</b></a> diagnose computer's floating arithmetic 
+ (<a href="examples/xmachar.f90">example</a>)
+<li>[20.2]
+<a href="recipes/igray.f90"><b>igray</b></a> Gray code and its inverse 
+ (<a href="examples/xigray.f90">example</a>)
+<li>[20.3]
+<a href="recipes/icrc.f90"><b>icrc</b></a> cyclic redundancy checksum 
+ (<a href="examples/xicrc.f90">example</a>)
+<li>[20.3]
+<a href="recipes/decchk.f90"><b>decchk</b></a> decimal check digit calculation or verification 
+ (<a href="examples/xdecchk.f90">example</a>)
+<li>[20.4]
+<a href="recipes/hufmak.f90"><b>hufmak</b></a> construct a Huffman code 
+<li>[20.4]
+<a href="recipes/hufenc.f90"><b>hufenc</b></a> use Huffman code to encode and compress a character 
+<li>[20.4]
+<a href="recipes/hufdec.f90"><b>hufdec</b></a> use Huffman code to decode and decompress a character 
+ (<a href="examples/xhuffman.f90">example</a>)
+<li>[20.5]
+<a href="recipes/arcmak.f90"><b>arcmak</b></a> construct an arithmetic code 
+<li>[20.5]
+<a href="recipes/arcode.f90"><b>arcode</b></a> encode or decode a character using arithmetic coding 
+ (<a href="examples/xarcode.f90">example</a>)
+<li>[20.6]
+<a href="recipes/mpops.f90"><b>mpops</b></a> multiple precision arithmetic, simpler operations 
+<li>[20.6]
+<a href="recipes/mpmul.f90"><b>mpmul</b></a> multiple precision multiply, using FFT methods 
+<li>[20.6]
+<a href="recipes/mpinv.f90"><b>mpinv</b></a> multiple precision reciprocal 
+<li>[20.6]
+<a href="recipes/mpdiv.f90"><b>mpdiv</b></a> multiple precision divide and remainder 
+<li>[20.6]
+<a href="recipes/mpsqrt.f90"><b>mpsqrt</b></a> multiple precision square root 
+<li>[20.6]
+<a href="recipes/mp2dfr.f90"><b>mp2dfr</b></a> multiple precision conversion to decimal base 
+<li>[20.6]
+<a href="recipes/mppi.f90"><b>mppi</b></a> multiple precision example, compute many digits of pi 
+ (<a href="examples/xmppi.f90">example</a>)
+</menu>
+</body>
+</html>

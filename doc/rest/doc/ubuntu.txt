@@ -1,0 +1,87 @@
+
+Informatics 2017/2018 Aerospace Engineering (UPM) 
+ 
+How to install FORTRAN and graphical windows in Ubuntu from windows 10 
+
+Author: Juan A. Hernandez:  juanantonio.hernandez@upm.es 
+
+
+
+
+A) Install UBUNTU from Windows 10 (skip this step if your machine is UBUNTU) 
+
+   1) Setting /Security / Developer ( allow to create and modify programs ) 
+   
+   2) control panel / programs / Windows characteristics allow UBUNTU 
+   
+   3) cmd> bash . Create user and password UBUNTU machine 
+   
+   4) Install X11 server for graphical windows ( XMing ) to run graphical linux binaries from shell.
+      Capability to start 64-bit GUI-programs from the desktop file manager 
+      
+   5) Install graphical vim editor to check: 
+   
+          $sudo apt-get install vim-gtk
+          
+          Now, you’ll need to set the “DISPLAY” environment variable to point at the X server running on your Windows 10 PC. 
+          If you don’t do this, graphical applications will simply fail to launch.
+          To do this, run the following command in the Bash environment:
+
+          $export DISPLAY=:0
+          $gvim
+          
+          
+B) Install gfortran 
+
+     1) $ sudo apt-get install gfortran 
+     
+               
+
+C) Install DISLIN to plot with UBUNTU 
+
+   1)  should install OpenMotif on Ubuntu 
+   
+         
+         $sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` universe multiverse'
+
+         $sudo apt-get update 
+   
+         $sudo apt-get install libxm4
+         
+         $sudo apt-get install libmotif4* libmotif-dev
+         
+         $sudo apt-get install libx11-dev libxt-dev libgl1-mesa-dev  WARNING:(l1 ele and then one )
+         
+ 
+    2) Check the compiler 
+    
+     1)$ ./compile.sh Hello_world
+     2)$ ./compile.sh plot_graph
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+
+  2) install dislin (from dislin distribution page 64 bits linux ) 
+   
+         $sudo dpkg -i ./lib_linux/dislin-11.0.linux.i586_64.deb
+
+
+gfortran doubleprec-app.f90 -static-libgfortran -I/usr/local/dislin/gf/real64 /usr/local/dislin/libdislin_d.a -lXm -lXt -lX11 -lGL -o doubleprec-app
+
+
+wget https://raw.githubusercontent.com/hotice/webupd8/master/org.gnome.gedit.policy -O /tmp/org.gnome.gedit.policy
+sudo cp /tmp/org.gnome.gedit.policy /usr/share/polkit-1/actions/
+
+

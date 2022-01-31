@@ -1,0 +1,264 @@
+%
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+%\usepackage{amsmath}
+%%\usepackage{txfonts}
+%\usepackage{mathrsfs}
+%\usepackage{mathdots}
+%\usepackage{lmodern}
+%%\usepackage[classicReIm]{kpfonts}
+%\usepackage{physics}    %  partial and total derivatives  
+%
+%
+%%___________ MATH THEOREMS
+%
+%%\newtheorem{definition}{a}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{example}{Example}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+
+%\newcommand{\definicion}[1]
+%{
+%	\begin{definition}
+%		\normalfont #1
+%	\end{definition}
+%}
+
+\newcommand{\proposicion}[1]
+{
+	\begin{proposition}
+		\normalfont #1
+	\end{proposition}
+}
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\supp}{supp}
+\renewcommand{\vec}{\mbox{vec}}
+\newcommand{\Mod}[1]{\ \mathrm{mod}\ #1}
+
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\renewcommand{\i}{\mathrm{i}}
+\newcommand{\ejemplo}[1]
+{
+	\begin{example}
+		\normalfont #1
+	\end{example}
+}
+
+\newcommand{\definicion}[1]
+{
+	\begin{definition}
+		\normalfont #1
+	\end{definition}
+}
+
+
+
+\newcommand{\Lorentz}
+{
+	\mathcal{L}
+}
+
+\newcommand{\Vp}
+{
+	\mathcal{V}_{\parallel}
+}
+
+\newcommand{\Ad}
+{
+	\mathcal{A}_{d}
+}
+
+
+
+\newcommand{\Laguerre}[2]
+{
+	{L}^{(#1)}_{#2}
+}
+
+
+\newcommand{\Eqn}[2]
+{
+	\begin{align}
+	#1
+	\label{#2}
+	\end{align}
+}
+
+\newcommand{\Set}[2]
+{
+	\left\lbrace #1  \,\middle|\, #2 \right\rbrace
+}
+
+\newcommand{\scalar}[2]{
+	\langle#1,#2\rangle
+}
+
+\newcommand{\R}[1]
+{ 
+	\mathbb{R}^{#1}
+}
+
+\newcommand{\Q}[1]
+{ 
+	\mathbb{Q}^{#1}
+}
+
+\newcommand{\M}[2]
+{
+	\mathcal{M}_{#1 \times #2}
+}
+
+\newcommand{\application}[3]
+{
+	#1 : #2 \longrightarrow #3
+}
+
+\newcommand{\applicationr}[5]
+{
+	\begin{tikzcd}[row sep = 0ex, ampersand replacement=\&]
+		#1: #2  \arrow[r]         \& #3 \\
+		#4  \arrow[r, mapsto] \& #5  
+	\end{tikzcd}
+}
+%&{#2}\longrightarrow {#3}\\
+%&{#4}\longmapsto {#5}
+%\underset{#4}{#2}  \underset{\longmapsto }{ \longrightarrow }  \underset{#5}{#3}
+
+
+
+
+\newcommand{\vp}{v_\parallel}
+
+%\newcommand{\C}[1]
+%{ 
+%	\mathbb{C}^{#1}
+%}
+
+\newcommand{\N}[1]
+{ 
+	\mathbb{N}^{#1}
+}
+
+\newcommand{\Z}[1]
+{ 
+	\mathbb{Z}^{#1}
+}
+
+\newcommand{\K}[1]
+{ 
+	\mathbb{K}^{#1}
+}
+
+\newcommand{\B}
+{ 
+	\vect{B}
+}
+\renewcommand{\b}
+{ 
+	\vect{b}
+}
+
+\renewcommand{\P}
+{ 
+	\mathcal{P}
+}
+
+\newcommand{\T}
+{ 
+	\mathcal{T}
+}
+
+\renewcommand{\L}
+{ 
+	\mathcal{L}
+}
+
+
+\DeclarePairedDelimiterX{\mean}[1]{\langle}{\rangle}{#1}
+
+\newcommand{\Eval}[1]
+{
+	#1|
+}
+\newcommand{\Frac}[2]
+{
+	\left.{#1} \right/ {#2}
+}
+\newcommand{\dotprod}[2]
+{
+	\mean*{#1,#2}
+}
+
+
+\newcommand{\Matrix}[2]
+{
+	\mleft[
+	\begin{array}{#1}
+		#2
+	\end{array}
+	\mright]
+}
+
+\newcommand{\Determinant}[2]
+{
+	\left|
+	\begin{array}{#1}
+		#2
+	\end{array}
+	\right|
+}
+
+\newcommand\ddfrac[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+
+
+
+% NUMBERING OF EQUATIONS DEPENDING ON SECTION: e.g: (2.3)
+% (For articles)
+
+\numberwithin{equation}{section}
+
+%\newcommand{\mean}[1]
+%{
+%	\langle {#1} \rangle
+%}
+
+
+
+
+
+
+
+
+
+
+\newcommand{\qmarks}[1]
+{
+	`` #1 ''
+}
+ 
+
+\newcommand{\btable}
+{
+  \begin{table}[H]
+      \begin{center}
+          \begin{spacing}{1.2}
+              \begin{tabular}{| p{2.5cm} |  p{2.8cm}  | p{1.1cm} | p{4.5cm} |}
+                  \hline
+ \bf Argument & \bf Type & \bf Intent & \bf Description \\ \hline \hline   
+}
+
+\newcommand{\etable}[1]
+{        \end{tabular}
+      \end{spacing}
+   \end{center}
+   \vspace*{-0.8cm}
+   \caption{#1}
+\end{table}     
+}
+
+

@@ -1,0 +1,665 @@
+
+    
+    %*************************************************************************
+    \chapter{First examples: calculus and algebra  \label{primeros_programas} }
+    %*************************************************************************
+   
+   
+   %*************************************************************************
+   \section{My first program: ``Hello world''  \label{hello_world} }
+   %*************************************************************************
+    
+   
+   
+   
+   
+   %*************************************************************************
+   \section{sum of a numeric series  \label{numeric_series} }
+   %*************************************************************************
+   
+   Dar el resultado de la suma de los 100 primeros términos de las siguientes series: 
+   \begin{enumerate}    
+   	\item Serie de números naturales.
+   	\item Serie de números naturales impares.
+   	\item Serie numérica donde el término general de la serie es: $ a_n = 1/n^2 $ desde $ n= 1 $.  
+   	\item Serie numérica donde el término general de la serie es $ a_n = 1/ n! $ desde $ n=1$.  % e 
+   	\item Serie numérica donde el término general de la serie es
+   	$ a_n = (-1)^{n+1}/ (2n-1) $ desde $ n=1$.   
+   \end{enumerate}         
+   
+   
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Operaciones con matrices y vectores   \label{vectores_matrices} }
+   %*************************************************************************
+   
+   
+   
+   
+   Considerar los vectores 
+   $V, W \in \mathbb{R}^N$ 
+   de componentes: 
+   $$
+   \{ v_i =\frac{1}{i^2}, \ \ i = 1 \ldots  N \},
+   $$
+   
+   $$
+   \{ w_i = \frac{(-1)^{i+1}}{2i-1}, \ \ i = 1 \ldots  N \}.
+   $$
+   
+   
+   
+   Considerar la matriz $A \in {\cal M}_{N \times N} (\mathbb{R})$ donde su término genérico vale 
+   $ a_{ij} = (i/N)^j $. 
+   Escribir un programa para calcular  las operaciones siguientes con $N=100$: 
+   \begin{enumerate}
+   	\item Suma de  todas las componentes del vector $V$ y del vector $ W$. 
+   	\item Suma de  todas las componentes de la matriz $A$.   
+   	\item Suma de  las componentes del vector $W$ mayores que cero.
+   	\item Producto escalar de los vectores $V$ y $W$.   
+   	\item Producto escalar del vector $V$ y la columna $N$ de la matriz $A$. 
+   	\item Suma de las componentes de vector que resulta de  multiplicar la matriz $A$ por el vector $V$.
+   	\item Traza de la matriz $A$.
+   \end{enumerate}
+   
+   
+   
+   
+   
+   
+   %*************************************************************************
+   \section{dynamic allocation of memory   \label{memoria_dinamica} }
+   %*************************************************************************
+   
+   
+   Dada la matriz  $A \in {\cal M}_{M \times M} (\mathbb{R})$  de término genérico 
+   $$
+   \{ a_{ij} = (i/M)^j, \ \ i=0, \ldots M-1, \ \  j=0, \ldots M-1 \}. 
+   $$
+   calcular las siguientes operaciones: 
+   
+   
+   \begin{enumerate}	
+   	\item Calcular 
+   	$$  \sum_{M=1} ^{10} traza(A) $$ 
+   	\item Calcular 
+   	$$  \sum_{M=1} ^{5} traza(A^2) $$ 
+   	\item Calcular  con $ M=4 $
+   	$$  traza \left( \sum_{k=1} ^{5} A^k  \right) $$
+   \end{enumerate}     
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Piecewise functions  \label{funciones} }
+   %*************************************************************************
+   
+   
+   Sean los vectores $X,F  \in \mathbb{R}^{N + 1}$. Las componentes de  $X$ almacenan los valores
+   discretos del dominio de definición y  $F$ las imágenes correspondientes
+   de la función $F : \mathbb{R} \rightarrow \mathbb{R}$ continua a trozos siguiente:
+   
+   $$
+   F (x) =
+   \left\{
+   \begin{array}{ll}
+   \displaystyle                          
+   1 , \hspace{1cm} \hspace{2cm} &  \displaystyle  a \leq x \leq - \frac{\pi}{2},      \\ \\
+   \displaystyle                                                            
+   \cos{(\pi x)} ,  & \displaystyle - \frac{\pi}{2} < x <  \frac{\pi}{2}, \\ \\
+   \displaystyle                                                            
+   0 ,              & \displaystyle  \frac{\pi}{2} \leq x \leq b.                                                                                                
+   \end{array}                                                                   
+   \right.                                                     
+   $$ 
+   Considerar una partición equiespaciada de la forma:
+   $$ \{ x_i = a + i \Delta x, \ \ i = 0 \ldots  N \}, \qquad 
+   \displaystyle \Delta x = \frac{b - a}{N}, \qquad a < - \frac{\pi}{2},  
+   \qquad b > \frac{\pi}{2}. $$
+   
+   Se pide calcular la suma; 
+   $$
+   S_N = \sum _{i=0} ^{N} F_i \Delta x 
+   $$
+   \begin{enumerate} 
+   	\item con $ N = 10 $ 
+   	\item con $ N = 20 $ 
+   	\item con $ N = 100 $
+   \end{enumerate}     
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Series of functions   \label{series_funciones} }
+   %*************************************************************************
+   
+   
+   Aproximar  mediante un desarrollo en serie de potencias de la forma
+   \[  f(x) = \sum_{k=0} ^M a_k \  x^k, \qquad \qquad a_k = \frac{  f^{(k)} (0)  }{ k! },  \]  
+   las funciones $F : \mathbb{R} \rightarrow \mathbb{R}$, siguientes:    
+   \begin{enumerate}
+   	\item $f(x) = e^x$ y calcular el valor $ f(1) $ con $ M=5$.      
+   	\item $f(x) = \sin(x)$ y calcular el valor $ f(\pi/2)$  con $M=8$.      
+   	\item $f(x) = \cosh(x)$ y calcular el valor $ f(1) $  con $M=10$. 
+   	\item $f(x) = \displaystyle \frac{1}{1 - x}$ y calcular el valor $ f(0.9) $  con $M=20$.  
+   	\item $f(x) = e^x$ y calcular el valor más preciso de  $ f(1) $ con doble precisión.        
+   	\item $f(x) = \sin(x)$ y calcular el valor más preciso  $ f(\pi/2)$ con doble precisión.   
+   	\item $f(x) = \cosh(x)$ y calcular el valor más preciso de  $ f(1) $ con doble precisión.
+   	\item $f(x) = \displaystyle \frac{1}{1 - x}$ y calcular el valor  más preciso de $ f(0.9) $ con doble precisión.
+   	
+   \end{enumerate}
+   
+   
+   
+   %*************************************************************************
+   \section{Reading and writing data files  \label{files_IO} }
+   %*************************************************************************
+   
+   
+   Crear los ficheros de datos ForTran con nombres  \verb|input_1.dat| e 
+   \verb|input_2.dat| con la informaci\'on siguiente:
+   
+   \vspace{1cm}
+   
+   Contenido del fichero de entrada \verb|input_1.dat| :
+   
+   \begin{verbatim}
+   1      Datos de entrada 1
+   2
+   3      1.2      3.4     6.2    -14.0    0.1
+   4      -25.2    -8.6    5.1     9.9    17.0
+   5      -1.0     -2.0    -5.4    -8.6    0.0
+   6      3.14     -11.9   -7.0    -12.1   9.2
+   7      6.66     5.32    0.001   0.2     0.001
+   \end{verbatim}
+   
+   \vspace{1cm}
+   
+   Contenido del fichero de entrada \verb|input_2.dat| :
+   
+   \begin{verbatim}
+   1      Datos de entrada 2
+   2
+   3      1.2      3.4     6.2    -14.0    0.1      4.89   7.54
+   4      -25.2    -8.6    5.1    12.0     9.9      12.24  17.0
+   5      0.0      34.5    -1.0   -2.0     -43.04   -8.6    0.0
+   6      3.14     -11.9   71.0   7.0     17.0      -12.1   9.2
+   7      6.66     5.32    0.001   0.2     0.001    0.008   -0.027
+   8      54.0     77.1    -9.002  -13.2   0.017    65.53   -0.021
+   9      23.04    -51.98  -34.2   9.99    5.34     8.87    3.22 
+   \end{verbatim}
+   
+   \vspace{0.5cm}
+   
+   
+   Escribir un programa que gestione los datos de los ficheros anteriores siguiendo los pasos siguientes:
+   
+   Declarar las matrices $A\in {\cal M}_{N \times N} (\mathbb{R})$,
+   $B\in {\cal M}_{N \times 3} (\mathbb{R})$,
+   $C\in {\cal M}_{N \times 2} (\mathbb{R})$
+   y los vectores $U, V, W, T \in \mathbb{R}^N$.
+   
+   Leer el fichero de entrada (\verb| input_1.dat | o \verb| input_2.dat |) de la forma siguiente: 
+   
+   \begin{enumerate}
+   	\item Cargar el fichero completo en la matriz $A$.
+   	\item Cargar las cuatro primeras columnas del fichero en los vectores $U$, $V$ , $W$ y $T$. 
+   	\item Cargar la primera columna en el vector $T$ y las tres \'ultimas columnas en la
+   	matriz $B$.
+   	\item Cargar la segunda columna en el vector $U$ y las dos \'ultimas columnas en la
+   	matriz $C$.
+   	\item Cargar las columnas 1, 2 y 4 en la matriz $B$.
+   \end{enumerate}
+   Adem\'as, el programa debe crear el fichero de salida 
+   (\verb| output_1.dat | o \verb| output_2.dat |), 
+   donde se ir\'an escribiendo las matrices y vectores de los apartados anteriores. 
+   El formato de escritura debe ser el de n\'umeros reales con cinco decimales.
+   
+   \vspace{0.5cm}
+   
+   Para el enunciado anterior, escribir los programas siguientes:
+   \begin{enumerate}
+   	\item Programa 1 : Asignaci\'on est\'atica de memoria.   \\
+   	Ejecutar el programa por separado para los ficheros \verb|input_1.dat| e 
+   	\verb|input_2.dat|. Para ello modificar las dimensiones y en nombre de los
+   	ficheros en el programa fuente.  
+   	\item Programa 2 : Asignaci\'on din\'amica de memoria.   \\
+   	Ejecutar el programa una \'unica vez para gestionar los datos de
+   	los ficheros de entrada \verb|input_1.dat| e \verb|input_2.dat|.      
+   \end{enumerate}         
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Systems of linear equations \label{sistemas_lineales} }
+   %*************************************************************************
+   
+   Implementar un módulo para la resolución de sistemas lineales de ecuaciones algebraicas.
+   Los métodos de resolución propuestos son el de eliminación Gaussiana, factorización LU,
+   factorización LU de la biblioteca {\it Numerical Recipes} y Jacobi.
+   
+   Para cada método se pide:
+   \begin{itemize}
+   	\item Validar los resultados con varios casos de prueba con dimensiones distintas.
+   	\item Evaluar tiempos de ejecución.
+   	\item Comparar resultados con los métodos restantes.          
+   \end{itemize}
+   
+   Aplicación : Estudiar el condicionamiento de sistemas lineales de ecuaciones para matrices
+   aleatorias y de Vandermonde. 
+   
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Systems of nonlinear equations \label{sistemas_no_lineales} }
+   %*************************************************************************
+   
+   
+   
+   Implementar un módulo para la resolución numérica de ecuaciones no lineales.
+   Para funciones  $F:\mathbb{R} \rightarrow \mathbb{R}$, los métodos de resolución propuestos son el de la bisección y el de 
+   Newton-Raphson.   
+   Para funciones  $F:\mathbb{R}^N \rightarrow \mathbb{R}^N$, se proponen el método de Newton-Raphson con matriz Jacobiana analítica y 
+   el método de Newton-Raphson con matriz Jacobiana numérica.
+   Para la validación de los métodos propuestos, se pide implementar un módulo con al menos tres funciones $F:\mathbb{R} \rightarrow \mathbb{R}$
+   y al menos tres funciones $F:\mathbb{R}^N \rightarrow \mathbb{R}^N$. Este módulo debe contener las derivadas y matrices Jacobianas correspondientes de las funciones propuestas.  
+   
+   En el informe correspondiente, presentar tablas de soluciones numéricas en cada paso de iteración para las funciones de prueba propuestas.
+   
+   
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Eigenvalues and eigenvectors \label{autovalores_autovectores} }
+   %*************************************************************************
+   
+   
+   Implementar un módulo para el cálculo de autovalores y autovectores de una matriz.
+   Los métodos de resolución propuestos son el método de la potencia y el método de la potencia inversa.
+   Implementar el método de la potencia inversa a partir de la matriz inversa y resolviendo el sistema lineal
+   correspondiente. 
+   
+   Para cada método se pide:
+   \begin{itemize}
+   	\item Validar los resultados con varios casos de prueba con dimensiones distintas.
+   	\item Evaluar tiempos de ejecución. Comparar tiempos de ejecución del método de la potencia inversa
+   	mediante los dos algoritmos propuestos : matriz inversa y solución del sistema lineal.       
+   \end{itemize}
+   
+   Aplicación : Estudiar el condicionamiento de sistemas lineales de ecuaciones para matrices
+   aleatorias y de Vandermonde. Calcular la relación $\lambda_{max} / \lambda_{min}$ de los casos de prueba
+   presentados en el hito 1 y relacionar y discutir los resultados. 
+   
+   
+   
+   \begin{verbatim} 
+   subroutine   power_method 
+   
+   integer :: i, j, k  
+   integer, parameter :: PI = 4 * atan(1d0) 
+   integer, parameter :: N = 20
+   real :: x(0:N), Vandermonde(0:N, 0:N), sigma   
+   real :: a=-1, b=1 
+   real V(0:N), V0(0:N) 
+   
+   
+   x = [ ( a + (b-a)*i/N, i=0, N) ] 
+   
+   forall(i=0:N, j=0:N) Vandermonde(i,j) = x(i)**j
+   
+   V = 1 
+   V0 = 0
+   do while( abs(norm2(V)-norm2(V0)) > 1d-5 )  
+   V0 = V
+   V = matmul( Vandermonde, V ) / norm2(V) 
+   write(*,*) maxval(V) 
+   end do 
+   sigma = dot_product( V, V ) 
+   write(*,*) "sigma = ", sigma 
+   
+   
+   end subroutine 
+   
+   \end{verbatim} 
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Finite differences \label{derivacion_numerica} }
+   %*************************************************************************
+   
+   \begin{enumerate}   
+   	
+   	\item Obtener las fórmulas de las derivadas numéricas primeras descentradas, con tres puntos
+   	equiespaciados a una distancia $\Delta x $.
+   	
+   	\item A partir de la función $f(x) = \mbox{e}^{x}$ en el punto $x=0$, 
+   	representar gráficamente el error total de las derivadas numéricas 
+   	frente al valor de $\Delta x$ en precisión simple y doble.
+   	En particular, representar gráficamente las derivadas primeras adelantada (definición de derivada), centrada y descentradas y la derivada segunda,
+   	con tres puntos equiespaciados a una distancia $\Delta x $. 
+   	Discutir los resultados obtenidos.
+   	
+   	
+   	
+   	\item Resolver los problemas de contorno en ecuaciones diferenciales ordinarias siguientes:
+   	
+   	\begin{itemize}
+   		
+   		\item {\bf Problema 1:}	         
+   		$$
+   		u^{\prime\prime} + u = 0,\quad
+   		x\in[-1,1], \qquad \qquad u(-1)=1,\quad u(1)=0,
+   		$$
+   		
+   		\item {\bf Problema 2:}	    
+   		$$
+   		u^{\prime\prime} + u^{\prime} - u=\sin(2 \pi x),\quad
+   		x\in[-1,1], \qquad \qquad u(-1)=0,\quad u^{\prime}(1)=0.
+   		$$
+   	\end{itemize}
+   	
+   	
+   	Para los problemas citados anteriormente se pide: 
+   	
+   	\begin{enumerate}
+   		\item A partir de las derivadas numéricas con tres puntos equiespaciados escribir el sistema de
+   		ecuaciones resultante.
+   		
+   		\item Obtener la solución numérica mediante la resolución de un sistema lineal de
+   		ecuaciones, con $N = 10$ y $N = 100$. 
+   		
+   		\item Representar gráficamente los resultados obtenidos.
+   	\end{enumerate}
+   	
+   \end{enumerate}
+   
+   
+   
+   
+   %*************************************************************************
+   \section{Numerical integration \label{integracion_numerica} }
+   %*************************************************************************
+   
+   
+   
+   Implementar un módulo para la resolución numérica de integrales definidas de funciones $F:\mathbb{R} \rightarrow \mathbb{R}$.
+   Los métodos de resolución propuestos son las reglas del rectángulo, punto medio, trapecio y Simpson.
+   Implementar un módulo de funciones $F:\mathbb{R} \rightarrow \mathbb{R}$ de prueba para validar los métodos numéricos
+   propuestos. Este módulo debe contener al menos tres funciones con funciones primitivas conocidas y una función cuya 
+   función primitiva sea desconocida.
+   
+   Evaluar el error de las soluciones numéricas para cada método propuesto y para distintos valores del incremento de la
+   partición.   
+   
+   
+   
+   
+   
+    
+    
+    
+    
+    %*************************************************************************
+    \section{to be included  \label{todo} }
+    %*************************************************************************
+    elemental 
+    advance = no 
+    dummy versus actual 
+    assumed shape explicit shape
+    
+    global, local and scope in modules 
+    
+    1 versus 1. 
+    
+    tab instead of blanks 
+    
+    brackets 
+    
+    mask in intrinsic functions 
+    
+    ! and \& 
+    
+    ; 
+    
+    camel case versus underscore 
+    
+    
+    overloading 
+    
+    forall parallel 
+    
+    enter matrices by row or columns 
+    
+    
+    lower bound: upper bound 
+    
+    
+    array operations C = A + B 
+    
+    public versus private 
+    
+    
+    encapsulamiento y ocultaci%ón de datos 
+    
+    
+    FORALL (I=1:N-1, J=1:N, J>I) A(I,J) = A(J,I)
+    
+    
+    \begin{verbatim} 
+    x   = 1.23456789123456789123456789Q00
+    xd  = 1.23456789123456789123456789Q00
+    xdd = 1.23456789123456789123456789Q00
+    write(*, '(ES)' ) x  ! scientific notation 1.234 (first digit should be greater or equal than one ) 
+    write(*, '(E)' ) x   ! exponential normalized  notation 0.1234 (first digit is zero ) 
+    
+    write(*,*) " Single, double and quadruple precision "
+    write(*, '(E)' ) x 
+    write(*, '(E)' ) xd
+    write(*, '(E)' ) xdd
+    
+    \end{verbatim}
+    
+    
+    
+    \begin{verbatim}
+    
+    
+    !*****************************************************************************
+    !*
+    !*****************************************************************************
+    subroutine type_element 
+    
+    
+    
+    
+    interface operator (+) 
+    module procedure element
+    end interface 
+    
+    character(len=20) :: name 
+    real (kind=4) :: x 
+    real (kind=8) :: xd 
+    real (kind=16) :: xdd 
+    
+    real :: a, b, c; 
+    !  real :: a1, a2, a3; 
+    
+    
+    type (person) :: father = person( "juan"), mother = person("cris")  
+    
+    associate ( name1 => father%name, name2=>mother%name )
+    name = trim(name1) // trim(name2)  
+    end associate 
+    
+    a = 1; b = 1 ; c = 1; 
+    associate ( a1 =>a, a2 =>b, a3=>c ) 
+    a3 = a1 + a2 
+    write(*,*) " a3 = ", a3 
+    end associate 
+    write(*,*) " c = ", c 
+    !    write(*,*) " a3 = ", a3 
+    
+    !   write(*,*) " father =", father % name
+    write(*,*) " element =", father + mother 
+    write(*,*) " name =", name 
+    
+    x   = 1.23456789123456789123456789Q00
+    xd  = 1.23456789123456789123456789Q00
+    xdd = 1.23456789123456789123456789Q00
+    write(*, '(ES)' ) x  ! scientific notation 1.234 (first digit should be greater or equal than one ) 
+    write(*, '(E)' ) x   ! exponential normalized  notation 0.1234 (first digit is zero ) 
+    
+    write(*,*) " Single, double and quadruple precision "
+    write(*, '(E)' ) x 
+    write(*, '(E)' ) xd
+    write(*, '(E)' ) xdd
+    
+    write(*, '(3(E, :, ","))' ) x, xd, xdd
+    
+    end subroutine 
+    
+    
+    
+    !*****************************************************************************
+    !*
+    !*****************************************************************************
+    subroutine Hello_world 
+    
+    
+    write(*,'(a)', advance='no') " Hello world..... " 
+    write(*,'(a)', advance='no') " press enter"
+    read(*,*) 
+    
+    end subroutine 
+    
+    
+    
+    !*****************************************************************************
+    !*
+    !***************************************************************************** 
+    subroutine  commandline
+    
+    character(len=256) :: line,  enval
+    integer :: i, iarg, stat, clen, len
+    integer :: estat, cstat
+    
+    iarg = command_argument_count()
+    write(*,*) " iarg = ", iarg 
+    do i=1,iarg
+    call get_command_argument(i,line,clen,stat)
+    write (*,'(I0,A,A)') i,': ',line(1:clen)
+    end do
+    call get_command(line,clen,stat)
+    write (*,'(A)') line(1:clen)
+    
+    call get_environment_variable('HOSTNAME',enval,len,stat)
+    if (stat == 0) write (*,'(A,A)') 'Host=', enval(1:len)
+    call get_environment_variable('USER',enval,len,stat)
+    if (stat == 0) write (*,'(A,A)') 'User=', enval(1:len)
+    
+    
+    ! call execute_command_line('ls -al', .TRUE., estat, cstat)
+    call execute_command_line('dir', .TRUE., estat, cstat)
+    if (estat==0) write (*,'(A)') "Command completed successfully"
+    
+    end subroutine 
+    
+    !*****************************************************************************
+    !*
+    !***************************************************************************** 
+    subroutine  allocate_characteristics 
+    
+    real, allocatable :: V(:), A(:, :)
+    character(:), allocatable :: S 
+    integer :: i, j, N 
+    
+    real, pointer ::  B(:,:), Diagonal(:)  
+    real, pointer :: memory(:) 
+    
+    real :: x, y, z 
+    class(*), pointer :: p1(:)
+    
+    
+    N = 10  
+    V = [ ( i/real(N), i=1, N ) ]  ! automatic allocation allocate( V(N) ) 
+    write(*,* ) " V = ", V
+    
+    N = 2  
+    A = reshape( [ (  ( (i/real(N))**j ,i=1, N ), j=1, N ) ], [N, N] )  
+    do i=1, N 
+    write(*,* ) " A = ", A(i,:) 
+    end do 
+    
+    N = 4  
+    A = reshape( [ (  ( (i/real(N))**j ,i=1, N ), j=1, N ) ], [N, N] )  
+    do i=1, N 
+    write(*,'(A, 100f6.2)' ) " A = ", A(i,:) 
+    end do  
+    
+    S = "Hello world"
+    write(*,*) " S = ", S, len(S)   
+    
+    S = "Hello"
+    write(*,*) " S = ", S, len(S)
+    
+    
+    allocate( memory(1:N*N) ) 
+    B(1:N,1:N) => memory  
+    memory = 0
+    forall(i=1:N) B(i,i) = 10. 
+    do i=1, N 
+    write(*,'(A, *(f6.2) )' ) " B = ", B(i,:) 
+    end do 
+    diagonal => memory(::N+1) 
+    write(*,'(A, 100f6.2)' ) " diagonal = ", diagonal
+    write(*,'(A, 100f6.2)' ) " trace = ", sum(diagonal)
+    write(*,'(A, 100f6.2)' ) " trace = ", sum(memory(::N+1))
+    
+    x = 1; y = 2; z = 3; 
+    
+    write(*,'("i=",I0,", REALs=",*(G0,1X),"....")') i, x, y, z  ! C++ style 
+    
+    
+    allocate( integer :: p1(5) ) ! p1 is an array of integers 
+    
+    select type (p1)
+    type is (integer)
+    p1 = [( i, i=1, size(p1) ) ] 
+    write(*,'(" p1 = ", *(I0, 1x) )')  p1 
+    
+    class default
+    stop 'Error in type selection'
+    end select
+    
+    deallocate(p1) 
+    allocate( real :: p1(3) ) ! now p1 is an array of reals 
+    
+    select type (p1)
+    type is (real)
+    p1 = [( i, i=1, size(p1) )  ] 
+    write(*,'(" p1 = ", *(G0, 1x) )')  p1 
+    
+    class default
+    stop 'Error in type selection'
+    end select
+    
+    
+    
+    end subroutine 
+    
+    \end{verbatim}
+    
+    
+ 
