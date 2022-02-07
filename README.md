@@ -3,6 +3,10 @@
 
 Set of modern Fortran numerical libraries covering:  zeroes of Systems of Equations,  Lagrange Interpolation, Finite Differences,  Cauchy Problems,  Boundary Value Problems, and  Initial Boundary Value  Problems.
 
+Numerical methods: 
+1) Spatial discretization: structured meshes with  finite differences of generic order q and spectral methods with q=N (collocation points).
+2) Temporal discretization: Euler, Inverse Euler, Embedded Runge-Kutta of different orders, GBS methods (Gragg-Bulirsch-Stoer), Predictor-Corrector (ABM).
+
 Procedure to run the NumericalHUB: 
 
 1) Install Microsoft Visual Studio and Intel compiler
