@@ -332,10 +332,11 @@ As in general there is no analytical way of solving (\ref{eq:Non_Linear_Equation
       	\vect{f}(\vect{x}_i) ,
       \end{align}
       %
-      whose solution is $\Delta \vect{x}_i=\vect{x}_i-\vect{x}_{i+1}$. This is implemented by performing a LU factorization as explained in the previous section:
+      whose solution is $\Delta \vect{x}_i=\vect{x}_i-\vect{x}_{i+1}$. 
+      This is implemented by performing a Gauss elimination as explained in the previous section:
       \vspace{0.5cm} 
       \listings{\home/sources/Non_linear_systems.f90}
-      {call LU}
+      {Gauss}
       {Dx =}{Non_linear_systems.f90}
       
       
@@ -355,7 +356,7 @@ As in general there is no analytical way of solving (\ref{eq:Non_Linear_Equation
       Once we have calculated the next iteration initial guess $\vect{x}_{i+1}$ we just have to make the assignation:
       %
       \begin{align}
-      	i \rightarrow i+1, \qquad \qquad \vect{x}_{i} \rightarrow \vect{x}_{i+1}.
+      	i \leftarrow i+1, \qquad \qquad \vect{x}_{i} \leftarrow \vect{x}_{i+1}.
       \end{align}
       
       The assignation of the value $\vect{x}_{i+1}$ to $\vect{x}_{i}$ is done immediately as the value of the former is stored over the latter in the vector \verb|x0|. The iteration evolution is implemented as:

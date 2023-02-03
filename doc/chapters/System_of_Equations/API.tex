@@ -3,7 +3,7 @@
 
 This is a library designed to solve systems of equations. The module \verb|Linear_systems| has functions and subroutines related to linear algebra. 
 
- \renewcommand{\home}{../libraries/Numerical_Methods/System_of_Equations}
+ \renewcommand{\home}{./sources/Numerical_Methods/System_of_Equations}
   \listings{\home/sources/Linear_systems.f90}
        {module Linear_systems}
        {contains}{Linear_systems.f90}
@@ -73,20 +73,8 @@ kappa = Condition_number(A)
 The function \verb|Condition_number| determines the condition number   $ \kappa = ||A||_2 \ || A^{-1} ||_2  $  
 where $ A $ is a square matrix. 
 
-%***********************************************************************************
-\subsection*{Tensor product}
-\begin{lstlisting}[frame=trBL]
-A = Tensor_product(u, v) 
-\end{lstlisting}
-The function \verb|Tensor_product| determines the matrix   $ A_{ij} = u_i \ v_j   $.  
-The arguments of the function are described in the following table.
-\btable
-u & vector of reals & in & Vector $\vect{u}$.\\ \hline
-v & vector of reals & in & Vector $\vect{v}$. \\ \hline
-\etable{Description of \texttt{Tensor\_product} arguments}
 
 
-\newpage 
 %***********************************************************************************
 \subsection*{Power method}
 \begin{lstlisting}[frame=trBL]
@@ -101,7 +89,7 @@ lambda & real & out & Largest eigenvalue. \\ \hline
 U & vector of reals & out & Associated eigenvector. \\ \hline
 \etable{Description of \texttt{Power\_method} arguments}
 
-
+\newpage 
 %***********************************************************************************
 \subsection*{Inverse Power method}
 \begin{lstlisting}[frame=trBL]
@@ -175,7 +163,7 @@ V & two-dimensional array of reals & out & $V_{ik}$ is the associated  eigenvect
  The module \verb|Non_Linear_Systems| is used to solve non linear system of equations. 
 
 
- \renewcommand{\home}{../libraries/Numerical_Methods/System_of_equations}
+ \renewcommand{\home}{./sources/Numerical_Methods/System_of_equations}
   \listings{\home/sources/Non_Linear_Systems.f90}
        {module Non_Linear_Systems}
        {contains}{Non_Linear_Systems.f90}

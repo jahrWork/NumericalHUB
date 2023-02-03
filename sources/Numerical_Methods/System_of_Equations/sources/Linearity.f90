@@ -4,17 +4,17 @@ implicit none
     
     abstract interface  
 
-       real function F1Ds(x, u, ux, uxx) 
+       real function F1D(x, u, ux, uxx) 
             real, intent(in) :: x, u, ux, uxx                 
        end function 
        
-        function F1D_system(x, u, ux, uxx) 
+        function F1DS(x, u, ux, uxx) 
             real, intent(in) :: x, u(:), ux(:), uxx(:)   
-            real :: F1D_system(size(u)) 
+            real :: F1DS(size(u)) 
        end function 
        
        
-       real function F2Ds(x, y, u, ux, uy, uxx, uyy, uxy)
+       real function F2D(x, y, u, ux, uy, uxx, uyy, uxy)
             real, intent(in) :: x, y, u, ux, uy, uxx, uyy, uxy
        end function
        
@@ -27,7 +27,7 @@ implicit none
     end interface
   
 
-    contains
+contains
 
 logical function Function_Linearity( F, Nv, N ) result(L)
        integer, intent(in) :: Nv, N      
@@ -67,7 +67,7 @@ end function
     
     
 logical function Linearity_BVP1D( F ) result(L)
-    procedure (F1Ds) :: F
+    procedure (F1D) :: F
  
        
     L = Function_Linearity( Fv, 1, 3)
@@ -87,8 +87,8 @@ contains
 end function
 
 
-logical function Linearity_BVP1D_system( F, Nv ) result(L)
-    procedure (F1D_system) :: F
+logical function Linearity_BVP1DS( F, Nv ) result(L)
+    procedure (F1DS) :: F
     integer, intent(in) :: Nv 
        
     L = Function_Linearity( Fv, Nv, 3*Nv)
@@ -110,7 +110,7 @@ end function
 
 
 logical function Linearity_BVP2D( F ) result(L)
-    procedure (F2Ds) :: F
+    procedure (F2D) :: F
  
        
     L = Function_Linearity( Fv, 1, 6)

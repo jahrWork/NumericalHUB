@@ -2,14 +2,150 @@
 
 module Utilities 
 
-
-
  implicit none 
+ private
+ public ::                  &
+           Tensor_product,  &     ! A_ij = u_i v_j 
+           my_reshape,      &     ! Creates a pointer
+           split,           &     ! split a char string based on delimiter 
+           Binary_search,   &     ! Binary search in an ordered list 
+           Linear_operatorF,& 
+           Tensor_product_R3
+  
+ public :: operator  (.x.)
+
+ interface operator(.x.) 
+       module procedure Tensor_product 
+ end interface
+
  
+contains
+
+
+
+!***********************************************************************
+! Given a vector function L: RN-> RN . 
+! If the function is linear, it gives the system matrix A
+! If L = A U + b, it gives the matrix A 
+!***********************************************************************
+function Linear_operatorF( L_operator, N) result(A)
+      interface
+         function L_operator(U)
+            real, intent(in) :: U(:) 
+            real :: L_operator( size(U) ) 
+         end function 
+      end interface 
+      integer, intent(in) :: N  
+      real :: A(N, N) 
+      
+     integer :: i   
+     real, target ::  U(N), b(N), L(N)  
    
+     U=0 
+     b = L_operator(U) 
+     
+     do i=1, N
+              U = 0 
+              U(i) = 1 
+              L = L_operator(U) - b 
+              A(:, i) = L 
+     end do 
+             
+end function  
+  
+    
 
-    contains
+!************************************************************************
+!* Tensor product A_ij = U_i V_j 
+!************************************************************************
+function Tensor_product(U, V) result(A) 
+     real, intent(in) :: U(:), V(:) 
+     real A( size(U), size(V) ) 
 
+     integer ::i, j, N, M 
+     
+     N = size(U) 
+     M = size(V) 
+     
+     
+     do i=1, N; do j=1, M 
+         
+         A(i,j) = U(i) * V(j) 
+         
+     end do;  end do 
+     
+end function    
+
+!************************************************************************
+!* Tensor product A_ij = U_i V_j 
+!************************************************************************
+function Tensor_product_R3(U, V, W) result(A) 
+     real, intent(in) :: U(:), V(:), W(:) 
+     real A( size(U), size(V), size(W) ) 
+
+     integer :: i, j, k, N, M, L 
+     
+     N = size(U) 
+     M = size(V) 
+     L = size(W)
+     
+     
+     do i=1, N; do j=1, M; do k=1, L  
+         
+         A(i,j,k) = U(i) * V(j) * W(k)  
+         
+     end do;  end do; end do  
+     
+end function     
+
+!************************************************************************
+!* It creates a pointer pU 
+!************************************************************************
+subroutine my_reshape( U, N1, N2,  pU )
+     integer, intent(in) :: N1, N2
+     real, target, intent(in) :: U(1:N1, 1:N2)  
+     real, pointer, intent(out) :: pU(:,:) 
+          
+     pU => U  
+     
+end subroutine 
+
+ 
+!*****************************************************************************
+!* It splits a string into N different substrings based on the delimiter
+!*****************************************************************************   
+subroutine split( string, delimiter, substrings, N  ) 
+   character(len=*), intent(in) :: string 
+   character(len=1), intent(in) :: delimiter
+   character(len=*), intent(out) :: substrings(:) 
+   integer, intent(out) :: N 
+
+
+      integer :: i, index, k 
+   
+    i = 1   
+    k = 1 
+    do while (i<=len(string) ) 
+        
+        index = scan( string(i:), delimiter) 
+        
+        if (index>0) then 
+                          substrings(k) = string(i:i+index-2)
+                          i = i + index 
+                          k = k + 1 
+        else 
+             substrings(k) = string(i:len(string))
+             N = k 
+             exit 
+        endif 
+        
+    end do 
+    
+   
+end subroutine 
+
+
+    
 !*****************************************************************************
 !* It converts a integer  to an integer  
 !*****************************************************************************   
@@ -25,20 +161,7 @@ character(len=2)  function  integer_to_char( i ) result(c)
       
 end function    
  
-!*****************************************************************
-!*
-!*****************************************************************
-subroutine my_reshape( U, N1, N2,  pU )
-     integer, intent(in) :: N1, N2
-     real, target, intent(in) :: U(1:N1, 1:N2)  
-     real, pointer, intent(out) :: pU(:,:) 
-          
-     pU => U  
-     
-end subroutine 
 
-
- 
 
 !*****************************************************************************
 !* It searches the element x in an ordered list V ( x = V(ix) ) 
@@ -160,38 +283,6 @@ end function
 
   
  
-!*****************************************************************************
-!* It splits a string into N different substrings based on the delimiter
-!*****************************************************************************   
-subroutine split( string, delimiter, substrings, N  ) 
-   character(len=*), intent(in) :: string 
-   character(len=1), intent(in) :: delimiter
-   character(len=*), intent(out) :: substrings(:) 
-   integer, intent(out) :: N 
-
-
-      integer :: i, index, k 
-   
-    i = 1   
-    k = 1 
-    do while (i<=len(string) ) 
-        
-        index = scan( string(i:), delimiter) 
-        
-        if (index>0) then 
-                          substrings(k) = string(i:i+index-2)
-                          i = i + index 
-                          k = k + 1 
-        else 
-             substrings(k) = string(i:len(string))
-             N = k 
-             exit 
-        endif 
-        
-    end do 
-    
-   
-end subroutine 
 
 
 !***********************************************************

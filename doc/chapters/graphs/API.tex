@@ -1,13 +1,112 @@
-\chapter{Plotting graphs with Latex }
+\chapter{Utilities}
 
 \section{Overview}
 
-This library is designed to plot $x-y$ and contour graphs on the screen or to create automatically Latex files with graphs and figures. 
-The  module:  \verb|Plots| has two subroutines:  \verb|plot_parametrics| and \verb|plot_contour|.
+This library comprises different utilities to help 
+the developer to build his simulation codes. These utilities go from the extraction 
+of the system matrix of a linear operator to plotting utilities.
+%The module \verb|Utilites|
+%The module \verb|Plots| allows to plot $x-y$ and contour graphs on the screen or to create automatically 
+%Latex files with graphs and figures. 
+
+\vspace{0.1cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Utilities}
+  \listings{\home/sources/Utilities.f90}
+       {module Utilities}
+       {contains}{Utilities.f90}
 
 
 
-\section{Plot parametrics}
+\newpage 
+%**************************************************************************
+\section*{System matrix of a linear operator}
+Given a vector function 
+$$
+F: \mathbb{R}^{N} \to \mathbb{R}^N, 
+$$ 
+and if the function is linear, then the function can be expressed by: 
+$$
+  F(U)  = A \ U + b, 
+$$
+where $ A $ is a square system matrix of size $ N \times N$ and $ b $ 
+is a column vector of size $ N$.
+The  function \verb|Linear_operator| allows to obtain the system matrix 
+with the following sentence:
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+  A = Linear_operatorF( F, N ).
+ \end{lstlisting} 
+ 
+
+To understand the use of this function, the following example is considered. 
+Let's discretize spatially the following differential problem:  
+$$
+    \frac{ d^2 u }{ d x^2 } = s(x), \qquad u(0)= 0, \qquad u(1) = 0  
+$$
+with a second order finite difference
+$$
+  F_i = u_{i+1} - 2 u_i + u_{i-1} -  \Delta x^2 s_i, \qquad i=2, \ldots, N-1
+$$
+The  function \verb|Linear_operatorF| is used in  \verb|myexampleE| with $ N = 6 $ 
+to give the following matrix A 
+associated to the linear system of  equations: 
+%The result is written is \verb|myexampleE| to give:   
+% \vspace{0.5cm}
+%  \renewcommand{\home}{./sources/Numerical_Methods/Utilities}
+%   \listings{\home/sources/Utilities.f90}
+%        {function Linear}
+%        {end function}{Utilities.f90}
+%
+%\vspace{-0.3cm}
+%  \listings{./sources/my_examples.f90}
+%  {subroutine myexampleE}
+%  {end subroutine}{my_examples.f90}
+%  
+\begin{verbatim}   
+     -2.0    1.0    0.0    0.0    0.0    0.0
+     -1.0   -2.0    1.0    0.0    0.0    0.0
+      0.0   -1.0   -2.0    1.0    0.0    0.0
+      0.0    0.0   -1.0   -2.0    1.0    0.0
+      0.0    0.0    0.0   -1.0   -2.0    1.0
+      0.0    0.0    0.0    0.0   -1.0   -2.0
+\end{verbatim} 
+       
+ 
+ 
+ 
+%***********************************************************************************
+\subsection*{Tensor product}
+\begin{lstlisting}[frame=trBL]
+A = Tensor_product(u, v) 
+\end{lstlisting}
+The function \verb|Tensor_product| determines the matrix   $ A_{ij} = u_i \ v_j   $
+where \verb|u| and \verb|v| are vector of different size.    
+%The arguments of the function are described in the following table.
+%\btable
+%u & vector of reals & in & Vector $\vect{u}$.\\ \hline
+%v & vector of reals & in & Vector $\vect{v}$. \\ \hline
+%\etable{Description of \texttt{Tensor\_product} arguments}
+
+ 
+ 
+
+\newpage 
+%***********************************************************************************
+\section{Plotting routines}
+%This library comprises different utilities to help 
+%the developer to build his simulation codes. These utilities go from the extraction 
+%of the system matrix of a linear operator to plotting utilities.
+%The module \verb|Utilites|
+%The module \verb|Plots| allows to plot $x-y$ and contour graphs on the screen or to create automatically 
+%Latex files with graphs and figures. 
+
+\vspace{0.1cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Utilities}
+  \listings{\home/sources/plots.f90}
+       {module plots}
+       {contains}{plots.f90}
+
+\section{Plot parametrics with Latex}
 
 \begin{lstlisting}[frame=trBL]
   call plot_parametrics(x, y, legends, x_label, y_label, title, & 
@@ -68,7 +167,7 @@ After compiling the above Latex code, the plot of figure \ref{fig:exampleCad} is
       
     
 \newpage     
-\section{Plot contour} 
+\section{Plot contour maps with Latex} 
 \begin{lstlisting}[frame=trBL]
   call plot_contour(x, y, z, x_label, y_label, levels, legend, & 
                     path, graph_type)

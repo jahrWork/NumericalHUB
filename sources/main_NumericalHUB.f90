@@ -12,21 +12,30 @@ program main_NumericalHUB
        use API_Example_Boundary_Value_Problem
        use API_Example_Initial_Boundary_Value_Problem
        use API_Example_IBVP_and_BVP
-       
+       use Advanced_problems
        use my_examples
-       use MUSE_orbits
-       use API_Example_Fourier_series
-       use API_Example_IBVP_Fourier
-      
-       use API_examples_dependencies
+       use my_milestones
        
-       use API_Example_Error_IVBP
-          
+       use API_Example_IBVP_Chebyshev
+       use Special_IBVP
+       
+       use Boundary_layer
+       use Navier_Stokes_cavities
+       use Burgers 
+       
+       use API_Example_Chebyshev_Fourier_interpolation
        implicit none 
-       integer :: option = 1  
-
-        
        
+       
+   
+       call main 
+       
+contains 
+    
+subroutine main
+integer :: option  
+      
+option = 1        
 do while (option>0) 
     
      write(*,*) "Welcome to NumericalHUB" 
@@ -40,16 +49,18 @@ do while (option>0)
      write(*,*) " 5. Boundary value problems  "
      write(*,*) " 6. Initial-boundary value problems  "
      write(*,*) " 7. Mixed problems: IBVP+BVP  "
-     write(*,*) " 8. High order  ODE schemes "
-     write(*,*) " 9. Advanced methods and problems "
+     write(*,*) " 8. High order ODE schemes "
+     write(*,*) " 9. Spectral methods and Navier Stokes examples"
+     write(*,*) " 10.My examples "
+     write(*,*) " 11.My milestones "
      
-     read(*,*) option 
+     read(*,*) option
      
      select case(option)
      case(1) 
          call Systems_of_Equations_examples
          
-     case(2) 
+     case(2)   
          call Lagrange_Interpolation_examples 
          
      case(3) 
@@ -71,60 +82,24 @@ do while (option>0)
          call Advanced_Cauchy_problem_examples
          
      case(9) 
-         call Advanced_problems 
+         call Spectral_and_advanced_problems 
          
-         case default
+     case(10) 
+         call myExamples
+         
+      case(11) 
+         call milestone_examples   
+         
+    case default
+          write(*,*) "Case not implemented" 
               
      end select 
      
 end do
   
+end subroutine  
 
-contains 
-    
-subroutine Advanced_problems 
-
-integer :: option = 1  
-           
-do while (option>0) 
-    
-     write(*,*) "Welcome to Advanced methods" 
-     
-     write(*,*) " select an option " 
-     write(*,*) " 0. Exit/quit  "
-     write(*,*) " 1. Orbits and numerical methods (Master MUSE)  "
-     write(*,*) " 2. SVD applications  "
-     write(*,*) " 3. Fourier problems  "
-     write(*,*) " 4. Chebyshev problems (not yet implemented)  "
-     write(*,*) " 5. Heat equation in solids with different conductivities"
-     
-     read(*,*) option 
-     
-     select case(option)
-     case(1) 
-           call Orbits_and_Numerical_Methods
-         
-     case(2) 
-          call Test_SVD
-          call Vandermonde_SVD_condition_number
-          call Test_Linear_regression
-         
-     case(3)  
-           call Fourier_problems 
-         
-     case(4)
-     case(5)   
-           call N_solids_with_different_conductivity
-      
-        
-         case default
-              
-     end select 
-     
-end do
-    
-end subroutine 
-    
- 
 end program  
 
+
+  

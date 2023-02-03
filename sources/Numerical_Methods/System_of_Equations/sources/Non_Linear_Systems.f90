@@ -2,8 +2,10 @@ module Non_Linear_Systems
 
  use Jacobian_module 
  use Linear_systems
-  
+   
 implicit none 
+
+real :: IMPOSE_ZERO = 1d-34
 
 private 
 public ::  & 
@@ -12,7 +14,8 @@ public ::  &
              ! with M implicit equations < N unknowns
              ! e.g.  G1 = x1 - x2 (implicit) with x1 = 1 (explicit)
   max_min, & ! It finds a relative max or min of E(x)
-  Gradient_descent ! It finds a relative min 
+  Gradient_descent, & ! It finds a relative min 
+  IMPOSE_ZERO 
 
 
 contains 
@@ -37,8 +40,6 @@ subroutine Newton(F, x0)
    integer :: i
 
    N = size(x0) 
-
-   Dx = 2 * x0 
    iteration = 0 
    eps = 1 
  
@@ -51,11 +52,12 @@ subroutine Newton(F, x0)
       Dx = Gauss( J, b) 
       x0 = x0 - Dx;  
 
-      eps = norm2( DX )  
+      eps = norm2( Dx )  
+      write(*,*) "iteration =", iteration, "Newton eps = ",  norm2( Dx ); !read(*,*)   
          
    end do 
    
-   if (iteration == itmax) then 
+   if (iteration == itmax+1) then 
       write(*,*) " morm2(J) =", maxval(J),  minval(J) 
       write(*,*) " Norm2(Dx) = ", eps, iteration  
    endif 
@@ -74,7 +76,6 @@ end subroutine
 !*                x0   : initial guess and output value 
 !*                F(X) : vector function 
 !*
-
 !*  Author: Juan A Hernandez (juanantonio.hernandez@upm.es) 
 !***************************************************************************
 subroutine Newtonc(F, x0) 
@@ -86,9 +87,7 @@ subroutine Newtonc(F, x0)
    integer :: iteration, itmax = 1000 
    logical :: equations( size(x0) )
   
-  
    integer :: i, N
-   
    
    call random_number(xr) 
    equations  = F(xr) /= 0  
@@ -104,18 +103,18 @@ subroutine Newtonc(F, x0)
     
       iteration = iteration + 1 
       J = Jacobianc( G, x )
-     
+      !do i=1, N;  write(*,'(A4, 100f15.8)') " J =", J(i,:);  end do   
+          
       b = -G(x) 
-      call LU_factorization( J ) 
-      
-      Dx = Solve_LU( J,  b ) 
+      Dx = Gauss( J, b) 
       x = x + Dx
     
       eps = norm2( Dx ) 
+      !write(*,*) " morm2(Dx) =", norm2(Dx)
     
    end do 
    
-   if (iteration==itmax) then 
+   if (iteration==itmax+1) then 
       write(*,*) " morm2(J) =", maxval(J),  minval(J) 
       write(*,*) " Norm2(Dx) = ", eps, iteration  
    endif

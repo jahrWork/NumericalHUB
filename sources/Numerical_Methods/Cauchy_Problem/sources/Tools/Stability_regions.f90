@@ -36,7 +36,6 @@ complex, allocatable :: roots(:), A(:)
 real :: U1(2), U2(2)
 
 
-
 Nx = size(x)-1
 Ny = size(y)-1
 

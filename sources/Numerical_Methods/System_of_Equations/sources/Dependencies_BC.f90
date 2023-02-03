@@ -5,10 +5,11 @@ module Dependencies_BC
 	
   public :: FREE_BOUNDARY_CONDITION      ! to impose free BCs
   public :: PERIODIC_BOUNDARY_CONDITION  ! to impose periodic BCs
+  public :: INTERFACE_CONDITION          ! to impose multiblocks 
   
-  real :: FREE_BOUNDARY_CONDITION = 123456789.  
-  real :: PERIODIC_BOUNDARY_CONDITION = 987654321. 
-  
+  real, parameter :: FREE_BOUNDARY_CONDITION = 123456789.  
+  real, parameter :: PERIODIC_BOUNDARY_CONDITION = 987654321. 
+  real, parameter :: INTERFACE_CONDITION = 1122334455.
 	
 	
 	 interface  

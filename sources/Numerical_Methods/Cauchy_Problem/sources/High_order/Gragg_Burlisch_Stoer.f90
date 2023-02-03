@@ -145,7 +145,7 @@ subroutine GBS_Solution( F, t1, t2, U1, U2, ierr)
               call GBS_solutionL( F, t1, t2, U1, UL, Uc, Ucs, NL) 
               Error = norm2( Uc - Ucs ) 
               !write(*,*) " Error = ", Error
-              !write(*,'(a10, e13.7,a10, e13.7,i3)') " Error =", Error, "Tolerance =", Tolerance, NL
+              !write(*,'(a10, e13.7,a10, e13.7,i3)') " Error =", Error, " Tolerance =", Tolerance, NL
               
          end do  
          U2 = Ucs    

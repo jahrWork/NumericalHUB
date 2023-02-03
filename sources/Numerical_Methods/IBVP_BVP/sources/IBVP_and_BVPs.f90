@@ -2,7 +2,6 @@ module IBVPs_and_BVPs
 
 use Cauchy_Problem
 use Temporal_scheme_interface
-!use Finite_differences
 use Collocation_methods 
 use Linear_Systems
 use Non_Linear_Systems
@@ -22,27 +21,31 @@ abstract interface
   real :: L_uv (size(u)) 
  end function  
 
- function BC2D_system(x, y, t, u, ux, uy) 
+ function BC2DS(x, y, t, u, ux, uy) 
        real, intent(in) :: x, y, t, u(:), ux(:), uy(:) 
-       real :: BC2D_system(size(u)) ! maximum number of BCs at each point
+       real :: BC2DS(size(u)) ! maximum number of BCs at each point
  end function  
+ 
+subroutine B_data(u, ux, uy, uxx, uyy) 
+       real, intent(in) :: u(:,:,:), ux(:,:,:),  uy(:,:,:), uxx(:,:,:), uyy(:,:,:) 
+end subroutine  
+ 
  
 end interface
 
 
 contains
+
     
-!********************************************************************************************************************************
-!*
-!********************************************************************************************************************************
 subroutine IBVP_and_BVP(  Time, x, y, L_u, L_v, BC_u, BC_v, &
-                          Ut, Vt, Scheme ) 
+                          Ut, Vt, Scheme, Boundary_data ) 
 
    real, intent(in) :: Time(0:), x(0:), y(0:)
    procedure (L_uv) ::   L_u, L_v
-   procedure (BC2D_system) :: BC_u, BC_v
+   procedure (BC2DS) :: BC_u, BC_v
    real, intent(out) :: Ut(0:, 0:, 0:, :),  Vt(0:, 0:, 0:, :)
-   procedure (Temporal_Scheme), optional :: Scheme  
+   procedure (Temporal_Scheme), optional :: Scheme
+   procedure (B_data), optional :: Boundary_data   
   
    real, pointer :: U_Cauchy(:, :) 
    real :: t_BC 
@@ -50,20 +53,18 @@ subroutine IBVP_and_BVP(  Time, x, y, L_u, L_v, BC_u, BC_v, &
    real, allocatable :: Ux(:,:,:), Uxx(:,:,:), Uxy(:,:,:),            & 
                         Uy(:,:,:), Uyy(:,:,:) 
    
-   Nx = size(x) - 1 ; Ny = size(y) - 1
-   Nt = size(Time) - 1
+   Nx = size(x) - 1 ; Ny = size(y) - 1; Nt = size(Time) - 1
    Nu = size(Ut, dim=4); Nv = size(Vt, dim=4) 
-          
+   allocate( Ux(0:Nx,0:Ny, Nu), Uxx(0:Nx,0:Ny, Nu), Uxy(0:Nx,0:Ny, Nu), & 
+             Uy(0:Nx,0:Ny, Nu), Uyy(0:Nx,0:Ny, Nu) )        
    M1 = Nu*(Ny-1); M2 = Nu*(Ny-1); M3 = Nu*(Nx-1); M4 = Nu*(Nx-1) 
    
-   allocate( Ux(0:Nx,0:Ny, Nu), Uxx(0:Nx,0:Ny, Nu), Uxy(0:Nx,0:Ny, Nu), & 
-             Uy(0:Nx,0:Ny, Nu), Uyy(0:Nx,0:Ny, Nu) ) 
    
    call my_reshape( Ut, Nt+1, Nu*(Nx+1)*(Ny+1), U_Cauchy ) 
    
-   call Cauchy_ProblemS( Time, BVP_and_IBVP_discretization, U_Cauchy )
+   call Cauchy_ProblemS( Time, BVP_and_IBVP_discretization, U_Cauchy, Scheme )
    
-   deallocate( Ux, Uxx, Uxy, Uy, Uyy  )
+ 
      
 contains
 
@@ -83,21 +84,31 @@ subroutine BVP_and_IBVP_discretization_2D( U, t, F_u )
     integer :: i, j, k 
     real :: Vx(0:Nx,0:Ny, Nv), Vxx(0:Nx,0:Ny, Nv), Vxy(0:Nx,0:Ny, Nv)
     real :: Vy(0:Nx,0:Ny, Nv), Vyy(0:Nx,0:Ny, Nv), Uc(M1+M2+M3+M4) 
-  
-        t_BC = t 
-        call Binary_search(t_BC, Time, it)
-        write(*,*) " Time domain index = ", it  
+    
+        t_BC = t;  call Binary_search(t_BC, Time, it)
+ !  *** Step 1. BVP for V        
+       call Boundary_Value_Problem( x, y, L_v_R, BC_v_R, Vt(it,0:,0:,:))
+       
+!  *** Derivatives for V
+       do k=1, Nv 
+        call Derivative( ["x","y"], 1, 1, Vt(it, 0:,0:, k), Vx (0:,0:,k) )
+        call Derivative( ["x","y"], 2, 1, Vt(it, 0:,0:, k), Vy (0:,0:,k) )
+        call Derivative( ["x","y"], 1, 2, Vt(it, 0:,0:, k), Vxx(0:,0:,k) )
+        call Derivative( ["x","y"], 2, 2, Vt(it, 0:,0:, k), Vyy(0:,0:,k) )
+        call Derivative( ["x","y"], 2, 1, Vx(0:    ,0:, k), Vxy(0:,0:,k) )
+       end do   
+       if (present(Boundary_data))  then 
+        call Boundary_data( Vt(it, 0:,0:, :), Vx, Vy, Vxx, Vyy)  
+       end if        
         
  !  *** initial boundary value :  Uc 
-        call Asign_BV2s( U( 0, 1:Ny-1, 1:Nu ), U( Nx, 1:Ny-1, 1:Nu ),  & 
-                         U( 1:Nx-1, 0, 1:Nu ), U( 1:Nx-1, Ny, 1:Nu ), Uc ) 
- !  *** Step1. Boundary points Uc from inner points U 
+        call Asign_BV2s( U(0, 1:Ny-1, 1:Nu ), U( Nx, 1:Ny-1, 1:Nu ),  & 
+                         U(1:Nx-1, 0, 1:Nu ), U( 1:Nx-1, Ny, 1:Nu ), Uc) 
+ !  *** Step 2. Boundary points Uc from inner points U 
         call Newton( BCs, Uc )
-        
 !   *** asign boundary points Uc  to U        
         call Asign_BVs(Uc, U( 0, 1:Ny-1, 1:Nu ), U( Nx, 1:Ny-1, 1:Nu  ), &
-                           U( 1:Nx-1, 0, 1:Nu ), U( 1:Nx-1, Ny, 1:Nu )  ) 
-        
+                           U( 1:Nx-1, 0, 1:Nu ), U( 1:Nx-1, Ny, 1:Nu )  )         
 !  *** Derivatives of U for inner grid points
        do k=1, Nu 
           call Derivative( ["x","y"], 1, 1, U(0:,0:, k),  Ux (0:,0:,k) )
@@ -106,25 +117,14 @@ subroutine BVP_and_IBVP_discretization_2D( U, t, F_u )
           call Derivative( ["x","y"], 2, 2, U(0:,0:, k),  Uyy(0:,0:,k) )
           call Derivative( ["x","y"], 2, 1, Ux(0:,0:,k),  Uxy(0:,0:,k) )
        end do  
-!  *** Step 2. BVP for V        
-       call Boundary_Value_Problem( x, y, L_v_R, BC_v_R, Vt(it,0:,0:,:))
-!  *** Derivatives for V
-    do k=1, Nv 
-      call Derivative( ["x","y"], 1, 1, Vt(it, 0:,0:, k), Vx (0:,0:,k) )
-      call Derivative( ["x","y"], 1, 2, Vt(it, 0:,0:, k), Vxx(0:,0:,k) )
-      call Derivative( ["x","y"], 2, 1, Vt(it, 0:,0:, k), Vy (0:,0:,k) )
-      call Derivative( ["x","y"], 2, 2, Vt(it, 0:,0:, k), Vyy(0:,0:,k) )
-      call Derivative( ["x","y"], 2, 1, Vx(0:    ,0:, k), Vxy(0:,0:,k) )
-    end do   
-    
 !  *** Step 3. Differential operator L_u(U,V) at inner grid points
  F_u=0   
  do i=1, Nx-1; do j=1, Ny-1
-    F_u(i, j, :) = L_u(                                                 &
-    x(i), y(j), t, U(i, j, :),                                          &
-    Ux(i, j, :), Uy(i, j, :), Uxx(i, j, :), Uyy(i, j, :), Uxy(i, j, :), &
-    Vt(it, i, j, :),                                                    &
-    Vx(i, j, :), Vy(i, j, :), Vxx(i, j, :), Vyy(i, j, :), Vxy(i, j, :)  )
+    F_u(i, j, :) = L_u(  x(i), y(j), t, U(i, j, :),                   &
+                         Ux(i, j, :), Uy(i, j, :), Uxx(i, j, :),      &
+                         Uyy(i, j, :), Uxy(i, j, :), Vt(it, i, j, :), &
+                         Vx(i, j, :), Vy(i, j, :), Vxx(i, j, :),      & 
+                         Vyy(i, j, :), Vxy(i, j, :)  )
     
  end  do; end do 
 end subroutine
@@ -172,9 +172,6 @@ subroutine Asign_BVs( Y, U1,  U2,  U3, U4)
 end subroutine
 
 
-!***********************************************************************************
-!*
-!***********************************************************************************
 subroutine Asign_BCs(  G1, G2,  G3,  G4  ) 
    real, intent(out) :: G1(1:Ny-1,Nu), G2(1:Ny-1,Nu),                  &
                         G3(1:Nx-1,Nu), G4(1:Nx-1,Nu)  
@@ -205,8 +202,7 @@ end subroutine
 
 
 !-----------------------------------------------------------------------
-function L_v_R(xr, yr, V, Vx, Vy, Vxx, Vyy, Vxy)   & 
-     result(Fv)
+function L_v_R(xr, yr, V, Vx, Vy, Vxx, Vyy, Vxy) result(Fv)
      real, intent(in) :: xr, yr, V(:), Vx(:), Vy(:), Vxx(:), Vyy(:), Vxy(:)
      real :: Fv(size(V))      
  
@@ -229,7 +225,7 @@ function BC_v_R(xr, yr, V, Vx, Vy) result (G_v)
      real, intent(in) :: xr, yr, V(:), Vx(:), Vy(:)
      real :: G_v(size(V))      
  
-    G_v = BC_v (xr, yr, t_BC, V, Vx, Vy )
+    G_v = BC_v( xr, yr, t_BC, V, Vx, Vy )
     
         
 end function

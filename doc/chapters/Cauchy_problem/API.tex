@@ -9,7 +9,7 @@ The module \verb|Cauchy_Problem| is designed to solve the following problem:
 =\vect{U}^0,  \ 
 \quad \vect{F}:\mathbb{R}^{Nv} \times\mathbb{R} \rightarrow \mathbb{R}^{Nv}
 \end{equation*}
- \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+ \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
   \listings{\home/sources/Cauchy_Problem.f90}
        {module Cauchy_Problem}
        {contains}{Cauchy_Problem.f90}
@@ -70,7 +70,7 @@ The following list describes new software implementations of the different famil
           \item \verb| "BogackiShampine".  |
           \item \verb| "DOPRI54".      |
           \item \verb|  "Fehlberg54".  |
-          \item \verb|  "Cash\_Karp".   |
+          \item \verb|  "Cash_Karp".   |
           \item \verb|  "Fehlberg87".  |
           \item \verb|  "Verner65".    |
           \item \verb|  "RK65".        |
@@ -150,7 +150,7 @@ the numerical scheme to accomplish the required tolerance.
 
 
 The module \verb|Temporal_schemes| comprises easy examples of temporal schemes and allows checking new methods developed by the user.  
- \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+ \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
   \listings{\home/sources/Temporal_schemes.f90}
        {module Temporal_Schemes}
        {Predictor_Corrector1}{Temporal_schemes.f90}
@@ -166,9 +166,11 @@ The \verb|Cauchy_problem| module uses schemes with the following interface:
 %______________________________________________
 The module \verb|Stability_regions| allows to calculate the region of absolute stability of any numerical method. This region is defined by the following expression: 
 \begin{equation*}
-{\cal R } = \{ z \in\mathbb{C}, \pi(\rho, \omega) =0, |\rho | < 1  \}
+{\cal R } = \{ \omega \in\mathbb{C}, \pi(\rho, \omega) =0, |\rho | < 1  \}
 \end{equation*}
- \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+where $ \pi(\rho, \omega) $ is the characteristic polynomial of stability 
+of the numerical scheme. 
+ \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
   \listings{\home/sources/tools/Stability_regions.f90}
        {module Stability_regions}
        {contains}{Stability_regions.f90}
@@ -190,6 +192,56 @@ call Absolute_Stability_Region(Scheme, x, y, Region)
                 Region & matrix of reals & in &  Maximum value of the roots of the characteristic polynomial for each point of the complex domain.  \\ \hline
 \etable{Description of \texttt{Cauchy\_ProblemS} arguments}
 
+\newpage 
+The module \verb|Stability| allows to calculate the eigenvalues $ \|lambda_k $  of the Jacobian 
+of $ F(u,t) $ particularized at $ u_0, t_0$ to determine 
+the time step to have a stable solution by imposing 
+$ \lambda_k \Delta t \in {\cal R } $.
+\vspace{0.5cm} 
+\renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
+  \listings{\home/sources/tools/Stability.f90}
+       {module Stability}
+       {contains}{Stability.f90}
+       
+To calculate the Jacobian of $ F(U,t) $
+$$  
+     J_{ij} = \frac{ \partial F_i }{ \partial U_j } (U_0, t_0 )
+$$
+evaluated at $ u_0, t_0 $ the following sentence is used:  
+\vspace{0.5cm}  
+\begin{lstlisting}[frame=trBL]
+  A = System_matrix( F, U0, t0) 
+\end{lstlisting}  
+To calculate the eigenvalues of the above Jacobian,        
+the following sentence is used:  
+\vspace{0.5cm} 
+\begin{lstlisting}[frame=trBL]
+  lambda = Eigenvalues_Jacobian( F, U0, t0)
+\end{lstlisting}         
+where \verb|lambda| is a vector of complex numbers that holds the eigenvalues of the 
+Jacobian of $F(U,t)$. 
+       
+%
+%%\subsection*{Absolute Stability Region}
+%
+%\begin{lstlisting}[frame=trBL]
+%call Absolute_Stability_Region(Scheme, x, y, Region)
+%\end{lstlisting}
+%
+%
+%\btable     
+%                Scheme & temporal scheme  & in  & Selects the scheme whose stability region is computed.    \\ \hline
+%                
+%                x & vector of reals & in &  Real domain $\Re z$ of the complex plane.  \\ \hline
+%                
+%                y & vector of reals & in &  Imaginary domain $\Im z$ of the complex plane.  \\ \hline
+%                
+%                Region & matrix of reals & in &  Maximum value of the roots of the characteristic polynomial for each point of the complex 
+%domain.  \\ \hline
+%\etable{Description of \texttt{Cauchy\_ProblemS} arguments}
+%
+
+
 
 
 \newpage
@@ -199,7 +251,7 @@ call Absolute_Stability_Region(Scheme, x, y, Region)
 
 
 The module \verb|Temporal_error| allows to determine, based on Richardson extrapolation, the error of a numerical solution.   
- \renewcommand{\home}{../libraries/Numerical_Methods/Cauchy_Problem}
+ \renewcommand{\home}{./sources/Numerical_Methods/Cauchy_Problem}
   \listings{\home/sources/tools/Temporal_error.f90}
        {module Temporal_error}
        {contains}{Temporal_error.f90}

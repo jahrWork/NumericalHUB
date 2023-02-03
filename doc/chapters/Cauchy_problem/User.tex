@@ -278,12 +278,16 @@ This function is used as an input argument for the subroutine \verb|Cauchy_Probl
  \newpage                            
  \section{Advanced high order numerical methods}
  When high precision requirements are necessary, high order temporal schemes must be used. 
- This is the case of orbits or satellite missions. These simulations require very small errors during their temporal integration. 
- Generally, it is said that a numerical method is of order $ q $ when its global error is  $ O(\Delta t^q) $.
- This means that high order numerical methods require greater time steps than low order schemes to accomplish the same error. 
+ This is the case of orbits or satellite missions. 
+ These simulations require very small errors during their temporal integration. 
+ %Generally, it is said that a numerical method is of order $ q $ when its global error is  
+ %$ O(\Delta t^q) $.
+ %This means that 
+ High order numerical methods require greater time steps than low order schemes to accomplish the same error 
+ than low order methods. 
  Consequently, high order methods have lower computational effort than low order methods. 
  The following subroutine shows the performance of  some advanced high order methods when simulating orbit problems:
-        \vspace{0.2cm} 
+      %  \vspace{0.01cm} 
         \listings{\home/examples/API_Example_Cauchy_Problem.f90}
         {subroutine Advanced_Cauchy_problem_examples}
         {end subroutine}{API_Example_Cauchy_Problem.f90}

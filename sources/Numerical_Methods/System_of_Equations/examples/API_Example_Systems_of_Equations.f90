@@ -3,6 +3,7 @@ module API_Example_Systems_of_Equations
     use Linear_systems
     use Non_Linear_Systems 
     use Numerical_Recipes
+    use Utilities
 
     implicit none
 
@@ -18,7 +19,7 @@ subroutine Systems_of_Equations_examples
     call Test_Power_Method 
     call Test_eigenvalues_PM  
     call Vandermonde_condition_number
-    call Test_SVD
+    call Test_Linear_regression
     
 end subroutine   
   

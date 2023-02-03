@@ -1,197 +1,263 @@
-\chapter{Initial Value Boundary Problem}
+\chapter{Initial Boundary Value Problem}
 \vspace{-0.5cm}
 \section{Overview}
-
-
-
 
 This library is intended  to solve an initial value boundary problem. 
 This problem is governed by a set time evolving partial differential equations together with boundary conditions and an initial condition. 
 
 \vspace{0.1cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Initial_Boundary_Value_Problem}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
   \listings{\home/sources/Initial_Boundary_Value_Problems.f90}
        {module Initial_Boundary_Value_Problems}
-       {end interface}{Initial_Boundary_Value_Problems.f90}
+       {Linear_operator}{Initial_Boundary_Value_Problems.f90}
 \vspace{-0.1cm}       
 Since the space domain $ \Omega \subset \R{k} $ with $ k=1,2,3$, initial value boundary problems are stated in 1D, 2D and 3D grids. 
-To have the same name interface when dealing with different space dimensions,  the subroutine 
-\verb|Initial_Value_Boundary_Problem| has been overloaded. 
-
+To have the same name interface when dealing with different space dimensions,  
+the subroutines 
+\verb|Initial_Value_Boundary_Problem|, \verb|Spatial_discretization|,
+ \verb|Spatial_truncation_error| and 
+\verb|Linear_operator| have been overloaded. 
 
 
 
 \newpage
-\section{Initial Value Boundary Problem  module}
-
-\subsection*{1D Initial Value Boundary Problem}
-
-\begin{lstlisting}[frame=trBL]
-call Initial_Boundary_Value_Problem(Time_Domain, x_nodes,                & 
-                                    Differential_operator,               & 
-                                    Boundary_conditions, Solution, Scheme)  
-\end{lstlisting}   
-This subroutine calculates the solution to a boundary initial value problem in a  domain $x$ $\in [a,b]$ such as:
-
-\begin{equation*}
-\frac{\partial u}{\partial t} = \mathcal{L}\left(x,\ t,\ u, \ \frac{\partial u}{\partial x}, \ \frac{\partial^2 u}{\partial x^2} \right) 
-\end{equation*}
-
-Besides, an initial condition must be established: $u(x,t = t_0) = u_0 (x)$.
-
-
-%\vspace{-1cm}
-
-\btable		
-				Time\_Domain & vector of reals & in &  Time domain where the solution is calculated.  \\ \hline
-				
-				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
-				
-				
-				Differential\_operator & \raggedright real function: $\mathcal{L}\left(x, t, u,  u_x,  u_{xx} \right)$ & in  & Differential operator.   \\ \hline
-				
-				Boundary\_conditions & \raggedright real function: $h\left(x, t, u,  u_x \right)$  & in &   The user must include a conditional sentenceto impose boundary conditions.  \\ \hline
-				
-			
-				
-				Solution & two-dimensional array of reals  & out &  Solution $u = u(x,t)$. \\ \hline
-				
-		    	Scheme & temporal scheme  & optional in & Numerical scheme to integrate in time. If it is not specified, it uses a Runge-Kutta of four stages.    \\ \hline
-				
-				
-				
-\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS} arguments for 1D problems}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\subsection*{1D Initial Value Boundary Problem for systems of equations}
+%************************************************************************************
+\section{Initial  Boundary Value Problem}
+\subsection*{1D Initial Boundary Value Problem for systems of equations}
 
 \begin{lstlisting}[frame=trBL]
 call Initial_Boundary_Value_Problem(Time_Domain, x_nodes,                & 
                                     Differential_operator,               & 
                                     Boundary_conditions, Solution, Scheme)    
 \end{lstlisting} 
-The subroutine \verb|Initial_Value_Boundary_Problem| calculates the solution to a boudary initial value problem in a rectangular domain $x$ $\in [a,b]$ such as:
-
-\begin{equation*}
-\frac{\partial \vect{u}}{\partial t} = \vect{\mathcal{L}}\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}, \ \frac{\partial^2 \vect{u}}{\partial x^2} \right)
-\end{equation*}
-%With proper boundary conditions:
-%\begin{align*}
-%& \vect{f}_a\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}\right)=0, & x=a, \\
-%& \vect{f}_b\left(x,\ t,\ \vect{u}, \ \frac{\partial \vect{u}}{\partial x}\right)=0 & x=b.
-%\end{align*}
-Besides, an initial condition must be established: $\vect{u}(x,t = t_0) = \vect{u}_0 (x)$.
-The arguments of the subroutine are described in the following table.
-
-\btable	
-				Time\_Domain & vector of reals & in &  Time domain where the solution wants to be calculated.  \\ \hline
-				
-				x\_nodes & vector of reals & inout &  Contains the mesh nodes.  \\ \hline
-				
-				Order &  integer  & in & It indicates the order of the finitte differences.  \\ \hline
-				
-				Differential\_operator & \raggedright function: $\vect{\mathcal{L}}\left(x, t, \vect{u}, \frac{\partial \vect{u}}{\partial x}, \frac{\partial^2 \vect{u}}{\partial x^2} \right) $ & in  & This function is the differential operator of the boundary value problem.   \\ \hline
-				
-				Boundary\_conditions & \raggedright function: $\vect{h}\left(x, t, \vect{u}, \vect{u}_x \right)$  & in &  Boundary conditions.
-				% The user must include a conditional sentence which sets $\vect{f}\left(a,\ t,\ \vect{u}, \ %\vect{u}_x \right) = \vect{f}_a$ and $\vect{f}\left(b,\ t, \ \vect{u}, \ \vect{u}_x \right) = %\vect{f}_b$.  
-				\\ \hline
-				
-				
-				Solution & three-dimensional array of reals  & out &  Solution $\vect{u} = \vect{u}(x,t)$. \\ \hline
-				
-		    	Scheme & temporal scheme  & optional in & Optional temporal scheme. Default: Runge Kutta of four stages.    \\ \hline
-				
-				
-\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS\_System} arguments for 1D problems}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newpage
-\subsection*{2D Initial Value Boundary Problems}
-
-\begin{lstlisting}[frame=trBL]
-call Initial_Boundary_Value_Problem(Time_Domain, x_nodes, y_nodes,       & 
-                                    Differential_operator,               & 
-                                    Boundary_conditions, Solution, Scheme)  
-\end{lstlisting} 
-This subroutine calculates the solution to a scalar initial value boundary problem in a rectangular domain $(x,y)\in[x_0,x_f] \times [y_0,y_f]$:
+The subroutine \verb|Initial_Value_Boundary_Problem| calculates the solution at 
+\verb|x_nodes| of the following problem:
 
 \begin{align*}
-\frac{\partial {u}}{\partial t} = {\mathcal{L}}(x,y,t, {u}, {u}_x, {u}_y, {u}_{xx}, {u}_{yy}, {u}_{xy}), \qquad \eval{{h} ( x,y,t,{u}, {u}_x, {u}_y)}_{\partial \Omega} = 0.
+\frac{\partial \vect{u}}{\partial t} = 
+\vect{\mathcal{L}}(x,t, \vect{u}, \vect{u}_x,  \vect{u}_{xx} ), \qquad 
+\eval{\vect{h} ( x,t,\vect{u}, \vect{u}_x)}_{\partial \Omega} = 0.
 \end{align*}
-Besides, an initial condition must be established: $u(x, y ,t_0) = u_0 (x,y)$.
-The arguments of the subroutine are described in the following table.
+Together with an initial condition  $\vect{u}(x,0) = \vect{u}_0 (x)$, the solution is 
+simulated in some time domain.
+The arguments of the subroutine are described in the following code:
+\vspace{0.1cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+  \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+       {:: Time_Domain}
+       {Scheme}{Initial_Boundary_Value_Problem1D.f90}
+The first index of \verb|Solution| stands for time, the second space and third is the index of variable 
+to integrate. 
+Besides, the differential operator  $ \vect{\mathcal{L}} $ and the boundary conditions $\vect{h} $ are defined with the following interface: 
+  \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+         {abstract interface}
+         {end interface}{Initial_Boundary_Value_Problem1D.f90}     
+       
 
-\btable	
-				Time\_Domain & vector of reals & in &  Time domain.  \\ \hline
-				
-				x\_nodes & vector of reals & inout & Mesh nodes along $OX$.  \\ \hline
-				
-				y\_nodes & vector of reals & inout & Mesh nodes along $OY$.  \\ \hline
-				
-				Order &  integer  & in & Finite differences order.  \\ \hline
-				
-				Differential\_operator & \raggedright real function: 
-				$ \mathcal{L} $ & in  & Differential operator of the problem.   \\ \hline
-				
-				Boundary\_conditions & \raggedright real function: $h$  & in &  Boundary conditions for $u$.  \\ \hline
-				
-			
-				
-				Solution & three-dimensional array of reals  & out & Solution of the problem $u$. \\ \hline
-				
-					Scheme & temporal scheme  & optional in & Scheme used to solve the problem. If not given a Runge Kutta of four stages is used.    \\ \hline
-				
-				
-\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS} arguments for 2D problems}
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\subsection*{Initial Value Boundary Problem System for 2D problems}
+\subsection*{Initial Boundary Value  Problem for 2D systems of equations}
 
 \begin{lstlisting}[frame=trBL]
 call Initial_Boundary_Value_Problem(                                &
              Time_Domain, x_nodes, y_nodes,  Differential_operator, & 
              Boundary_conditions,  Solution, Scheme                 )  
 \end{lstlisting}   
-The subroutine \verb|Initial_Value_Boundary_ProblemS| calculates the solution to a boundary initial value problem in a rectangular domain $(x,y)\in[x_0,x_f] \times [y_0,y_f]$:
+The subroutine \verb|Initial_Value_Boundary_ProblemS| calculates the solution 
+at (\verb|x_nodes|, \verb|y_nodes|) of the following problem: 
 
 
 \begin{align*}
-\frac{\partial \vect{u}}{\partial t} = \vect{\mathcal{L}}(x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}), \qquad \eval{\vect{h} ( x,y,t,\vect{u}, \vect{u}_x, \vect{u}_y)}_{\partial \Omega} = 0.
+\frac{\partial \vect{u}}{\partial t} = 
+\vect{\mathcal{L}}(x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}), \qquad \eval{\vect{h} ( 
+x,y,t,\vect{u}, \vect{u}_x, \vect{u}_y)}_{\partial \Omega} = 0.
 \end{align*}
-Besides, an initial condition must be established: $\vect{u}(x, y ,t = t_0) = \vect{u}_0 (x,y)$.
-The arguments of the subroutine are described in the following table.
+Together with an initial condition  $\vect{u}(x,y,0) = \vect{u}_0 (x,y)$, the solution is 
+simulated in some time domain.
+The arguments of the subroutine are described in the following code:
 
-\btable			
-				Time\_Domain & vector of reals & in &  Time domain.  \\ \hline
-				
-				x\_nodes & vector of reals & inout &  Mesh nodes along $OX$.  \\ \hline
-				
-				y\_nodes & vector of reals & inout &  Mesh nodes along $OY$.  \\ \hline
-				
-				
-				Differential\_operator & \raggedright function: $     	\vect{\mathcal{L}}$   & in  & Differential operator.   \\ \hline
-				
-				Boundary\_conditions & \raggedright function: $     	\vect{h}$  & in &  Boundary conditions.  \\ \hline
-				
-			
-				Solution & four-dimensional array of reals  & out &  Solution of the problem $\vect{u} $.\\ \hline
-				
-					Scheme & temporal scheme  & optional in & Scheme used to solve the problem. If not given, a Runge Kutta of four stages is used.    \\ \hline
-								
-				
-				
-\etable{Description of \texttt{Initial\_Value\_Boundary\_ProblemS\_System} arguments for 2D problems}
+\vspace{0.1cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+  \listings{\home/sources/Initial_Boundary_Value_Problem2D.f90}
+       {:: Time_Domain}
+       {Scheme}{Initial_Boundary_Value_Problem2D.f90}
+The first index of \verb|Solution| stands for time, the second \verb|x_nodes| position, 
+the third  \verb|x_nodes| position and the fourth is the index of variable 
+to integrate. 
+Besides, the differential operator  $ \vect{\mathcal{L}} $ and the boundary conditions $\vect{h} $ are defined with the following interface: 
+  \listings{\home/sources/Initial_Boundary_Value_Problem2D.f90}
+         {abstract interface}
+         {end interface}{Initial_Boundary_Value_Problem1D.f90}     
+       
 
 
+%********************************************************************************************
+\newpage
+\section{Spatial discretization}
+To carry out the numerical integration of the initial boundary value problem, the method of lines 
+is used. This method performs the spatial discretization of the differential operator
+together with the boundary conditions. 
+Once the spatial discretization is accomplished, the following ordinary systems of equations 
+is obtained: 
+$$
+   \frac{ d \vect{U} } { dt } = \vect{F}( \vect{U}, t),
+$$
+where $ \vect{F}( \vect{U}, t) $ represents the spatial discretization of the problem. 
+The following function allows to calculate the space discretization: 
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+F = Spatial_discretization(Differential_operator,  & 
+                           Boundary_conditions, x, y, U, t) 
+\end{lstlisting} 
+
+\subsection*{1D Spatial discretization for systems of equations}
+
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+        {function Spatial_discretization1DS}
+        {real ::}{Initial_Boundary_Value_Problem1D.f90}
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. The argument \verb|x| represents the grid nodes which 
+are previously calculated by \verb|Grid_initialization|. 
+The argument \verb|U| represents the solution or some test function evaluated at all grid nodes. 
+The first index stands for space and second for the variable.   
+The result discretization \verb|F| share the dimensions of \verb|U|. 
+It is important to mention that the vector \verb|F| includes inner and boundary points. 
+   
+%
+ 
+\newpage
+\subsection*{Spatial discretization for 2D systems of equations}
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem2D.f90}
+        {function Spatial_discretization2DS}
+        {real ::}{Initial_Boundary_Value_Problem2D.f90}
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. The argument \verb|x| and \verb|y| represent the grid nodes which 
+are previously calculated by \verb|Grid_initialization|. 
+The argument \verb|U| represents the solution or some test function evaluated 
+at all grid nodes $ (x_i, y_j)$. 
+The first and the second index of \verb|U| stand for the grid nodes and the third for the variable.   
+The result discretization \verb|F| share the dimensions of \verb|U|. 
+The matrix \verb|F| includes inner and boundary points. 
+Since, spatial discretization is accomplished for those points in which 
+no boundary conditions are imposed, those points that must satisfy boundary conditions have zero 
+components of the matrix \verb|F|. 
+
+%********************************************************************************************
+\newpage
+\section{Spatial truncation error}
+The spatial truncation error is defined at different grid points $ (x_i, y_j) $ by the following equation: 
+$$
+   \vect{R}_{ij} = 
+   \vect{\mathcal{L}}(x,y,t, \vect{u}, \vect{u}_x, \vect{u}_y, \vect{u}_{xx}, \vect{u}_{yy}, \vect{u}_{xy}) |_{(x_i, y_j)} - \vect{F}_{ij} 
+$$
+where $ F_{ij} $ represents the spatial discretization of some test function $ \vect{u}(x,y,t) $. 
+The first term of the above equation represents the differential operator together 
+with the boundary conditions applied to same  test function evaluated at all different grid points. 
+The definition of the spatial truncation error 
+requires to differentiate analytically the test function to determine the spatial truncation error.
+The following function allows to calculate this error numerically by means of two grids using Richardson 
+extrapolation.  
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+ R = Spatial_Truncation_Error( Nv, Differential_operator,  & 
+                               Boundary_conditions,        & 
+                               x, y, Order, Test_U  ) 
+\end{lstlisting} 
+
+\subsection*{1D Spatial truncation error for systems of equations}
+
+%\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+        {function Spatial_Truncation_Error1DS}
+        {real :: R}{Initial_Boundary_Value_Problem1D.f90}
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. \verb|Nv| stands for the number of variables.  
+For example, the heat equation has $ N_v = 1 $ and the wave equation has $ Nv =2$. 
+The argument \verb|x| represents the grid nodes which 
+are previously calculated by \verb|Grid_initialization| and \verb|Order| stands for the degree of the 
+interpolation to accomplish the space discretization. 
+The $\verb|Test_function|$ evaluates any test function $u(x)$ at the grid points.   
+The first index of the result \verb|R| allows to know the truncation error at every grid node $ x_i $  and 
+the second index stands for different variables. 
+
+ 
+
+\subsection*{Spatial truncation error for 2D systems of equations}
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem2D.f90}
+        {function Spatial_Truncation_Error2DS}
+        {real :: R}{Initial_Boundary_Value_Problem2D.f90}
+        
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. \verb|Nv| stands for the number of variables. 
+The arguments \verb|x| and \verb|y| represent the grid nodes which 
+are previously calculated by \verb|Grid_initialization| and \verb|Order| stands for the degree of the 
+interpolation to accomplish the space discretization. 
+The $\verb|Test_function|$ evaluates any test function $u(x,y)$ at the grid points.   
+The first index and the second index of the result \verb|R| 
+allows to know the truncation error at every grid node $ (x_i, y_j) $  and 
+the third index stands for different variables. 
+
+
+
+
+
+
+
+%********************************************************************************************
+\newpage
+\section{Linear operator}
+If the differential operator and the boundary conditions are linear, 
+and once the space discretization is accomplished, an ordinary system of differential equations is obtained.  
+$$
+   \frac{ dU } { dt } = A \ U  + b,
+$$
+where $ A $ is the system matrix of size $ M \times M $ where $ M $ is the dimension of the vector $ U $ 
+which represents the solution of all variables at all different grid or collocation nodes. 
+The following function allows to obtain the matrix $ A$ associated to the space discretization problem: 
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+A = Linear_operator( Nv, x, y, Order, Differential_operator, & 
+                     Boundary_conditions) 
+\end{lstlisting}  
+
+\subsection*{Linear operator 1D for systems of equations}
+
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
+        {function Linear_operator1DS}
+        {real ::}{Initial_Boundary_Value_Problem1D.f90}
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. 
+\verb|Nv| stands for the number of variables. 
+The argument \verb|x| represents the grid nodes which 
+are previously calculated by \verb|Grid_initialization| and \verb|Order| stands for the degree of the 
+interpolation to accomplish the space discretization.   
+The function returns a square matrix \verb|A|  of size $ M \times M $ with $ M = (N_x+1)  Nv $
+which includes inner and boundary points.  
+%
+ 
+\newpage
+\subsection*{Linear operator 2D for systems of equations}
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Initial_Boundary_Value_Problem}
+   \listings{\home/sources/Initial_Boundary_Value_Problem2D.f90}
+        {function Linear_operator2DS}
+        {real ::}{Initial_Boundary_Value_Problem2D.f90}
+The differential operator and the boundary conditions share the same definition than the subroutine 
+\verb|Initial_Boundary_Value_Problem|. 
+\verb|Nv| stands for the number of variables. 
+The arguments  \verb|x| and \verb|y| represens the grid nodes which 
+are previously calculated by \verb|Grid_initialization| and \verb|Order| stands for the degree of the 
+interpolation to accomplish the space discretization.   
+The function returns a square matrix \verb|A|  of size $ M \times M $ with $ M = (N_x+1) (N_y+1)  Nv $
+which includes inner and boundary points. 
+Those rows associated to boundary points have all components equal to zero. 
 
 

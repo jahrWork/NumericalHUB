@@ -165,7 +165,7 @@ end subroutine
 ! OUTPUTS: 
 !           Step_size : new temporal step 
 !******************************************************************
-real function Step_size( dU, tolerance , q , h  )
+real function Step_size( dU, tolerance, q, h  )
      real, intent(in) :: dU(:), tolerance, h
      integer, intent(in) :: q
     

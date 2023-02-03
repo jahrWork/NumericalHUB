@@ -52,7 +52,7 @@ To  use all functions of this module, the statement:
               
               \vspace{0.5cm} 
               \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
-              {real function Legendre}
+              {function Legendre}
               {end function}
               {API_example_Boundary_Value_Problem.f90}
                     
@@ -153,7 +153,7 @@ where $\nabla^2 u = \partial^2 u / \partial x^2 + \partial^2 u / \partial y^2 $ 
 This Poisson equation is implemented by the following code: 
 \vspace{0.8cm} 
 \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
-         {real function Poisson}
+         {function Poisson}
          {end function}
          {API_example_Boundary_Value_Problem.f90}
          
@@ -180,7 +180,7 @@ The differential operator \verb|Poisson|  with its boundary conditions \verb|PBC
 \vspace{0.3cm} 
  \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
           {Poisson equation}
-          {Solution}
+          {PBCs}
           {API_example_Boundary_Value_Problem.f90}
 In figure  \ref{fig:Poisson} the solution of this Poisson equation is shown. 
 \vspace{-0.1cm}
@@ -258,7 +258,7 @@ The differential operator \verb|Elastic_Plate| and its boundary conditions \verb
             \vspace{0.5cm} 
             \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
             {Elastic linear plate}
-            {Solution}
+            {Plate_BCs}
             {API_example_Boundary_Value_Problem.f90}
             
 In figure \ref{fig:LinearPlateBVP}a, the external load is shown. As it was mentioned, the net force between the hydro-static pressure and the 
@@ -352,7 +352,7 @@ The differential operator \verb|NL_Plate| and its boundary conditions \verb|NL_P
           \vspace{0.5cm} 
           \listings{\home/examples/API_example_Boundary_Value_Problem.f90}
           {Elastic nonlinear plate}
-          {Solution}
+          {NL_Plate_BCs}
           {API_example_Boundary_Value_Problem.f90}
           
         

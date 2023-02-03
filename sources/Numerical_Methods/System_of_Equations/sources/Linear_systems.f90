@@ -1,5 +1,6 @@
 module Linear_systems 
 
+use Utilities    
 implicit none 
 private 
 public ::               & 
@@ -8,17 +9,11 @@ public ::               &
   Inverse,              & ! Inverse of A 
   Gauss,                & ! It solves A x = b by Guass elimination
   Condition_number,     & ! Kappa(A)  = norm2(A)  * norm2( inverse(A) )
-  Tensor_product,       & ! A_ij = u_i v_j 
   Power_method,         & ! It determines to largest eigenvalue of A 
   Inverse_Power_method, & ! It determines the smallest eigenvalue of A
   Eigenvalues_PM,       & ! All eigenvalue of A by the power method
   SVD,                  & ! A = U S transpose(V)  
   linear_regression       ! y = c1 x + c0 
-public :: operator  (.x.)
-
-interface operator(.x.) 
-       module procedure Tensor_product 
-end interface 
 
 
 contains 
@@ -134,7 +129,7 @@ function  Gauss(A, b) result(x)
 
 !    Check if the system has a sigular matrix
      if(pivot == 0.0) then
-       write(*,*) " The matrix is sigular "
+       write(*,*) " The matrix is singular "
        stop 
      end if
 
@@ -418,7 +413,7 @@ end function
 !* Given a set of points ( y_i, x_i) i=1, .. M 
 !* determine the best fit regression by means of SVD decomposiotn. 
 !* A x  = b with martrix A of MxN and M>>N (overdetermined)
-!* Best fitting: least squeares 
+!* Best fitting: least squares 
 !*      x = V S^-1 U^T b 
 !*
 !*    input  : x(:), y(:)  
@@ -551,28 +546,6 @@ function Solve_LU_band( A, b, rj)
 end function 
 
 
-!************************************************************************
-!* Tensor product A_ij = U_i V_j 
-!************************************************************************
-function Tensor_product(U, V) result(A) 
-     real, intent(in) :: U(:), V(:) 
-     real A( size(U), size(V) ) 
-
-     integer ::i, j, N, M 
-     
-     N = size(U) 
-     M = size(V) 
-     
-     
-     do i=1, N; do j=1, M 
-         
-         A(i,j) = U(i) * V(j) 
-         
-     end do;  end do 
-     
-     
-
-end function 
 
 
 end module 

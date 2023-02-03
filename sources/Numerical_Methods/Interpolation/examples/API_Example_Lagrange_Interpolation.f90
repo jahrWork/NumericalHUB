@@ -2,6 +2,7 @@ module API_Example_Lagrange_Interpolation
 
     use Interpolation
     use Lagrange_interpolation
+    use Utilities 
     use plots 
     
     implicit none
@@ -24,7 +25,7 @@ subroutine Lagrange_Interpolation_examples
      
      call Chebyshev_polynomials
      call Interpolant_versus_Chebyshev 
-   
+     call Interpolation_examples2D
 end subroutine  
 
 
@@ -77,10 +78,9 @@ subroutine Interpolant_example
   xp = [ (a + (b-a)*i/M, i=0, M) ] 
 
   I_N = Interpolant(x, f, N, xp) 
- 
-  write(*,*) "It plots an interpolant and its derivative"
-  write(*,*) "press enter ";  read(*,*)
-  call plot_parametrics(xp, transpose(I_N(0:1,:)),["I", "dI/dx"],"x","y")
+  
+  call plot_parametrics(xp, transpose(I_N(0:1,:)),["I","dI/dx"],"x","y",& 
+                        "Interpolant of 3th degree and its Derivative" ) 
    
  
 end subroutine    
@@ -102,7 +102,6 @@ subroutine Integral_example
    I0 = Integral( x, f, 4 )
    write(*, *) "The integral [0,1] of sin( PI x ) is: ", I0
    write(*, *) "Error = ",  ( 1 -cos(PI) )/PI - I0
-   write(*, *) "press enter ";  read(*,*)
 end subroutine
 
 
@@ -126,9 +125,8 @@ subroutine Lagrange_polynomial_example
  do i=0, M;  Lg(:, :, i) = Lagrange_polynomials( x, xp(i) ); end do 
  Lebesgue_N = Lebesgue_functions( x, xp ) 
    
- write (*, *) "It plots Lagrange functions"
- write(*,*) "press enter ";  read(*,*)
- call plot_parametrics(xp, transpose(Lg(0, 0:N, :)), legends,"x","y")
+ call plot_parametrics(xp, transpose(Lg(0, 0:N, :)), legends,"x","y", & 
+                       "Lagrange polynomials with 5 points")
 end subroutine
 
  
@@ -154,11 +152,11 @@ subroutine Ill_posed_interpolation_example
  I_N = Interpolant(x, f, N, xp) 
  Lebesgue_N = Lebesgue_functions( x, xp ) 
  
- write(*, *) "It plots an interpolant with errors at boundaries " 
+ write(*, *) "" 
  write(*, *) "maxval Lebesgue =", maxval( Lebesgue_N(0,:) )  
  
- write(*, *) "press enter "; read(*,*)
- call plot_parametrics(xp, transpose(I_N(0:0, :)), ["I"], "x", "y")
+ call plot_parametrics(xp, transpose(I_N(0:0, :)), ["I"], "x", "y", & 
+             "Interpolant of sin(PIx) with errors at boundaries" )
  
 end subroutine 
 
@@ -181,24 +179,22 @@ subroutine Lebesgue_and_PI_functions
  
    Lebesgue_N = Lebesgue_functions( x, xp ) 
    PI_N = PI_error_polynomial( x, xp ) 
-  
-   write(*, *) "It plots Lebesgue  functions" 
-   write(*, *) "function, first and second derivative" 
-   write(*, *) "press enter ";  read(*, *)
+   
    call plot_parametrics(xp, transpose(Lebesgue_N(0:2, :)),  & 
-                         ["l", "dldx","d2ldx2"], "x","y")
+                         ["l", "dldx","d2ldx2"], "x","y",    & 
+         "Lebesgue function with first and second derivative"  )
    
    call plot_parametrics(xp, transpose(PI_N(0:2, :)),        & 
-                         ["pi", "dpidx","d2pidx2"], "x","y")                       
+                         ["pi", "dpidx","d2pidx2"], "x","y", & 
+         "PI function with first and second derivative"        )                       
   
  
 end subroutine 
 
 
-
  
 !**************************************************************************************************
-!
+! Chebyshev polynomials
 !**************************************************************************************************
 subroutine Chebyshev_polynomials
  
@@ -215,11 +211,9 @@ subroutine Chebyshev_polynomials
            Tk(:, k) = cos ( k * theta )
            Uk(:, k) = sin ( k * theta ) / sin (theta)
     end do 
-    
-    write(*, *) "It plots Chebyshev polynomials" 
-    write(*, *) "press enter ";  read(*,*)
-    call plot_parametrics(x, Tk(:, 0:M), lTk, "x","y")
-    call plot_parametrics(x, Uk(:, 0:M), lUk, "x","y")
+    call plot_parametrics(x, Tk(:, 0:M), lTk, "x","y", "Chebyshev polynomials")
+    call plot_parametrics(x, Uk(:, 0:M), lUk, "x","y", & 
+                          "Second class Chebyshev polynomials"  )
 end subroutine
 
 
@@ -250,8 +244,8 @@ subroutine Interpolant_versus_Chebyshev
     do k=0, N 
         Integrand = sin( PI * xp) * cos ( k * theta ) 
         
-        if (k==0) then;    gamma =  PI; 
-                  else;    gamma =  PI / 2; 
+        if (k==0 .or. k==N) then;    gamma =  PI; 
+                            else;    gamma =  PI / 2; 
         end if 
         c_k = Integral( theta , Integrand ) / gamma
         P_N = P_N - c_k * cos( k * theta ) 
@@ -265,9 +259,74 @@ subroutine Interpolant_versus_Chebyshev
     
     Error(:, 1) = sin( PI * xp ) - I_N(0, :) 
     Error(:, 2) = sin( PI * xp ) - P_N 
-    call plot_parametrics(xp, Error(:, 1:2), legends, "x","y")
+    call plot_parametrics(xp, Error(:, 1:2), legends, "x","y", & 
+    " Chebyshev Error: Interpolant versus Truncated series (N=6)")
    
 end subroutine
+
+
+ 
+subroutine Interpolation_examples2D
+
+     call Interpolated_value_example2D 
+     call Interpolant_example2D 
+     
+end subroutine  
+
+
+
+!*************************************************************************************
+! It interpolates a function at a given abscisa x= xp for a given set of values:
+!       (xj, fj) j=0, ..., N  
+!******************************************************************************
+subroutine Interpolated_value_example2D 
+
+    integer, parameter :: N = 3
+    real :: x(N) = [ 0.0, 0.1, 0.2 ]
+    real :: y(N) = [ 0.0, 0.1, 0.2 ] 
+    real :: f(N, N) 
+    
+    
+    real :: xp = 0.15, yp = 0.15, I_2D  
+   
+    f = Tensor_product( 1 + x + x**2, -1 + 3*y + y**2 ) 
+      
+    I_2D = Interpolated_value( x , y, f , xp, yp, N-1 )
+    write(*,*)  'The interpolated value 2D at (xp, yp) is = ', I_2D 
+    write(*,*)  'Error  at (xp, yp) is = ', (1 + xp + xp**2)*(-1 + 3*yp + yp**2) - I_2D  
+   
+end subroutine
+ 
+  
+
+!********************************************************************
+!*  It builds an interpolant for a given set of values 
+!************************************************************
+subroutine Interpolant_example2D
+
+ integer, parameter :: N=5, M=200 
+ real ::  xp(0:M), yp(0:M)  
+ real :: x(0:N), y(0:N), f(0:N, 0:N)
+ real :: I_N(0:M, 0:M) 
+ 
+ real, parameter :: PI = 4 *atan(1.) 
+ real :: a =0, b= 2*PI  
+ integer :: i
+ 
+  x = [ ( a +(b-a)*i/N, i=0, N )  ] 
+  y = x
+  f = Tensor_product( sin(x), sin(y) ) 
+  
+  xp = [ ( a +(b-a)*i/M, i=0, M )  ] 
+  yp = xp 
+  I_N = Interpolant(x, y, f, N, xp, yp ) 
+  
+  call plot_contour(x, y, f, "x", "y", graph_type ="color") 
+  call plot_contour(xp, yp, I_N, "x", "y", graph_type ="color") 
+  
+ 
+end subroutine
+
 
 
 

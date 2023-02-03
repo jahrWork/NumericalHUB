@@ -1,9 +1,7 @@
 module ODE_Interface
     
- implicit none 
+implicit none 
   
- real :: ZERO = 1d-14
- 
 abstract interface 
 
   function ODES( U, t) 

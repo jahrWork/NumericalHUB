@@ -11,19 +11,23 @@ module MUSE_orbits
         use Temporal_error 
         use show_orbits  
         use plots   
+        use ODE_Interface
+        use Numerical_Recipes
         
         implicit none 
 
        real, parameter :: PI = 4 * atan(1d0) 
        real :: mu = 0.0121505856
+       private 
+       public :: Orbits_and_Numerical_Methods, kepler_orbits
        
     contains  
     
  subroutine Orbits_and_Numerical_Methods
  
-  integer :: option = 1
+  integer :: option 
     
-    
+  option = 1   
   do while (option>0) 
   write(*,*) " Enter milestone number to execute " 
   write(*,*) " 0. Exit  "
@@ -64,12 +68,6 @@ module MUSE_orbits
  
  end subroutine 
 
- subroutine Kepler_orbits 
-     
-    call Kepler_orbit
-    
-  
- end subroutine 
   
  subroutine Error_in_orbits
      
@@ -208,44 +206,29 @@ end function
 !***************************************** 
 !   Kepler_orbit and errors
 !*****************************************
- subroutine Kepler_orbit
+ subroutine Kepler_orbits
    integer, parameter :: N = 10000
-   real :: Time(0:N), U(0:N,4) 
+   real :: Time(0:N), U(0:N,4,4) 
    real :: t0 =0, tf=12*PI 
    integer :: i
+   character (len=30) :: legends(4) = ["Euler method", "Inverse Euler method", & 
+                                       "Crank_Nicolson method", "Runge_kutta4  " ] 
  
    Time = [ (t0 + (tf -t0 ) * i/real(N), i=0, N ) ]
-   
-    U(0,:) = [1., 0., 0., 1.]
-   
-    do i=1, 4 
-     if (i==1) then 
-         write (*, *) 'Euler method  ' 
-         call Cauchy_ProblemS( Time_Domain=Time, Differential_operator = F_Kepler, Solution = U, & 
-                               Scheme = Euler )
-     else if (i==2) then
-         write (*, *) 'Inverse Euler method  ' 
-         call Cauchy_ProblemS( Time_Domain=Time, Differential_operator = F_Kepler, Solution = U, & 
-                               Scheme = Inverse_Euler ) 
-     else if (i==3) then
-         write (*, *) 'Crank_Nicolson method  ' 
-         call Cauchy_ProblemS( Time_Domain=Time, Differential_operator = F_Kepler, Solution = U, & 
-                               Scheme = Crank_Nicolson ) 
-     else if (i==4) then
-         write (*, *) 'Runge_kutta4  ' 
-         call Cauchy_ProblemS( Time_Domain=Time, Differential_operator = F_Kepler, Solution = U, & 
-                               Scheme = Runge_kutta4 )  
-     end if 
-     
-    
-     write (*, *) 'Kepler orbit  '     
-     write(*,*) "press enter " ; read(*,*) 
-     call plot_parametrics(Time, U(:,1:2), ["x", "y"], "time","distance")
+   do i=1, 4; U(0,:,i) = [1., 0., 0., 1.]; end do
+       
+   call Cauchy_ProblemS( Time, F_Kepler, U(:,:,1), Euler )
+   call Cauchy_ProblemS( Time, F_Kepler, U(:,:,2), Inverse_Euler )
+  
+   call Cauchy_ProblemS( Time, F_Kepler, U(:,:,3), Crank_Nicolson )
+   call Cauchy_ProblemS( Time, F_Kepler, U(:,:,4), Runge_kutta4 )
+           
  
-     write (*, *) 'Phase diagram: Kepler orbits  '     
-     write(*,*) "press enter " ; read(*,*) 
-     call plot_parametrics(U(:,1), U(:,2:2), [""], "x","y")
-    end do
+   do i=1,4
+       call plot(U(:,1,i), U(:,2,i), legends(i) ) 
+   end do      
+    
+  
  
  end subroutine
  
@@ -284,11 +267,7 @@ subroutine Error_Kepler_orbit
     real :: Ue(0:N,Nv)                     ! Exact solution 
     
     integer :: i
-    
-    write(*,*) "Error determination by Richardson extrapolation"   
-    write(*,*) "press enter " 
-    read(*,*)
-    
+       
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U(0,:) = [1, 0, 0, 1]   !Initial conditions for the Kepler equation 
     Ue(0,:) = U(0,:)
@@ -326,11 +305,7 @@ subroutine Convergence_rate_Euler_RK4_Kepler
     integer :: i 
     character (len=20) :: names(Np) = [ "Euler", "RK4"] 
    
-    write(*,*) "Convergence rate: Error versus number of time steps"  
-    write(*,*) "Temporal scheme : Euler, Rk4 "   
-    write(*,*) "press enter " 
-    read(*,*)
-    
+   
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U0=[1,0,0,1]             !Initial conditions 
     U(0,:) = U0 
@@ -370,11 +345,7 @@ subroutine Convergence_rate_GBS_oscillator
     integer :: i, j  
     character (len=20) :: names(Np)
    
-    write(*,*) "Convergence rate: Error versus number of time steps"  
-    write(*,*) "Temporal scheme : GBS "   
-    write(*,*) "press enter " 
-    read(*,*)
-    
+       
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U0=[1,0]      
     
@@ -409,12 +380,7 @@ subroutine Convergence_rate_GBS_Kepler
     real :: order
     integer :: i, j  
     character (len=20) :: names(Np)
-   
-    write(*,*) "Convergence rate: Error versus number of time steps"  
-    write(*,*) "Temporal scheme : GBS "   
-    write(*,*) "press enter " 
-    read(*,*)
-    
+     
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U0 = [1,0,0,1] 
     
@@ -443,9 +409,7 @@ subroutine Stability_region_examples
    dx = (xf-x0) / N; dy = (yf-y0) / N
    x = [ ( x0 + dx * i  , i=0,N )]
    y = [ ( y0 + dy * j  , j=0,N )]
-   write (*, *) "Region of absolute stability: Euler"  
-   write(*,*) "press enter "; read(*,*)
-   
+    
    levels = [ ( j/real(N_levels)  , j=0, N_levels )]
    
    
@@ -491,10 +455,7 @@ subroutine Temporal_effort_with_tolerance_GBS_RK
     character (len=20) :: names(Np), family(Np)   
     integer :: i, j
     
-    write(*,*) "Convergence rate: Error versus tolerance "   
-    write(*,*) "Temporal schemes :  ", names  
-    write(*,*)  "press enter "; read(*,*) 
-    
+      
     family = ["GBS", "eRK"]
     names = ["GBS", "RK87"]
     U0 = [1,0,0,1] 
@@ -506,9 +467,8 @@ subroutine Temporal_effort_with_tolerance_GBS_RK
      call set_tolerance( 1d-5)
      call Cauchy_ProblemS( Time, F_Kepler, U ) 
      call plot_parametrics( U(:,1), U(:,2:2), names(2:2), "$x $", "$y$ ") 
-   !  stop 
-     
-   !  call Temporal_effort_with_tolerance( Time, F_kepler, U0, log_mu, log_effort(:,j)  )
+  
+     call Temporal_effort_with_tolerance( Time, F_kepler, U0, log_mu, log_effort(:,j)  )
     end do 
     stop 
     
@@ -531,9 +491,7 @@ subroutine Stability_region_examples_high_order
    dx = (xf-x0) / N; dy = (yf-y0) / N
    x = [ ( x0 + dx * i  , i=0,N )]
    y = [ ( y0 + dy * j  , j=0,N )]
-   write (*, *) "Region of absolute stability: GBS schemes"  
-   write(*,*) "press enter "; read(*,*)
-   
+    
    levels = [ ( j/real(N_levels)  , j=0, N_levels )]
    
    
@@ -670,10 +628,7 @@ subroutine Phase_space_Kepler_orbit_polar
      v(:, i) = U(:,2) 
    end do   
    
-    
-    write (*, *) 'Polar coordinates: Kepler orbit  '     
-    write(*,*) "press enter " ; read(*,*) 
-    call plot_parametrics(r(:,0:Np), v(:,0:Np), legends,"r","drdt")
+   call plot_parametrics(r(:,0:Np), v(:,0:Np), legends,"r","drdt")
  
 end subroutine
 
@@ -712,13 +667,8 @@ subroutine Phase_space_Kepler_orbit
     v(:,i) = ( x(:,i)*dx(:,i) + y(:,i)*dy(:,i) )/r(:,i)
    end do 
  
-   
-    write (*, *) 'Kepler orbit  '     
-    write(*,*) "press enter " ; read(*,*) 
     call plot_parametrics(x(:,0:Np), y(:,0:Np), legends,"x","y")
  
-    write (*, *) 'Phase diagram: Kepler orbits  '     
-    write(*,*) "press enter " ; read(*,*) 
     call plot_parametrics(r(:,0:Np), v(:,0:Np), legends,"r","v")
  
 end subroutine

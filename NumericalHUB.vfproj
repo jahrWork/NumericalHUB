@@ -25,8 +25,8 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/heap-arrays" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" RealKIND="realKIND8" Traceback="true" BoundsCheck="true" StackFrameCheck="true"/>
-				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" AdditionalDependencies="user32.lib gdi32.lib"/>
+				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/heap-arrays" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" HeapArrays="0" WarnInterfaces="true" RealKIND="realKIND8" Traceback="true" BoundsCheck="true" StackFrameCheck="true"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/STACK:100000000" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" AdditionalDependencies="user32.lib gdi32.lib"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -35,8 +35,8 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Release|x64">
-				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/heap-arrays" SuppressStartupBanner="true" RealKIND="realKIND8"/>
-				<Tool Name="VFLinkerTool" AdditionalOptions="/STACK:100000000" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole" AdditionalDependencies="user32.lib gdi32.lib"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RealKIND="realKIND8"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/STACK:10000000000" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole" AdditionalDependencies="user32.lib gdi32.lib"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -52,8 +52,7 @@
 		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\examples\API_Example_Boundary_Value_Problem.f90"/></Filter>
 		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\sources\Boundary_value_problems.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\sources\Boundary_value_problems1D.f90"/>
-		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\sources\Boundary_value_problems2D.f90"/>
-		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\sources\Boundary_value_problems3D.f90"/></Filter>
+		<File RelativePath=".\sources\Numerical_Methods\Boundary_Value_Problem\sources\Boundary_value_problems2D.f90"/></Filter>
 		<Filter Name="Cauchy Problem">
 		<Filter Name="Examples">
 		<File RelativePath=".\sources\Numerical_Methods\Cauchy_Problem\examples\API_Example_Cauchy_Problem.f90"/>
@@ -91,25 +90,32 @@
 		<File RelativePath=".\sources\Numerical_Methods\Finite_Differences\sources\Non_uniform_grids.f90"/></Filter>
 		<Filter Name="IBVP_and_BVP">
 		<Filter Name="Examples">
-		<File RelativePath=".\sources\Numerical_Methods\IBVP_BVP\examples\API_Example_IBVP_and_BVP.f90"/></Filter>
+		<File RelativePath=".\sources\Numerical_Methods\IBVP_BVP\examples\API_Example_IBVP_and_BVP.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\IBVP_BVP\examples\Boundary_layer.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\IBVP_BVP\examples\Navier_Stokes_cavities.f90"/></Filter>
 		<File RelativePath=".\sources\Numerical_Methods\IBVP_BVP\sources\IBVP_and_BVPs.f90"/></Filter>
 		<Filter Name="Initial  Boundary Value Problem">
 		<Filter Name="examples">
-		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\API_Example_IBVP_Error.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\API_Example_IBVP_Chebyshev.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\API_Example_IBVP_Fourier.f90"/>
-		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\API_Example_Initial_Boundary_Value_problem.f90"/></Filter>
+		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\API_Example_Initial_Boundary_Value_problem.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\Burgers.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\examples\Special_IBVP.f90"/></Filter>
+		<Filter Name="Tools"/>
 		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\sources\Initial_Boundary_Value_Problem1D.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\sources\Initial_Boundary_Value_Problem2D.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Initial_Boundary_Value_Problem\sources\Initial_Boundary_Value_Problems.f90"/></Filter>
 		<Filter Name="Interpolation">
 		<Filter Name="Examples">
-		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Chebyshev_series.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Chebyshev_Fourier_interpolation.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Chebyshev_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Fourier_series.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Lagrange_Interpolation.f90"/></Filter>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Chebyshev_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Fourier_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Interpolation.f90"/>
-		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Lagrange_interpolation.f90"/></Filter>
+		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Lagrange_interpolation.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Legendre_points.f90"/></Filter>
 		<Filter Name="Numerical Recipes">
 		<File RelativePath=".\sources\Numerical_Methods\Numerical Recipes\other\nrtype.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Numerical Recipes\Numerical_Recipes.f90"/></Filter>
@@ -127,10 +133,12 @@
 		<File RelativePath=".\sources\Numerical_Methods\System_of_Equations\sources\Linearity.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\System_of_Equations\sources\Non_Linear_Systems.f90"/></Filter>
 		<Filter Name="Utilities">
-		<File RelativePath=".\sources\Numerical_Methods\Utilities\sources\show_orbits.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Utilities\sources\plots.f90"/>
+		<File RelativePath=".\sources\Numerical_Methods\Utilities\sources\show_orbits.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Utilities\sources\Utilities.f90"/></Filter>
 		<File RelativePath=".\.gitignore"/>
+		<File RelativePath=".\sources\Advanced_problems.f90"/>
 		<File RelativePath=".\sources\main_NumericalHUB.f90"/>
-		<File RelativePath=".\sources\my_examples.f90"/></Filter></Files>
+		<File RelativePath=".\sources\my_examples.f90"/>
+		<File RelativePath=".\sources\my_milestones.f90"/></Filter></Files>
 	<Globals/></VisualStudioProject>

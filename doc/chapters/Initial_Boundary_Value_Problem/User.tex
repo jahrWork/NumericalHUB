@@ -8,10 +8,11 @@
 In this chapter, several Initial  Boundary Value problems will be presented. 
 These problems can be divided into those purely diffusive are the heat equation and those purely convective as the wave equation. 
 In between,  there are convective and diffusive problems that are represented by the convective-diffusive equation.
-In the subroutine \verb|IBVP_examples|,  seven examples of these problems are implemented.
-The first problem is to obtain the solution of the one-dimensional heat equation. The second problem presents a two-dimensional solution of the heat equation with non-homogeneous boundary conditions. 
-The third problem and fourth problem are devoted to the advection-diffusion equation in 1D and 2D spaces. 
-The fifth problem and sixth problem integrate movement of reflecting waves in a 1D closed tube and   in a 2D quadrangular box. 
+In the subroutine \verb|IBVP_examples|,  different examples of these problems are implemented.
+%The first problem is to obtain the solution of the one-dimensional heat equation. The second problem presents a two-dimensional solution of 
+%%%the heat equation with non-homogeneous boundary conditions. 
+%The third problem and fourth problem are devoted to the advection-diffusion equation in 1D and 2D spaces. 
+%The fifth problem and sixth problem integrate movement of reflecting waves in a 1D closed tube and   in a 2D quadrangular box. 
 \vspace{0.2cm} 
 \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
          {subroutine IBVP_examples}
@@ -42,8 +43,6 @@ and the initial temperature profile is:
       \begin{equation*}      	
       u(x,0)=\exp(-25 x^2).
       \end{equation*}
-      
-      
 The implementation of the differential operator is done by means of the function \verb|Heat_equation1D|
       \vspace{0.2cm} 
       \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
@@ -84,16 +83,16 @@ In this section, the heat equation is integrated in a two-dimensional quadrangul
 This differential operator is implemented in \verb|Heat_equation2D|
 \vspace{0.2cm}
 \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
-{real function Heat_equation2D}
+{function Heat_equation2D}
 {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
 In this example, the influence of the non-homogeneous boundary conditions is taken into account by imposing the following temperatures at boundaries: 
     \begin{align*}      	
-        u(-1, y, t)=1, \quad u(+1, y, t)=0, \quad  u(x, -1, t)=0, \quad  u(x, +1, t)=0,
+        u(-1, y, t)=1, \quad u(+1, y, t)=0, \quad  u_y - 5 u|_{(x,-1,t)} = 0, \quad   u_y + 5 u| _{(x,1,t)} = 0,
       \end{align*}
 and zero temperature as an initial condition $ u(x,y,0) = 0$. 
 \vspace{0.2cm}  
 \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
-{real function Heat_BC2D}
+{function Heat_BC2D}
 {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
 The subroutine \verb|InitialValue_Boundary_Problem| uses these definitions to integrate the solution
 \vspace{0.2cm} 
@@ -130,18 +129,16 @@ As it was mentioned, extra boundary conditions are imposed to analyze their effe
        \begin{equation*}      	
        u(-1,t)=0, \quad u(1,t)=0.
        \end{equation*}
-The convective and diffusive eveloution is studied from the following initial condition:
+Together with the following initial condition:
        \begin{equation*}      	
        u(x,0)=\exp(-25 x^2).
        \end{equation*}
-       
-           
 The differential operator and the boundary equations are implemented in the following two subroutines: 
-\vspace{0.5cm} 
+\vspace{0.2cm} 
 \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
        {function Advection_equation1D}
        {end function}{API_Example_Initial_Boundary_Value_Problem.f90}
-\vspace{0.5cm} 
+\vspace{0.2cm} 
 \listings{\home/examples/API_Example_Initial_Boundary_Value_Problem.f90}
        {function Advection_BC1D}
        {end function}{API_Example_Initial_Boundary_Value_Problem.f90}

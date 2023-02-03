@@ -6,14 +6,15 @@ This library is intended to solve an interpolation problem.
 It comprises:  Lagrangian interpolation, Chebyshev interpolation and Fourier interpolation. 
 To accomplish this purpose, \verb|Interpolation| module uses three modules as it is shown in the following code: 
   
-\vspace{0.5cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+\vspace{0.1cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
   \listings{\home/sources/Interpolation.f90}
        {module Interpolation}
        {contains}{Interpolation.f90}
 \vspace{-0.3cm}       
-The  function \verb|Interpolated_value| interpolates the value of a function at a certain point taking into account values of that function at other points. The function \verb|Integral| computes the integral of a function in a certain interval
-and, finally, the function \verb|Interpolant|  calculates the interpolated values at different points.
+%The  function \verb|Interpolated_value| interpolates the value of a function at a certain point taking into account values of that function 
+%at other points. The function \verb|Integral| computes the integral of a function in a certain interval
+%and, finally, the function \verb|Interpolant|  calculates the interpolated values at different points.
 
 
 
@@ -26,22 +27,24 @@ and, finally, the function \verb|Interpolant|  calculates the interpolated value
 %****************************************************
 \subsection*{Interpolated value}
 
-The function \verb|interpolated_value| is devoted to conduct a piecewise polynomial interpolation of the value of a certain function $y(x)$ in $x=x_p$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes.
+The function \verb|interpolated_value| is devoted to conduct a piecewise polynomial interpolation 
+of the value of a certain function $f(x)$ in $x=x_p$. 
+The data provided to carry out the interpolation is the value of that function $f(x)$ in a set of nodes.
 
 \vspace{0.5cm}
 \begin{lstlisting}[frame=trBL]
-yp = interpolated_value( x, y, xp, degree )
+yp = Interpolated_value( x, f, xp, degree )
 \end{lstlisting}
 
 
 
 
 \btable
-				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				x & vector of reals & in & Points in which the value of the function $f(x)$ is provided.\\ \hline
 				
-				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				f & vector of reals & in & Values of the function $f(x)$ in the group of points denoted by $x$. \\ \hline
 				
-				xp & real & in & Point in which the value of the function $y$ will be interpolated. \\ \hline
+				xp & real & in & Point in which the value of the function $f$ will be interpolated. \\ \hline
 				
 				degree & integer & optional, in & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
 \etable{Description of \texttt{interpolated\_value} arguments}
@@ -56,11 +59,13 @@ yp = interpolated_value( x, y, xp, degree )
 %___________________________________________________________________
 \subsection*{Integral}
 \begin{lstlisting}[frame=trBL]
-I = Integral( x, y, degree )
+I = Integral( x, f, degree )
 \end{lstlisting}
 
 
-The function \verb|Integral| is devoted to conduct a piecewise polynomial integration of a certain function $y(x)$. The data provided to carry out the interpolation is the value of that function $y(x)$ in a group of nodes. The limits of the integral correspond to the minimum and maximum values of the nodes.
+The function \verb|Integral| is devoted to conduct a piecewise polynomial integration of a certain function $f(x)$. The data provided to 
+carry out the interpolation is the value of that function $f(x)$ in a group of nodes. The limits of the integral correspond to the minimum 
+and maximum values of the nodes.
 
 
 
@@ -69,22 +74,136 @@ The function \verb|Integral| is devoted to conduct a piecewise polynomial integr
 The arguments of the function are described in the following table.
 
 \btable	
-				x & vector of reals & in & Points in which the value of the function $y(x)$ is provided.\\ \hline
+				x & vector of reals & in & Points in which the value of the function $f(x)$ is provided.\\ \hline
 				
-				y & vector of reals & in & Values of the function $y(x)$ in the group of points denoted by $x$. \\ \hline
+				f & vector of reals & in & Values of the function $f(x)$ in the group of points denoted by $x$. \\ \hline
 				
 				degree & integer & in (optional) & Degree of the polynomial used in the interpolation. If it is not presented, it takes the value 2. \\ \hline
 				
 \etable{Description of \texttt{Integral} arguments}
 
 
+\newpage
+\subsection*{Interpolant for $\bold{x} \in \R{k} $ }
+Since the space domain $ \Omega \subset \R{k} $ with $ k=1,2,3$, 1D, 2D or 3D interpolants
+are calculated depending on the numerical problems. 
+To avoid  dealing with different names associated to different space dimensions, the subroutine 
+\verb|Interpolant| is overloaded with the following subroutines: 
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+    \listings{\home/sources/Interpolation.f90} 
+        {interface Interpolant}
+       {end interface}{Interpolation.f90}
+   
+
+
+
+%****************************************************
+\subsection*{Interpolant1D}
+
+The function \verb|Interpolant| builds a polynomial interpolation and its derivatives 
+by means of a given set of points  $(x_i, f_i) $.  
+The interpolant and its derivatives are evaluated at the set of points $ x_p $. 
+
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+Ip = Interpolant( x, f, xp, degree )
+\end{lstlisting}
+
+%The interface of the function is: 
+%\vspace{0.5cm}
+% \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+%  \listings{\home/sources/Interpolation.f90}
+%       {function Interpolant}
+%       {-1}{Interpolation.f90}
+The result \verb|Ip| is a matrix containing the interpolant and its derivatives evaluated 
+at the set of points $ x_p $. First index represents the derivative order 
+and the second index represents the point in which the interpolant is evaluated. 
+\btable
+				x & vector of reals & in & Points in which the value of the function $f(x)$ is provided.\\ \hline
+				
+				f & vector of reals & in & Values of the function $f(x)$ in the set of points denoted by $x$. \\ \hline
+				
+				xp & vector of reals & in & Points in which the interpolant and its derivatives are evaluated.   \\ \hline
+				
+				degree & integer & in & Degree of the polynomial used in the interpolation. \\ \hline
+\etable{Description of \texttt{Interpolant} arguments}
+
+
+\newpage
+%****************************************************
+\subsection*{Interpolant 2D}
+
+The function \verb|Interpolant| builds a polynomial interpolation 
+by means of a given set of points  $(x_i, y_j, f_{ij}) $.  
+The interpolant   are evaluated at the set of points $ (x_p, y_p) $. 
+
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+Ip = Interpolant( x, y, f, xp, yp, degree )
+\end{lstlisting}
+
+%The interface of the function is: 
+%\vspace{0.5cm}
+% \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+%  \listings{\home/sources/Interpolation.f90}
+%       {function Interpolant}
+%       {-1}{Interpolation.f90}
+The result is a tensor of rank 2 containing the interpolant  evaluated 
+at the set of points $ (x_p, y_p) $. First and second  indexes 
+represent the point $(x_p, y_p)$ in which the interpolant is evaluated. 
+
+\btable
+				x & vector of reals & in & Points in which the value of the function $f(x, y)$ is provided.\\ \hline
+				
+				y & vector of reals & in & Points in which the value of the function $f(x, y)$ is provided.\\ \hline
+				f & vector of reals & in & Values of the function $f(x,y)$ in the set of points $(x_i, y_j)$. \\ \hline
+				
+				xp & vector of reals & in & Points in which the interpolant is evaluated.   \\ \hline
+				yp & vector of reals & in & Points in which the interpolant is evaluated.   \\ \hline
+				
+				degree & integer & in & Degree of the polynomial used in the interpolation. \\ \hline
+\etable{Description of \texttt{Interpolant} arguments}
 
 
 
 
 
 
+\newpage
+%****************************************************
+\subsection*{Interpolant 3D}
 
+The function \verb|Interpolant| builds a polynomial interpolation 
+by means of a given set of points  $(x_i, y_j, z_k, f_{ijk}) $.  
+The interpolant are evaluated at the set of points $ (x_p, y_p, z_p) $. 
+
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+yp = Interpolant( x, y, z, f, xp, yp, zp, degree )
+\end{lstlisting}
+
+%The interface of the function is: 
+%\vspace{0.5cm}
+% \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+%  \listings{\home/sources/Interpolation.f90}
+%       {function Interpolant}
+%       {-1}{Interpolation.f90}
+The result is a matrix containing the interpolant evaluated 
+at the set of points $ (x_p, y_p, z_p) $. First index and second indexes 
+represent the point in which the interpolant is evaluated. 
+
+
+\btable
+	x & vector of reals & in & Interpolation  x--coordinate\\ \hline
+	y & vector of reals & in &Interpolation  y--coordinate\\ \hline
+	z & vector of reals & in &Interpolation  z--coordinate\\ \hline				
+	f & vector of reals & in & Values  $f(x_i,y_j,z_k)$. \\ \hline
+	xp & vector of reals & in & Points in which the interpolant is evaluated.   \\ \hline
+	yp & vector of reals & in & Points in which the interpolant is evaluated.   \\ \hline
+	zp & vector of reals & in & Points in which the interpolant is evaluated.   \\ \hline
+	degree & integer & in & Degree of the polynomial used in the interpolation. \\ \hline
+\etable{Description of \texttt{Interpolant} arguments}
 
 
 
@@ -99,7 +218,7 @@ The Lagrange  interpolation module is devoted to determine Lagrange interpolants
 To accomplish this purpose, \verb|Lagrange_interpolation| module comprises the two following functions: 
   
 \vspace{0.5cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
   \listings{\home/sources/Lagrange_interpolation.f90}
        {module Lagrange_interpolation}
        {contains}{Lagrange_interpolation.f90}
@@ -116,7 +235,7 @@ yp =  Lagrange_polynomials( x, xp )
 \end{lstlisting}
 The interface of the function is: 
 \vspace{0.5cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
   \listings{\home/sources/Lagrange_interpolation.f90}
        {pure function Lagrange_polynomials}
        {-1}{Lagrange_interpolation.f90}
@@ -140,7 +259,7 @@ yp =  Lebesgue_functions( x, xp )
 \end{lstlisting}
 The interface of the function is: 
 \vspace{0.5cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Interpolation}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
   \listings{\home/sources/Lagrange_interpolation.f90}
        {pure function Lebesgue_functions}
        {-1}{Lagrange_interpolation.f90}
@@ -148,14 +267,40 @@ The result is a matrix containing the Lebesgue function:
 $$
     \lambda(x) = |\ell_0(x)|  + |\ell_1(x)| + \hdots+ |\ell_N(x)|  
 $$
-and their derivatives $\lambda^{(i)}(xp_j)$ (first index of the array) calculated at different points point $xp_j$.       
+and their derivatives $\lambda^{(i)}(xp_j)$ (first index of the array) calculated at different points $xp_j$.       
 The integral of the Lebesgue function is represented  by the first index with value equal to -1. The index 0 means the value of the 
 Lebesgue function and an index $k$  greater than 0 represents the  "$k$-th" derivative of the Lebesgue function. The second index of the array 
 takes into account different components of  \verb|xp|. 
 
 
 
+\subsection{Error polynomial} 
+Given a set of of nodal or interpolation points \verb|x|, 
+the function \verb|PI_Error_polynomial| computes the truncation error polynomial 
+$$
+    \pi_{N+1}(x) = |x-x_0| \ |x-x_1| \ \hdots \ |x-x_N|  
+$$
+and its derivatives at different points  \verb|xp|. 
+The following sentence determines the error polynomial and its derivatives: 
+\vspace{0.5cm}
+\begin{lstlisting}[frame=trBL]
+yp =  PI_error_polynomial( x, xp )  
+\end{lstlisting}
+\newpage
+The interface of the function is: 
+\vspace{0.5cm}
+ \renewcommand{\home}{./sources/Numerical_Methods/Interpolation}
+  \listings{\home/sources/Lagrange_interpolation.f90}
+       {function PI_error_polynomial}
+       {-1}{Lagrange_interpolation.f90}
+The result is a matrix containing the error polynomial
+and its derivatives of $\pi_{N+1}$ 
+calculated at different points \verb|xp|.  
+The first index of the array is used to hold the value of the derivatives if the error polynomial 
+(0 for the value and values greatr than zero for high order derivatives).
+The second index takes into account different components of  \verb|xp|.  
 
+ 
 
 
 

@@ -6,6 +6,7 @@ use Initial_Boundary_Value_Problems
 use Collocation_methods
 use Temporal_Schemes
 use plots 
+use Utilities
 implicit none 
 
 
@@ -21,10 +22,10 @@ end subroutine
 !********************************************************************************************
 subroutine Fourier_Burgers_equation_1D
 
-       integer, parameter :: Nx = 64 !255 ! 
+       integer, parameter :: Nx = 64, Nv = 1 !255 ! 
        integer, parameter ::  Nt = 2000
        real ::  x(0:Nx-1)
-       real :: Time(0:Nt), U(0:Nt,0:Nx-1)  
+       real :: Time(0:Nt), U(0:Nt,0:Nx-1, Nv)  
        
        real, parameter :: PI = 4 * atan(1.) 
        real ::  x0 = 0, xf = 2*PI*Nx/(Nx-1), t0 = 0, tf =  4
@@ -44,7 +45,7 @@ subroutine Fourier_Burgers_equation_1D
   ! call Grid_Initialization( "nonuniform", "x", x, q )
     call Grid_Initialization( "Fourier", "x", x )
        
-     U(0, :)  =  sin(x) 
+     U(0, :, 1)  =  sin(x) 
     
      call Initial_Boundary_Value_Problem(                              & 
                        Time_Domain = Time, x_nodes = x,                & 
@@ -52,20 +53,21 @@ subroutine Fourier_Burgers_equation_1D
                        Boundary_conditions   =  Burgers_BC1D,             & 
                        Solution = U ) 
      
-     call plot_parametrics(x, transpose(U(0:Nt:Nt/Nl,:)), legends(1:Nl), "$x$", "$u(x,t)$") 
+     call plot_parametrics(x, transpose(U(0:Nt:Nt/Nl,:,1)), legends(1:Nl), "$x$", "$u(x,t)$") 
            
 contains 
 
-real function Burgers_equation1D( x, t, u, ux, uxx) result(F)
-          real, intent(in) ::  x, t, u, ux, uxx
+function Burgers_equation1D( x, t, u, ux, uxx) result(F)
+          real, intent(in) ::  x, t, u(:), ux(:), uxx(:)
+          real :: F( size(u) ) 
             
          F =   -u * ux  + 0.03*  uxx
-    !     F =   - ux  
            
 end function 
 !-------------------------------------------------------
-real function Burgers_BC1D(x, t, u, ux) result(BC) 
-    real, intent(in) :: x, t, u, ux 
+function Burgers_BC1D(x, t, u, ux) result(BC) 
+    real, intent(in) :: x, t, u(:), ux(:) 
+    real :: BC( size(u) ) 
   
          ! No need to impose BCs. They are periodic.
            BC = 0 
@@ -75,23 +77,14 @@ end function
 end subroutine 
 
 
-character(len=5) function float_to_str(x) result(c) 
-      real, intent(in) :: x
-
-    write(c,'(f5.1)')  x
-    
-end function
-
-
-
 
 
 
 !*************************************************************************
 subroutine Fourier_Advection_diffusion_2D
 
-      integer, parameter :: Nx = 32, Ny = 32, Nt = 100
-      real :: x(0:Nx-1), y(0:Ny-1), Time(0:Nt), U(0:Nt, 0:Nx-1, 0:Ny-1) 
+      integer, parameter :: Nx = 32, Ny = 32, Nv =1, Nt = 100
+      real :: x(0:Nx-1), y(0:Ny-1), Time(0:Nt), U(0:Nt, 0:Nx-1, 0:Ny-1, 1:Nv) 
        
        real, parameter :: PI = 4 * atan(1.) 
        real :: x0 = 0, xf = Nx/real(Nx-1), y0 = 0, yf = Ny/real(Ny-1)
@@ -109,8 +102,8 @@ subroutine Fourier_Advection_diffusion_2D
      call Grid_Initialization( "Fourier", "x", x )
      call Grid_Initialization( "Fourier", "y", y )
   
-    U(0, :, :) = Tensor_product( exp(-200*(x-0.5)**2), exp(-200*(y-0.5)**2) ) 
-    call plot_contour(x, y, U(0,:,:), "x","y", levels, graph_type ="isolines") 
+    U(0, :, :, 1) = Tensor_product( exp(-200*(x-0.5)**2), exp(-200*(y-0.5)**2) ) 
+    call plot_contour(x, y, U(0,:,:, 1), "x","y", levels, graph_type ="isolines") 
  !  stop 
  
 !    Advection diffusion 2D      
@@ -123,26 +116,27 @@ subroutine Fourier_Advection_diffusion_2D
      !stop 
      
      do i=0, Nt, Nt/10 + 1 
-       call plot_contour(x, y, U(i,:,:), "x","y", levels, graph_type ="isolines") 
+       call plot_contour(x, y, U(i,:,:,1), "x","y", levels, graph_type ="isolines") 
      end do
      
 contains
 !----------------------------------------------------
 function Advection_equation2D(x, y, t, U, Ux, Uy, Uxx, Uyy, Uxy) result(F) 
-           real,intent(in) :: x, y, t, U, Ux, Uy, Uxx, Uyy, Uxy
-           real :: F 
+           real,intent(in) :: x, y, t, U(:), Ux(:), Uy(:), Uxx(:), Uyy(:), Uxy(:)
+           real :: F(size(U)) 
         
         real :: nu = 0.02
 
-        F = - Ux - Uy  ! +  nu * ( Uxx + Uyy )
+        F(1) = - Ux(1) - Uy(1)  ! +  nu * ( Uxx + Uyy )
        
 
 end function
 !-------------------------------------------------------
-real function Advection_BC2D( x, y, t, U, Ux, Uy ) result (BC) 
-          real, intent(in) :: x, y, t, U, Ux, Uy
+function Advection_BC2D( x, y, t, U, Ux, Uy ) result (BC) 
+          real, intent(in) :: x, y, t, U(:), Ux(:), Uy(:)
+          real :: BC( size(U) ) 
 
-          ! No need to immpodr BCs. They are periodic 
+          ! No need to impose BCs. They are periodic 
             BC =  0                       
      
 end function

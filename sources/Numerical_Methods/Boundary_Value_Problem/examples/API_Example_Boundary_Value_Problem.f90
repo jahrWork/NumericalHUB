@@ -1,21 +1,19 @@
 module API_Example_Boundary_Value_Problem
 
     use Boundary_value_problems 
-    !use Finite_differences
     use Collocation_methods 
     use Non_Linear_Systems
     use plots
     use Stability
     
     implicit none
-    
            
-interface  
-    function FunctionRN_RN(x) result(F) 
-      real, intent(in) :: x(:) 
-      real :: F( size(x) ) 
-     end function 
-end interface  
+!interface  
+!    function FunctionRN_RN(x) result(F) 
+!      real, intent(in) :: x(:) 
+!      real :: F( size(x) ) 
+!     end function 
+!end interface  
 
 contains  
   
@@ -32,8 +30,8 @@ end subroutine
 
 subroutine Legendre_1D
 
-    integer, parameter :: N = 40, q = 6  
-    real :: x(0:N), U(0:N,1), Error(0:N,1) 
+    integer, parameter :: N = 40, q = 6, Nv = 1  
+    real :: x(0:N), U(0:N,Nv), Error(0:N,1) 
     real :: x0 = -1 , xf = 1
     integer :: i
     character(len=100) :: path(2) = [   & 
@@ -48,10 +46,10 @@ subroutine Legendre_1D
     call Grid_Initialization( grid_spacing = "nonuniform", &
                               direction = "x",   q = q, nodes = x )
 !   Legendre solution   
-    call Boundary_Value_Problem( x_nodes = x,                         & 
+    call Boundary_Value_Problem( x = x,                                & 
                                  Differential_operator = Legendre,     & 
                                  Boundary_conditions   = Legendre_BCs, & 
-                                 Solution = U(:,1) )
+                                 Solution = U )
     
     Error(:,1) = U(:,1) - ( 231 * x**6 - 315 * x**4 + 105 * x**2 - 5 )/16.
     
@@ -61,8 +59,9 @@ contains
 
 
 !****** Differential operator *********
-real function Legendre(x, y, yx, yxx) result(L)
-   real, intent(in) :: x, y, yx, yxx   
+function Legendre(x, y, yx, yxx) result(L)
+   real, intent(in) :: x, y(:), yx(:), yxx(:)   
+   real :: L(size(y)) 
    
     integer :: n = 6
         
@@ -71,8 +70,9 @@ real function Legendre(x, y, yx, yxx) result(L)
 end function 
     
 !********* Boundary conditions *********
-real function Legendre_BCs(x, y, yx) result(BCs)
-           real, intent(in) :: x, y, yx            
+function Legendre_BCs(x, y, yx) result(BCs)
+           real, intent(in) :: x, y(:), yx(:)   
+           real :: BCs(size(y))
 
         if (x==x0 .or. x==xf ) then
                            BCs = y - 1 
@@ -84,49 +84,6 @@ end function
 
 end subroutine 
 
-subroutine Test_BVP1D
-
-    integer, parameter :: N = 20, q = 6  
-    real :: x(0:N), U(0:N,1), Error(0:N,1) 
-    real :: x0 = -1 , xf = 1
-    integer :: i
-    
-    x(0) = x0; x(N) = xf  
-    call Grid_Initialization( grid_spacing = "nonuniform", &
-                              direction = "x",   q = q, nodes = x )
-!
-    call Boundary_Value_Problem( x_nodes = x,                         & 
-                                 Differential_operator = test,     & 
-                                 Boundary_conditions   = test_BCs, & 
-                                 Solution = U(:,1) )
-    
-    call plot_parametrics(x, U(:,1:1), ["y"], "$x$", "$y$" )
-contains 
-
-
-!****** Differential operator *********
-real function test(x, y, yx, yxx) result(L)
-   real, intent(in) :: x, y, yx, yxx   
-   
-       L =  yxx - 1
-           
-end function 
-    
-!********* Boundary conditions *********
-real function test_BCs(x, y, yx) result(BCs)
-           real, intent(in) :: x, y, yx            
-
-        if (x==x0 ) then
-                           BCs = yx 
-        else  if (x==xf ) then
-                           BCs = y - 1                   
-        else 
-            write(*,*) " Error BCs x=", x; stop  
-        endif            
-                 
-end function  
-
-end subroutine 
 
 
 
@@ -148,7 +105,7 @@ subroutine Elastic_beam_1D
                               direction = "x",   q = q, nodes = x )
     
 !   Legendre solution  
-    call Boundary_Value_Problem( x_nodes = x,                         & 
+    call Boundary_Value_Problem( x = x,                         & 
                                  Differential_operator = Beam_equations, & 
                                  Boundary_conditions   = Beam_BCs, & 
                                  Solution = U  ) !, Solver = Itera )
@@ -197,12 +154,12 @@ end subroutine
 
 subroutine Poisson_2D
 
-    integer, parameter :: Nx = 30, Ny = 30, q = 11 ! mesh grid and order
-    real :: x(0:Nx), y(0:Ny), U(0:Nx, 0:Ny)        ! grid and solution 
-    integer :: i, j 
+    integer, parameter :: Nx = 30, Ny = 30, Nv = 1 ! mesh grid and order
+    real :: x(0:Nx), y(0:Ny), U(0:Nx, 0:Ny, Nv)    ! grid and solution 
+    integer :: i, j, q = 11 
     real :: a=0, b=1, Umax, Umin
     integer, parameter :: Nl = 19                  ! number of isolines  
-    real ::  levels(0:Nl)  = 0                      ! value of isolines 
+    real ::  levels(0:Nl)  = 0                     ! value of isolines 
     character(len=100) :: path(2) = [   & 
            "./doc/chapters/Boundary_Value_Problem/figures/Poissona", &
            "./doc/chapters/Boundary_Value_Problem/figures/Poissonb"  ]
@@ -214,33 +171,30 @@ subroutine Poisson_2D
     call Grid_Initialization( "nonuniform", "y",  y, q )
 
 !   Poisson equation     
-    call Boundary_Value_Problem( x_nodes = x, y_nodes = y,               & 
-                                 Differential_operator = Poisson,        & 
-                                 Boundary_conditions = PBCs, Solution = U) 
+    call Boundary_Value_Problem( x, y, Poisson, PBCs,  U) 
     
     
-    call plot_contour(x, y, U, "$x$", "$y$",              & 
+    call plot_contour(x, y, U(:,:,1), "$x$", "$y$",              & 
                       levels, "(b)", path(2), "isolines" ) 
     do i=0, Nx; do j=0, Ny; 
-        U(i,j) = source( x(i), y(j) ) 
+        U(i,j,1) = source( x(i), y(j) ) 
     end do; end do 
-    call plot_contour(x, y, U, "$x$", "$y$", levels, "(a)", path = path(1), graph_type = "isolines" ) 
+    call plot_contour(x, y, U(:,:,1), "$x$", "$y$", levels, "(a)", path = path(1), graph_type = "isolines" ) 
     
 
 contains
-    
-
-!********* Function *********
-real function Poisson(x, y, u, ux, uy, uxx, uyy, uxy) result(L) 
-  real, intent(in) :: x, y, u, ux, uy, uxx, uyy, uxy
+ 
+function Poisson(x, y, u, ux, uy, uxx, uyy, uxy) result(L) 
+  real, intent(in) :: x, y, u(:), ux(:), uy(:), uxx(:), uyy(:), uxy(:)
+  real :: L( size(u) ) 
         
          L =  uxx + uyy - source(x,y)
        
 end function
 
-!********* Boundary conditions *********
-real function PBCs(x, y, u, ux, uy) result(BCs)
-real, intent(in) :: x, y, u, ux, uy
+function PBCs(x, y, u, ux, uy) result(BCs)
+  real, intent(in) :: x, y, u(:), ux(:), uy(:)
+  real :: BCS(size(u)) 
 
         if ( x==a .or. x==b .or. y==a .or. y==b ) then
                                                  BCs = u
@@ -250,7 +204,7 @@ real, intent(in) :: x, y, u, ux, uy
 
 end function
 
-!************** source term *********
+
 real function source(x, y)
     real, intent(in) :: x, y
         
@@ -288,10 +242,7 @@ subroutine Elastic_Plate_2D
     call Grid_Initialization( "nonuniform", "x", x, q )
     call Grid_Initialization( "nonuniform", "y", y, q ) 
     
-    call Boundary_Value_Problem( x_nodes = x, y_nodes = y,             & 
-                                 Differential_operator = Elastic_Plate,& 
-                                 Boundary_conditions = Plate_BCs,      &
-                                 Solution = U )
+    call Boundary_Value_Problem( x, y, Elastic_Plate, Plate_BCs,  U )
     
     do i=0, Nx; do j=0, Ny; f(i,j) = load(x(i), y(j)); enddo; enddo  
     call plot_contour( x, y, f, "$x$", "$y$", levels,                   &
@@ -372,10 +323,8 @@ subroutine Elastic_Nonlinear_Plate_2D
      call Grid_Initialization( "nonuniform", "y", y, q )
    
 !   Elastic nonlinear plate    
-    call Boundary_Value_Problem( x_nodes = x, y_nodes = y,             & 
-                                 Differential_operator = NL_Plate,     & 
-                                 Boundary_conditions   = NL_Plate_BCs, & 
-                                 Solution = U )
+    U = 0.0 
+    call Boundary_Value_Problem( x, y, NL_Plate, NL_Plate_BCs, U )
     
     call plot_contour( x, y, U(:,:,1), "$x$", "$y$", levels,    & 
                        legends(1), path(1), "isolines" )
@@ -386,7 +335,6 @@ subroutine Elastic_Nonlinear_Plate_2D
 contains
 
 
-!****** Function *********
 function NL_Plate(x, y, u, ux, uy, uxx, uyy, uxy) result(L)
   real, intent(in) :: x, y, u(:), ux(:), uy(:), uxx(:), uyy(:), uxy(:)
   real :: L(size(u))
@@ -432,6 +380,9 @@ function NL_Plate_BCs(x, y, u, ux, uy) result(BCs)
     end function
 
 end subroutine 
+
+
+
 
 
 
@@ -481,24 +432,26 @@ end subroutine
 
 subroutine BVP1D
 
-    integer, parameter :: N = 40, q = 6  
-    real :: x(0:N), U(0:N), x0 = -1 , xf = 1
+    integer, parameter :: N = 40, q = 6, Nv = 1  
+    real :: x(0:N), U(0:N, Nv), x0 = -1 , xf = 1
    
     x(0) = x0; x(N) = xf  
     call Grid_Initialization( "nonuniform","x", x, q )
     call Boundary_Value_Problem( x, L, BCs, U )
-    call qplot(x, U, N+1) 
+    call qplot(x, U(:,1), N+1) 
 contains 
 
-real function L(x, u, ux, uxx) 
-   real, intent(in) :: x, u, ux, uxx   
+function L(x, u, ux, uxx) 
+   real, intent(in) :: x, u(:), ux(:), uxx(:)  
+   real :: L(size(u)) 
       
     L =  uxx  + sin(6*u) 
        
 end function 
 
-real function BCs(x, u, ux) 
-  real, intent(in) :: x, u, ux            
+function BCs(x, u, ux) 
+  real, intent(in) :: x, u(:), ux(:)
+  real :: BCs(size(u))
 
         if (x==x0) then 
                     BCs = u - 1 
