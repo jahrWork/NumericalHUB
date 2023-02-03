@@ -6,6 +6,7 @@ module API_Example_Cauchy_Problem
     use Temporal_error 
     use Stability
     use plots 
+    use MUSE_orbits
       
     implicit none
     
@@ -34,11 +35,11 @@ end subroutine
 !  Advanced numerical methods 
 !***********************************
 subroutine Advanced_Cauchy_problem_examples
-  integer :: option = 1 
-
+  integer :: option
+  
+  option = 1
   do while (option>0) 
-     write(*,*) "Advanced methods" 
-     write(*,*) " select an option " 
+     write(*,*) "Advanced methods, select an option: " 
      write(*,*) " 0. Exit/quit  "
      write(*,*) " 1. Van del Pol system " 
      write(*,*) " 2. Henon Heiles system "
@@ -48,6 +49,7 @@ subroutine Advanced_Cauchy_problem_examples
      write(*,*) " 6. Arenstorf orbit (GBS methods, Wrapper ODEX)"
      write(*,*) " 7. Arenstorf orbit (ABM methods, Wrapper ODE113)"
      write(*,*) " 8. Computational effort Runge-Kutta methods" 
+     write(*,*) " 9. Orbits and numerical methods (Master MUSE)  "
      read(*,*) option 
      select case(option)
       case(1)  
@@ -67,6 +69,8 @@ subroutine Advanced_Cauchy_problem_examples
              call ABM_and_wrapper_ODE113
       case(8) 
              call Temporal_effort_with_tolerance_eRK
+      case(9) 
+             call Orbits_and_Numerical_Methods         
       case default
      end select 
   end do
@@ -89,8 +93,6 @@ subroutine First_order_ODE
                           Differential_operator = F1, Solution = U ) 
     
     write(*,*) "Solution of du/dt - 2 u"     
-    write(*,*)  "press enter "  
-    read(*,*)
     call plot_parametrics(Time, U, ["Solution of du/dt-2u"], "time", "u") 
   
 contains
@@ -115,7 +117,7 @@ subroutine Linear_Spring
     integer, parameter :: N = 100   !Time steps
     real :: t0 = 0, tf = 4, Time(0:N), U(0:N, 2)
 
-    Time = [ (t0 + (tf -t0 ) * i / (1d0 * N), i=0, N ) ]
+    Time = [ (t0 + (tf -t0 )*i/real(N), i=0, N ) ]
     U(0,:) = [ 5, 0] 
     call Cauchy_ProblemS( Time_Domain = Time ,                     & 
                           Differential_operator = F_spring,        & 
@@ -123,7 +125,6 @@ subroutine Linear_Spring
    
     write (*, *) 'Solution of the Cauchy problem:  ' 
     write (*, *) ' d2u/dt2 = -3 t u, u(0) = 5, du(0)/dt = 0' 
-    write(*,*) "press enter ";  read(*,*)
     call plot_parametrics(Time, U, ["Sd2u/dt2 = -3 t  u"], "time", "u") 
   
 contains
@@ -161,8 +162,7 @@ subroutine Lorenz_Attractor
                           Solution = U, Scheme = Runge_Kutta4 )
     
     
-    write (*, *) 'Solution of the Lorenz attractor  '     
-    write(*,*) "press enter " ; read(*,*) 
+    write (*, *) 'Solution of the Lorenz attractor  '   
     call plot_parametrics(U(:,1),U(:,2:2), ["Lorenz attractor"],"x","y")
        
 contains
@@ -206,7 +206,6 @@ subroutine Stability_regions_RK2_RK4
    x = [ ( x0 + dx * i  , i=0,N )]
    y = [ ( y0 + dy * j  , j=0,N )]
    write (*, *) "Region of absolute stability: Runge kutta 2, 4"  
-   write(*,*) "press enter "; read(*,*)
    
    levels = [ ( j/real(N_levels)  , j=0, N_levels )]
    do j=1, 2  
@@ -246,9 +245,7 @@ subroutine Error_solution
     integer :: i
     
     write(*,*) "Error determination by Richardson extrapolation"   
-    write(*,*) "Temporal scheme : Rk2 "   
-    write(*,*) "press enter " 
-    read(*,*)
+    write(*,*) "Temporal scheme : Rk2 "  
     
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     Solution(0,:) = [3, 4]   !Initial conditions for VanDerpol equation 
@@ -292,8 +289,6 @@ subroutine Convergence_rate_RK2_RK4
     
     write(*,*) "Convergence rate: Error versus number of time steps"  
     write(*,*) "Temporal scheme : Rk2, Rk4 "   
-    write(*,*) "press enter " 
-    read(*,*)
     
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U0=[3, 4]             !Initial conditions for van der pol
@@ -389,8 +384,6 @@ subroutine Variable_step_with_Predictor_Corrector
     write(*,*) "Oscillator integrated with:"
     write(*,*) "  1) variable step Predictor-Corrector"  
     write(*,*) "  2) constant step Runge-Kutta 2"  
-    write(*,*) "press enter " 
-    read(*,*)
    
     call Cauchy_ProblemS( Time_Domain = Time,  Differential_operator = F,& 
                           Solution = U, Scheme = Predictor_Corrector1 )  
@@ -437,8 +430,6 @@ subroutine Variable_step_simulation
     
     write(*,*) "Comparison constant step and variable step"   
     write(*,*) "Temporal scheme : Runge Kutta 2 order "   
-    write(*,*) "press enter " 
-    read(*,*)
     
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     do j=1, Np 
@@ -486,8 +477,6 @@ subroutine Convergence_rate_Runge_Kutta_wrappers
     
     write(*,*) "Convergence rate: Error versus number of time steps"   
     write(*,*) "Temporal scheme : DOPRI5, DOP853  "  
-    write(*,*) "press enter " 
-    read(*,*)
     
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]
     U0=[3, 4]       
@@ -599,8 +588,7 @@ subroutine GBS_and_wrapper_ODEX
                                         "./doc/chapters/Cauchy_problem/figures/GBSb"  ] 
        
      write (*, *) 'Arenstorf orbit  '     
-     write (*, *) 'GBS and ODEX (press enter) ' 
-     read(*,*)
+     write (*, *) 'GBS and ODEX  ' 
      
      do j=1, Np 
        U(0,:,j) = [0.994, 0., 0., -2.0015851063790825 ] 
@@ -693,8 +681,7 @@ subroutine ABM_and_wrapper_ODE113
                                         "./doc/chapters/Cauchy_problem/figures/ABMb"  ] 
        
      write (*, *) 'Arenstorf orbit '     
-     write (*, *) 'ABM and ODE113 (press enter) ' 
-     read(*,*)
+     write (*, *) 'ABM and ODE113  ' 
     
      do j=1, Np 
        U(0,:,j) = [0.994, 0., 0., -2.0015851063790825 ] 
@@ -749,7 +736,6 @@ subroutine Temporal_effort_with_tolerance_eRK
     
     write(*,*) "Convergence rate: Error versus tolerance "   
     write(*,*) "Temporal schemes :  Embedded Runge Kutta "  
-    write(*,*)  "press enter "; read(*,*) 
     
     U0 = [3, 4]
     Time = [ (t0 + (tf -t0 ) * i / real(N), i=0, N ) ]

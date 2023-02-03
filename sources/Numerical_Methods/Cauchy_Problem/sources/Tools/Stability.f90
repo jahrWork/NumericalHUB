@@ -4,24 +4,14 @@ module Stability
    use ODE_Interface
    implicit none
 
-   
-abstract interface 
-
- function F_R_RN(N, t) 
-         integer, intent(in) :: N 
-         real, intent(in) ::  t 
-         real :: F_R_RN(N) 
-      
- end function 
-
-end interface 
-   
-   
+private 
+public ::  System_matrix, &     ! A = dF/dU (u0, t0) 
+           Eigenvalues_Jacobian ! for the Cauchy problem dU/dt = F(U,t) 
    
 contains
 
 !***********************************************************************
-!*  If gives the linearized operator F(U,t) in some point U0 
+!*  It gives the linearized operator F(U,t) in some point U0 
 !***********************************************************************
 function System_matrix( F, U0, t ) result(A)
              procedure (ODES) :: F 
@@ -46,7 +36,10 @@ function System_matrix( F, U0, t ) result(A)
 end function  
         
 
-
+!***************************************************************************
+! Given the Cauchy problem dU/dt = F(u,t), U(t0) = U0, 
+! it gives the eigenvalues of dF/dU( U0, t0)  
+!***************************************************************************
 function Eigenvalues_Jacobian( Differential_operator, U0, t0) result(lambda)
             procedure (ODES) :: Differential_operator 
             real, intent(in)  :: U0(:), t0  
@@ -65,6 +58,9 @@ function Eigenvalues_Jacobian( Differential_operator, U0, t0) result(lambda)
           
              
 end function 
+
+
+
                             
 end module 
 

@@ -14,15 +14,24 @@ module Initial_Boundary_Value_Problems
  implicit none 
  private
  public :: Initial_Boundary_Value_Problem, & 
-           Spatial_discretization
+           Spatial_discretization,         &
+           Spatial_truncation_error,       & 
+           Linear_operator
 
  interface  Initial_Boundary_Value_Problem
-    module procedure IBVP1D, IBVP1D_system, IBVP2D, IBVP2D_system
+    module procedure IBVP1DS, IBVP2DS 
  end interface
  
  interface  Spatial_discretization
-   module procedure Spatial_discretization1D, Spatial_discretization1D_system, & 
-                    Spatial_discretization2D, Spatial_discretization2D_system
+    module procedure Spatial_discretization1DS, Spatial_discretization2DS
  end interface
-
+ 
+ interface  Spatial_truncation_error
+    module procedure Spatial_truncation_error1DS, Spatial_truncation_error2DS
+ end interface
+ 
+ interface  Linear_operator
+    module procedure Linear_operator1DS, Linear_operator2DS  
+ end interface
+ 
 end module 

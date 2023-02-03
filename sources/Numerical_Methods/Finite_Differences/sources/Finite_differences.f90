@@ -4,15 +4,6 @@ module Finite_differences
 
   implicit none 
  
-  
-  !interface Derivative
-  !    module procedure FD_Derivative3D, FD_Derivative2D, FD_Derivative1D
-  !end interface 
-  
-  !interface FD_Derivative
-  !    module procedure FD_Derivative3D, FD_Derivative2D, FD_Derivative1D
-  !end interface 
- 
  
   type Grid
  
@@ -20,10 +11,10 @@ module Finite_differences
     real, allocatable :: Derivatives( :, :, :)
     integer :: N
     real, allocatable :: nodes(:) 
+    integer :: Order 
     
   end type 
- 
-  integer, save :: Order
+  
   integer, parameter :: Nmax = 20 
   type (Grid), save :: Grids(1:Nmax)
   integer, save :: ind = 0
@@ -42,22 +33,24 @@ module Finite_differences
 ! Authors : Juan A Hernandez (juanantonio.hernandez@upm.es)  
 !           Pablo Sierra Heras (pablo.sierra@hotmail.com)
 !***********************************************************************************
-subroutine FD_Grid_Initialization( grid_spacing , direction, nodes, q ) 
-
-          character(len=*),  intent(in) :: grid_spacing, direction 
-          integer, intent(in) ::  q
-          real, intent(inout) :: nodes(:)
+subroutine FD_Grid_Initialization( grid_spacing, direction, nodes, q ) 
+  character(len=*),  intent(in) :: grid_spacing, direction 
+  integer, intent(in) ::  q
+  real, intent(inout) :: nodes(:)
           
-          integer d, df
-                 
-     Order = q 
+  integer d, df
      
-     if (grid_spacing == "uniform") then 
+     if (grid_spacing == "unmodified" ) then      
          
+     elseif (grid_spacing == "uniform" .or. q <=2) then 
                 call  Uniform_grid( nodes ) 
                 
      elseif  (grid_spacing == "nonuniform") then
-                call  Non_uniform_grid( nodes, Order )
+                call  Non_uniform_grid( nodes, q )
+      
+     else 
+            write(*,*) " ERROR: grid_spacing:", grid_spacing
+            stop 
      endif 
          
      d = 0  
@@ -68,29 +61,31 @@ subroutine FD_Grid_Initialization( grid_spacing , direction, nodes, q )
        ind = ind + 1                
        Grids(ind) % N = size(nodes) - 1
        Grids(ind) % name = direction
+       Grids(ind) % Order = q
       
        allocate(Grids(ind)%nodes(0:Grids(ind) % N ))      
-       allocate(Grids(ind)%Derivatives(-1:Order, 0:Order, 0:Grids(ind)%N)) 
+       allocate(Grids(ind)%Derivatives(-1:q, 0:q, 0:Grids(ind)%N)) 
      
        Grids(ind) % nodes = nodes
      
-       call High_order_derivatives( Grids(ind) % nodes, Order,  & 
+       call High_order_derivatives( Grids(ind) % nodes, q,  & 
                                     Grids(ind) % Derivatives    )   
        write(*,*) " Grid name = ", Grids(ind) % name 
      
      elseif (d > 0) then
      
+       Grids(d) % Order = q
        Grids(d) % N = size(nodes) - 1
        Grids(d) % name = direction
        
        deallocate(Grids(d) % nodes, Grids(d) % Derivatives)
      
        allocate(Grids(d) % nodes(0:Grids(d) % N ))      
-       allocate(Grids(d) % Derivatives(-1:Order, 0:Order, 0:Grids(d)%N)) 
+       allocate(Grids(d) % Derivatives(-1:q, 0:q, 0:Grids(d)%N)) 
      
        Grids(d) % nodes = nodes
      
-       call High_order_derivatives( Grids(d) % nodes, Order,  & 
+       call High_order_derivatives( Grids(d) % nodes, q,  & 
                                     Grids(d) % Derivatives    ) 
      endif
 end subroutine 
@@ -143,6 +138,7 @@ subroutine FD_Derivative3D( direction, coordinate, derivative_order, W, Wxi )
     integer :: i, j, k, d1=0, d2=0, d3=0, Nx, Ny, Nz 
     integer, allocatable :: sx(:), sy(:), sz(:)
     integer :: m 
+    integer :: Orderx, Ordery, Orderz 
    
     d1 = findloc( Grids(:) % name, direction(1), dim=1   ) 
     d2 = findloc( Grids(:) % name, direction(2), dim=1   ) 
@@ -153,10 +149,14 @@ subroutine FD_Derivative3D( direction, coordinate, derivative_order, W, Wxi )
     Nx = Grids(d1) % N 
     Ny = Grids(d2) % N
     Nz = Grids(d2) % N  
+    Orderx = Grids(d1) % Order 
+    Ordery = Grids(d2) % Order 
+    Orderz = Grids(d3) % Order 
+   
     
-    sx = Stencilv( Order, Nx ) 
-    sy = Stencilv( Order, Ny ) 
-    sz = Stencilv( Order, Nz ) 
+    sx = Stencilv( Orderx, Nx ) 
+    sy = Stencilv( Ordery, Ny ) 
+    sz = Stencilv( Orderz, Nz ) 
    
     do i=0, Nx
       do j=0, Ny  
@@ -164,18 +164,18 @@ subroutine FD_Derivative3D( direction, coordinate, derivative_order, W, Wxi )
 
           if     (coordinate == 1) then 
                 
-           Wxi(i,j,k) = dot_product( Grids(d1) % Derivatives(m, 0:Order, i), &
-                                      W(sx(i):sx(i)+Order, j, k) );
+           Wxi(i,j,k) = dot_product( Grids(d1) % Derivatives(m, 0:Orderx, i), &
+                                      W(sx(i):sx(i)+Orderx, j, k) );
 
           elseif (coordinate == 2) then 
                  
-           Wxi(i,j,k)  = dot_product( Grids(d2) % Derivatives(m, 0:Order, j), &
-                                           W(i, sy(j):sy(j)+Order, k) );
+           Wxi(i,j,k)  = dot_product( Grids(d2) % Derivatives(m, 0:Ordery, j), &
+                                           W(i, sy(j):sy(j)+Ordery, k) );
                                   
           elseif (coordinate == 3) then 
                 
-           Wxi(i,j,k) = dot_product( Grids(d3) % Derivatives(m, 0:Order, k), &
-                                           W(i, j, sz(k):sz(k)+Order) );                          
+           Wxi(i,j,k) = dot_product( Grids(d3) % Derivatives(m, 0:Orderz, k), &
+                                           W(i, j, sz(k):sz(k)+Orderz) );                          
           else
           
            write(*,*) " Error Derivative3D"
@@ -219,46 +219,43 @@ subroutine FD_Derivative2D( direction, coordinate, derivative_order, W, Wxi )
     integer :: i, j, d1, d2, Nx, Ny
     integer, allocatable :: sx(:), sy(:)
     integer :: k 
+    integer :: Orderx, Ordery
 
-    d1 = 0  ;   d1 = findloc( Grids(:) % name, direction(1), dim=1 )
-    d2 = 0  ;   d2 = findloc( Grids(:) % name, direction(2), dim=1 )
+d1 = 0  ;   d1 = findloc( Grids(:) % name, direction(1), dim=1 )
+d2 = 0  ;   d2 = findloc( Grids(:) % name, direction(2), dim=1 )
   
-    k = derivative_order
+k = derivative_order
     
  if (d1 > 0 .and. d2 > 0) then
- Nx = Grids(d1) % N
- Ny = Grids(d2) % N
- allocate( sx(0:Nx), sy(0:Ny) ) 
- sx = Stencilv( Order, Nx ) 
- sy = Stencilv( Order, Ny ) 
-   
-   do i=0, Nx
-      do j=0, Ny 
-
+   Nx = Grids(d1) % N; Ny = Grids(d2) % N
+   Orderx = Grids(d1) % Order;  Ordery = Grids(d2) % Order 
+   allocate( sx(0:Nx), sy(0:Ny) ) 
+   sx = Stencilv( Orderx, Nx ); sy = Stencilv( Ordery, Ny ) 
+    
+   do i=0, Nx; do j=0, Ny 
+       
         if     (coordinate == 1) then 
             
-         Wxi(i,j) = dot_product( Grids(d1) % Derivatives(k, 0:Order, i), & 
-                                 W(sx(i):sx(i)+Order, j) );
+         Wxi(i,j) = dot_product( Grids(d1) % Derivatives(k, 0:Orderx, i), & 
+                                 W(sx(i):sx(i)+Orderx, j) );
 
         elseif (coordinate == 2) then 
             
-         Wxi(i,j) = dot_product( Grids(d2) % Derivatives(k, 0:Order, j), &
-                                 W(i, sy(j):sy(j)+Order) );
+         Wxi(i,j) = dot_product( Grids(d2) % Derivatives(k, 0:Ordery, j), &
+                                 W(i, sy(j):sy(j)+Ordery) );
         else
                 write(*,*) " Error Derivative"
                 stop   
-        endif   
-       
-      enddo 
-   enddo 
+        endif  
+   enddo; enddo
    deallocate( sx, sy ) 
    
-   else
+else
         write(*,*) " Error Derivative2D"
         write(*,*) "Grids =", Grids(:)% name, "direction =", direction 
         write(*,*) "d1 =", d1, "d2 =", d2
         stop 
-   end if  
+end if  
 end subroutine
 
 
@@ -275,7 +272,8 @@ subroutine FD_Derivative1D( direction, derivative_order, W, Wxi, j )
    
     integer :: i, d, N, i1, i2  
     integer, allocatable :: sx(:)
-    integer :: k 
+    integer :: k, Orderx  
+    
 
     d = 0    
     d = findloc( Grids(:) % name, direction, dim=1   )
@@ -284,24 +282,63 @@ subroutine FD_Derivative1D( direction, derivative_order, W, Wxi, j )
     if (d > 0) then
         
         N = Grids(d) % N
+        Orderx = Grids(d) % Order
         allocate ( sx(0:N) )
-        sx = Stencilv( Order, N )   
+        sx = Stencilv( Orderx, N )   
         
         if (present(j)) then 
                       i1 = j; i2 = j 
         else 
                       i1 = 0; i2 = N 
-        end if 
+        end if  
         do i= i1,  i2 
             
-            Wxi(i)=dot_product( Grids(d) % Derivatives(k, 0:Order, i), & 
-                                W(sx(i):sx(i)+Order) )
+            Wxi(i)=dot_product( Grids(d) % Derivatives(k, 0:Orderx, i), & 
+                                W(sx(i):sx(i)+Orderx) )
         enddo 
-        
-       deallocate( sx ) 
-       
+        deallocate( sx ) 
     else
-        write(*,*) " Error Derivative1D"; stop 
+        write(*,*) " Error Derivative1D direction =", direction; stop 
+    endif 
+
+end subroutine
+
+
+
+!****************************************************************************************
+!* Derivative 1D
+!****************************************************************************************
+subroutine FiniteD_Derivative1D( direction, derivative_order, W, Wxi) 
+
+   character(len=*), intent(in) :: direction
+   integer, intent(in) :: derivative_order 
+   real, intent(in) ::   W(0:)
+   real, intent(out)::   Wxi(0:)
+   
+    integer :: i, d, N  
+    integer, allocatable :: sx(:)
+    integer :: k, Orderx  
+    
+
+    d = 0    
+    d = findloc( Grids(:) % name, direction, dim=1   )
+    k = derivative_order
+    
+    if (d > 0) then
+        
+        N = Grids(d) % N
+        Orderx = Grids(d) % Order
+        allocate ( sx(0:N) )
+        sx = Stencilv( Orderx, N )   
+        
+        do i= 0, N 
+            
+            Wxi(i)=dot_product( Grids(d) % Derivatives(k, 0:Orderx, i), & 
+                                W(sx(i):sx(i)+Orderx) )
+        enddo 
+        deallocate( sx ) 
+    else
+        write(*,*) " Error Derivative1D direction =", direction; stop 
     endif 
 
 end subroutine

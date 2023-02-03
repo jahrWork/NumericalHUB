@@ -3,7 +3,7 @@
         title style={at={(0.5,-0.45)},anchor=south}, title={(a)},
         xlabel={ $x$ },
         ylabel={ $y$ },
-        {}, legend style={font=\small},  {no marks, legend columns = 1 } ]
+        {}, legend style={font=\small},  {mark repeat =  9, cycle list name = black white, legend columns = 1 }, legend pos = north east  ]
         \foreach \x/\y in { 0/1,2/3,4/5}
         \addplot table [skip first n=2, x index=\x, y index=\y]{./results/myexampleCa.plt   };
         \legend{ $\sin x$, $\cos x$, $\sin 2x$ }

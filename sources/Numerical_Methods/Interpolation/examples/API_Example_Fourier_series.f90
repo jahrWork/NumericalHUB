@@ -5,6 +5,7 @@ module API_Example_Fourier_series
     use Linear_systems
     use plots 
     use API_Example_IBVP_Fourier
+    use Utilities
     
     implicit none
     real :: PI = 4 * atan(1d0)
@@ -15,9 +16,9 @@ module API_Example_Fourier_series
    
  subroutine Fourier_problems 
  
-  integer :: option = 1
+  integer :: option
     
-    
+  option = 1  
   do while (option>0) 
   write(*,*) " Enter example to execute " 
   write(*,*) " 0. Exit  "
@@ -512,6 +513,49 @@ function derivative_a( x,  U) result(dU)
 end function 
 
 
+
+
+!*****************************************************************************************
+! Fast Fourier Transform of a real 1D function 
+!*****************************************************************************************
+subroutine  FFT_example
+
+
+  integer, parameter :: N = 256 
+  complex :: u(0:N-1) 
+  
+
+  integer :: i
+  real :: k(0:N/2-1), ck(0:N/2-1)  
+  real :: x(0:N-1) 
+  
+  x = [ ( 2*PI*i/N, i=0, N-1 ) ]  
+  u =  cos(x) ! + sin (4 * x ) 
+    
+   call FFT( N, u )
+  
+   do i=0, N-1 
+    write(*,*) " k = ", u(i)
+   end do 
+  
+   
+   u =  conjg(u)  / N    ! (Duhamel et al., 1988)
+  
+  call FFT(N, u)  
+  u = conjg( u)  
+  
+  do i=0, N-1 
+    write(*,*) " i = ", i,  u(i)
+   end do 
+  
+  call scrmod("reverse")
+  write (*, '(A40)') 'Reconstructed FFT from its harmonics ' 
+  write(*,*) "press enter " 
+  read(*,*)
+  call qplot( x, real(u), N )
+    
+  
+end subroutine
 
 
 

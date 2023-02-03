@@ -175,31 +175,97 @@
 %%    caption =\detokenize{\lstname}
 %}
 
- \lstset{ 
-     language=Fortran, % choose the language of the code
-    % basicstyle=\footnotesize\ttfamily,
-    % keywordstyle=\color{black}\textit, % style for keywords
-     basicstyle=\footnotesize\ttfamily,
-     keywordstyle=\normalsize\bfseries,%\textit, %%
-     numbers=none, % where to put the line-numbers
-     numberstyle=\tiny, % the size of the fonts that are used for the line-numbers     
-     backgroundcolor=\color{gray!2},
-     showspaces=false, % show spaces adding particular underscores
-     showstringspaces=false, % underline spaces within strings
-     showtabs=false, % show tabs within strings adding particular underscores
-     frame=single, % adds a frame around the code
-     tabsize=2, % sets default tabsize to 2 spaces
-     rulesepcolor=\color{gray},
-     stringstyle=\color{gray},     % string literal style
-     captionpos=b, % sets the caption-position to bottom
-     breaklines=true, % sets automatic line breaking
-     breakatwhitespace=false, 
-     commentstyle=\color{gray!50},
-     numberstyle = \color{black},
-     frame=trBL,
-     morekeywords={procedure, findloc}
- }
+% \lstset{ 
+%     language=Fortran, % choose the language of the code
+%    % basicstyle=\footnotesize\ttfamily,
+%    % keywordstyle=\color{black}\textit, % style for keywords
+%     basicstyle=\footnotesize\ttfamily,
+%     keywordstyle=\normalsize\bfseries,%\textit, %%
+%     numbers=none, % where to put the line-numbers
+%     numberstyle=\tiny, % the size of the fonts that are used for the line-numbers     
+%     backgroundcolor=\color{gray!2},
+%     showspaces=false, % show spaces adding particular underscores
+%     showstringspaces=false, % underline spaces within strings
+%     showtabs=false, % show tabs within strings adding particular underscores
+%     frame=single, % adds a frame around the code
+%     tabsize=2, % sets default tabsize to 2 spaces
+%     rulesepcolor=\color{gray},
+%     stringstyle=\color{gray},     % string literal style
+%     captionpos=b, % sets the caption-position to bottom
+%     breaklines=true, % sets automatic line breaking
+%     breakatwhitespace=false, 
+%     commentstyle=\color{gray!50},
+%     numberstyle = \color{black},
+%     frame=trBL,
+%     morekeywords={procedure, findloc}
+% }
 \newcommand\mycap[1]{ \texttt{ \detokenize{#1} }  }
 
 
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+%
+%
+% \lstset{ 
+%     language=Fortran, % choose the language of the code
+%    % basicstyle=\footnotesize\ttfamily,
+%   %  keywordstyle=\color{black}\textit, % style for keywords
+%     basicstyle=\footnotesize\ttfamily,
+%     keywordstyle=\color{blue}\normalsize\bfseries,%\textit, %%
+%     numbers=none, % where to put the line-numbers
+%     numberstyle=\tiny, % the size of the fonts that are used for the line-numbers     
+%     backgroundcolor=\color{blue!1},
+%     showspaces=false, % show spaces adding particular underscores
+%     showstringspaces=false, % underline spaces within strings
+%     showtabs=false, % show tabs within strings adding particular underscores
+%     frame=single, % adds a frame around the code
+%     rulecolor=\color{black},
+%     tabsize=2, % sets default tabsize to 2 spaces
+%     rulesepcolor=\color{blue},
+%     stringstyle=\color{orange},     % string literal style
+%     captionpos=b, % sets the caption-position to bottom
+%     breaklines=true, % sets automatic line breaking
+%     breakatwhitespace=false, 
+%     commentstyle=\color{codegreen},
+%     numberstyle = \color{black},
+%     frame=trBL,
+%     morekeywords={procedure, findloc}
+% }
+
+
+ \lstset{ 
+     language=Fortran, % choose the language of the code
+    % basicstyle=\footnotesize\ttfamily,
+   %  keywordstyle=\color{black}\textit, % style for keywords
+     basicstyle=\footnotesize\ttfamily,
+     keywordstyle=\color{blue}\normalsize\bfseries,%\textit, %%
+     numbers=none, % where to put the line-numbers
+     numberstyle=\tiny, % the size of the fonts that are used for the line-numbers     
+     backgroundcolor=\color{blue!1},
+  %   backgroundcolor=\color{blue!5!white},
+     showspaces=false, % show spaces adding particular underscores
+     showstringspaces=false, % underline spaces within strings
+     showtabs=false, % show tabs within strings adding particular underscores
+     frame=single, % adds a frame around the code
+  %   rulecolor=\color{black},
+     rulecolor=\color{Blue!75!black},
+     tabsize=2, % sets default tabsize to 2 spaces
+  %   rulesepcolor=\color{blue},
+     rulesepcolor=\color{Blue!75!black},
+     stringstyle=\color{orange},     % string literal style
+     captionpos=b, % sets the caption-position to bottom
+     breaklines=true, % sets automatic line breaking
+     breakatwhitespace=false, 
+     commentstyle=\color{codegreen},
+     numberstyle = \color{black},
+     frame=trBL,
+     morekeywords={procedure, findloc}
+ }
+

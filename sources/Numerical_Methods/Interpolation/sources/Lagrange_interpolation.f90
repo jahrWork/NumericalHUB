@@ -3,8 +3,8 @@ module Lagrange_interpolation
 implicit none 
 public ::               & 
   Lagrange_polynomials, & ! Lagrange polynomial at xp from (x_i, y_i)
-  Lebesgue_functions      ! Lebesgue function at xp from x_i    
-         
+  Lebesgue_functions,   & ! Lebesgue function at xp from x_i   
+  PI_error_polynomial     ! pi error polynomial at xp from x_i 
 
 contains 
 
@@ -222,11 +222,9 @@ end function
 !
 !       Outputs: 
 !               PI_error_polynomial(k,i)
-!                    k = -1 means integral value of lagrange_j{N+1} (x) from xj to xp (xj  nearest node from xp)
-!                    k =  0 means value of lagrange_j{N+1} (x) at xp 
-!                    k > 1    means derivative value of lagrange_j{N+1} (x) at xp 
-!
-!                    i: index of the xp point where error polynomial is evaluated 
+!               k =  0 means value of pi{N+1} (x) at xp_i 
+!               k > 1 means derivative value of pi{N+1} (x) at xp_i 
+!               i: index of the xp point where error polynomial is evaluated 
 !
 ! Author : Juan A Hernandez (juanantonio.hernandez@upm.es) 
 !*****************************************************************************************************************************************
@@ -240,14 +238,8 @@ function PI_error_polynomial( x, xp )
     N = size(x) - 1 
     M = size(xp) - 1  
     
-    
     do i=0, M  
          PI_error_polynomial(:, i) =  abs( Lagrange_error_polynomial( x, xp(i) ) ) 
-         !write(*,*) " xp = ", xp(i) 
-         ! write(*,*) " x = ", x
-         !write(*,*) " PI = ", PI_error_polynomial(0,i)
-         !stop 
-         !read(*,*) 
     end do 
  
   

@@ -152,28 +152,22 @@ With these different levels of abstraction, modern Fortran programming becomes r
  Initial boundary value problems can be expressed in spatial domains   $\Omega \subset \mathbb{ R}^p$ with $ d=1, 2, 3 $. 
  From the conceptual point of view, there is no difference in the algorithm explained before. However, from the implementation point of view, 
  tensor variables are of order $p+1$ which makes the implementation slightly different. To make a user friendly interface for the user, the initial boundary value problem has been overloaded. It means that the subroutine to solve the boundary value problem is named \verb|Initial_Boundary_Value_Problem| for all values of $ d $ and for different number of variables of $ \vect{u} $.  
- The overloading is implemented in the following code, 
- 
-  \vspace{0.5cm} 
+ The overloading is shown in the following code, 
+  \vspace{0.2cm} 
         \listings{\home/sources/Initial_Boundary_Value_problems.f90}
         {module Initial_Boundary_Value_Problems}
         {end interface}{Initial_Boundary_value_problems.f90}
-        
-        
  For example, if a scalar 2D problem is solved, the software recognizes automatically associated to the interface  of $  \vect{\mathcal{L}} (\vect{x}, t, \vect{u}(\vect{x})) $ and $  \vect{h} (\vect{x},t, \vect{u}(\vect{x})) $. If the given interface of $ \vect{\mathcal{L}} $ and $ \vect{h}$ does not match the implemented existing interfaces, the compiler will complain saying that this problem is not implemented. 
  As an example, the following code shows the interface of 1D and 2D differential operators $ \vect{\mathcal{L}} $
-  \vspace{0.5cm} 
+  \vspace{0.2cm} 
         \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
-        {real function DifferentialOperator1D}
+        {function DifferentialOperator1DS}
         {end function}{Initial_Boundary_Value_Problem1D.f90}
-  
         \listings{\home/sources/Initial_Boundary_value_problem2D.f90}
-        {real function DifferentialOperator2D}
+        {function DifferentialOperator2DS}
         {end function}{Initial_Boundary_value_problem2D.f90}
  
- 
-  
-       
+    
    
        
      
@@ -192,7 +186,7 @@ For the sake of simplicity,  only the 1D problem is shown.
    \vspace{-0.5cm}
 The function   \verb|Spatial_discretization1D|  calculates the spatial discretization: 
          \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
-         {Check if}{enddo}{Initial_Boundary_Value_Problem1D.f90}      
+         {It solves}{enddo}{Initial_Boundary_Value_Problem1D.f90}      
         
 \newpage  
  In order to speed up the calculation, the subroutine \verb|Dependencies_IBVP_1D| checks if the differential operator
@@ -206,7 +200,7 @@ The function   \verb|Spatial_discretization1D|  calculates the spatial discretiz
 % \newpage 
          \vspace{0.1cm} 
                  \listings{\home/sources/Initial_Boundary_Value_Problem1D.f90}
-                 {subroutine Boundary_points}
+                 {subroutine Determine_boundary_points}
                  {contains}{Initial_Boundary_Value_Problem1D.f90}
  As it was mentioned, the algorithm to solve a IBVP has to deal with differential-algebraic equations. Hence, any time the vector function is evaluated by the temporal scheme, boundary values are determined by solving a linear or nonlinear system of equations involving the unknowns at the boundaries. Once these values are known, the inner components of $ F (U) $ are evaluated. 
  

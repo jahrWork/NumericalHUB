@@ -20,6 +20,8 @@ module Fourier_interpolation
      Fourier_Grid_Initialization 
  
  
+ public ::  DFT
+ 
   real, save :: x0, xf, y0, yf, z0, zf ! independent domain 
   real, save :: fx = 1, fy = 1, fz = 1 ! dimension factor for derivatives 
  
@@ -176,13 +178,13 @@ function Spectral_derivative1D(N, C, k) result(DC)
 end function 
 
 !******************************************************************************
-! Derivative1D by means of a Fourier expansions 
+! Derivative1D by means of a Fourier expansion 
 ! 
 !  I(x) = sum_m( c_m exp(  I m x  ) ) 
 !
 ! Algorithm : 
 !            1) given a set of colloction points    U = [ u_0, .... u_{n-1} ]
-!            2) obtain its Fourier cofficients  C_k k=-n/2... N/2-1  
+!            2) obtain its Fourier coefficients  C_k k=-n/2... N/2-1  
 !            3) derive in the spectral plane: new coefficients: (I m)**k c_m 
 !            4) transform to the physical space 
 !   
@@ -382,6 +384,8 @@ subroutine Fourier_Grid_Initialization( direction, nodes )
        
   real :: a , b;  
   integer :: N, i
+  write(*,*) " Fourier Direction =", direction
+  write(*,*) " nodes =", size(nodes) 
 
    N = size(nodes) 
    
@@ -395,7 +399,7 @@ subroutine Fourier_Grid_Initialization( direction, nodes )
        
     elseif (direction == "z") then 
        z0 = nodes(0); zf = nodes(N-1) * N / real(N-1) 
-       fx = 2 * PI / ( zf - z0 ) 
+       fz = 2 * PI / ( zf - z0 ) 
        
     else 
         write(*,*) "ERROR: Fourier_Grid_Initialization "

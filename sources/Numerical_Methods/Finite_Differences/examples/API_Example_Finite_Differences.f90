@@ -1,7 +1,6 @@
 module API_Example_Finite_Differences
-
    
-    !use Finite_differences
+    use Utilities
     use Collocation_methods 
     use Non_Linear_Systems
     use Linear_systems
@@ -46,8 +45,7 @@ subroutine Derivative_function_x
     
     write (*, *) 'Finite differences formulas: 4th order ' 
     write (*, *) 'First and second derivative of sin pi x  ' 
-    write(*,*) "press enter ";   read(*,*)
-   
+       
     call plot_parametrics(x, Uxk, ["ux", "uxx"], "x", "y")  
      
 
@@ -87,7 +85,6 @@ subroutine Derivative_function_xy
     write (*, *) '2D Finite differences formulas: 6th order ' 
     write (*, *) 'Second partial derivative with respect x' 
     write (*, *) 'of  u(x,y) = sin pi x sin pi y  '
-    write(*,*) "press enter ";  read(*,*) 
    
     call plot_contour(x, y, uxx, "x", "y" )
     
@@ -144,7 +141,6 @@ subroutine Derivative_error
  call scrmod("reverse")
  write(*,*) "Second derivative error versus spatial step for q=2,4,6,8 " 
  write(*,*) " Test function:  f(x) = cos pi x  " 
- write(*,*) "press enter " ; read(*,*)
  
  call plot_parametrics( log_dx, log_Error, ["E2", "E4", "E6", "E8"], & 
                        "log_dx","log_Error")

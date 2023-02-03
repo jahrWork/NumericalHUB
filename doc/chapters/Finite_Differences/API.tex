@@ -17,7 +17,7 @@ Hence, given a set of nodals or interpolation points, the coefficients for diffe
 \vspace{0.1cm}
  %\renewcommand{\home}{../libraries/Numerical_Methods/Finite_Differences}
 %  \listings{\home/sources/Finite_differences.f90}
- \renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+ \renewcommand{\home}{./sources/Numerical_Methods/Collocation_methods}
    \listings{\home/Collocation_methods.f90} 
        {module Collocation_methods}
        {Derivative}{Collocation_methods.f90}
@@ -85,7 +85,7 @@ are calculated depending on the numerical problems.
 To avoid  dealing with different names associated to different space dimensions, the subroutine 
 \verb|Derivative| is overloaded with the following subroutines: 
 \vspace{0.5cm}
- \renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+ \renewcommand{\home}{./sources/Numerical_Methods/Collocation_methods}
     \listings{\home/Collocation_methods.f90} 
         {interface Derivative}
        {end interface}{Collocation_methods.f90}
@@ -109,14 +109,13 @@ Wxi & vector of reals & out &  Value of the $k$-th derivate at the same nodal va
 \verb|Wxi(0:N)|.\\ \hline
 j & integer, optional & in &  Index in which the derivative is calculated.\\ \hline
 \etable{Description of \texttt{Derivative} arguments for 1D grids}
-
 If the \verb|j| argument is present then, only the derivative is calculated at $ x_j $. 
-Otherwise, derivatives are calculated at every grid point form $ x_0 $ to $ x_N $. 
+If this argument is not present, derivatives are calculated at every grid point form $ x_0 $ to $ x_N $. 
 
 \newpage
 To explain how the \verb|Collocation_methods| module works, 
 the following snippet is shown:
-\renewcommand{\home}{../libraries/Numerical_Methods/Collocation_methods}
+\renewcommand{\home}{./sources/Numerical_Methods/Collocation_methods}
     \listings{\home/Collocation_methods.f90} 
         {subroutine Derivative1D}
        {end subroutine}{Collocation_methods.f90}

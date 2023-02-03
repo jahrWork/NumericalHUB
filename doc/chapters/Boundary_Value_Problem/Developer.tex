@@ -173,11 +173,11 @@ For example, if a scalar 2D problem is solved, the software recognizes automatic
 As an example, the following code shows the interface of 1D and 2D differential operators $ \vect{\mathcal{L}} $
  \vspace{0.2cm} 
        \listings{\home/sources/Boundary_value_problems1D.f90}
-       {real function DifferentialOperator1D}
+       {function DifferentialOperator1DS}
        {end function}{Boundary_value_problems1D.f90}
  
        \listings{\home/sources/Boundary_value_problems2D.f90}
-       {real function DifferentialOperator2D}
+       {function DifferentialOperator2DS}
        {end function}{Boundary_value_problems2D.f90}
 
 
@@ -236,13 +236,13 @@ Since any available and validated \verb|Solver| can be used,  no further explana
 
 
 \newpage 
-The function  \verb|BVP_discretization| is implemented by the following code: 
+The function  \verb|Space_discretization| is implemented by the following code: 
  \vspace{0.2cm} 
-             \listings{\home/sources/Boundary_value_problems1D.f90}
-             {function BVP_discretization}
-             {end function}{Boundary_value_problems1D.f90}
+%             \listings{\home/sources/Boundary_value_problems1D.f90}
+%             {function Space_discretization}
+%             {end function}{Boundary_value_problems1D.f90}
 \listings{\home/sources/Boundary_value_problems1D.f90}
-{subroutine FD_Equations}
+{function Difference_equations}
 {contains}{Boundary_value_problems1D.f90}
 First, the subroutine calculates only the derivatives appearing in the problem. Second, the boundary conditions at $ x_0 $ and 
 $x_N $ are analyzed. If there is no imposed boundary condition (\verb|C == FREE_BOUNDARY_CONDITION|), the corresponding equation is taken 
@@ -254,7 +254,7 @@ points $ x_1, \ldots, x_{n-1}. $
 %solution of the boundary value problem. 
 \vspace{0.2cm} 
 \listings{\home/sources/Boundary_value_problems1D.f90}
-{C == FREE}
+{== FREE}
 {end if}{Boundary_value_problems1D.f90}
 
  

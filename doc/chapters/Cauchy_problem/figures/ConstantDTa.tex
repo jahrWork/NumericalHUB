@@ -3,7 +3,7 @@
         title style={at={(0.5,-0.45)},anchor=south}, title={(a)},
         xlabel={ $t$ },
         ylabel={ $x$ },
-        {}, legend style={font=\small},  {mark repeat = 14, cycle list name = black white, legend columns = 1 }, legend pos = south west  ]
+        {}, legend style={font=\small},  {mark repeat = 14, cycle list name = black white, legend columns = 1 }, legend pos = north east  ]
         \foreach \x/\y in { 0/1,2/3}
         \addplot table [skip first n=2, x index=\x, y index=\y]{./doc/chapters/Cauchy_problem/figures/ConstantDTa.plt   };
         \legend{ const $\Delta t $, var $\Delta t $ }

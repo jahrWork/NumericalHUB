@@ -72,11 +72,7 @@ contains
        real, intent(out) ::  U2(:)
        integer, intent(out) :: ierr 
   
-          real :: t, dt 
-               
-       dt = t2 - t1
-       t = t1 
-       U2 = U1 + dt * F(U1, t) 
+       U2 = U1 + (t2 - t1) * F(U1, t1) 
        ierr = 0    
  
  end subroutine 
@@ -96,16 +92,16 @@ subroutine Inverse_Euler(F, t1, t2, U1, U2, ierr )
        
     ! Try to find a zero of the residual of the inverse Euler  
       call Newtonc( F = Residual_IE, x0 = U2 )
-              
+                
       ierr = 0
 contains 
 
 function Residual_IE(X) result(G) 
-         real, target :: X(:), G(size(X))
+         real, target :: X(:)
+         real :: G(size(X))
       
       G = X - U1 - dt * F(X, t2) 
-      
-      where (F(X, t2)==ZERO) G = 0 
+      where (F(X, t2)==IMPOSE_ZERO) G = 0 
       
 end function 
 end subroutine 
@@ -134,26 +130,26 @@ subroutine Crank_Nicolson(F, t1, t2, U1, U2, ierr )
       U2 = U1 
         
       call Newtonc( F = Residual_CN, x0 = U2 )
-      
-      
+     
 
   contains 
 !---------------------------------------------------------------------------
 !  Residual of the Crank Nicolson scheme 
 !---------------------------------------------------------------------------
-function Residual_CN(Z) result(G)
-         real, target :: Z(:)
-         real :: G(size(Z)) 
+function Residual_CN(X) result(G)
+         real, target :: X(:)
+         real :: G(size(X)) 
        
-         real :: Fc(size(Z)) 
+         real :: Fc(size(X)) 
          
-         Fc = F(Z, t2) 
+         Fc = F(X, t2) 
          
-         G = Z - dt/2 *  Fc - a 
+         G = X - dt/2 *  Fc - a 
          
-         where (Fc==ZERO) G = 0 
+         where (Fc==IMPOSE_ZERO) G = 0 
    
 end function 
+
 
 end subroutine   
   

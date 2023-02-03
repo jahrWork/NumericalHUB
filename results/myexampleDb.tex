@@ -1,10 +1,10 @@
   \begin{tikzpicture}[]
      \begin{axis}[ height = \textwidth, width = \textwidth,
         title style={at={(0.5,-0.4)}, yshift=-0.05}, title={(b)},
-        xlabel={ x },
-        ylabel={ y },
+        xlabel={ x },    xmin=    0.00, xmax =    6.28,
+        xlabel={ y },    ymin=    0.00, ymax =    6.28,
          view={0}{90}, colormap/blackwhite ]
-  \addplot3[contour gnuplot = { levels={  -1.0, -0.8, -0.6, -0.4, -0.2,  0.0,  0.2,  0.4,  0.6,  0.8,  1.0 }},
+  \addplot3[contour/labels=false, contour gnuplot = { levels={   -1.00,  -0.93,  -0.86,  -0.79,  -0.72,  -0.66,  -0.59,  -0.52,  -0.45,  -0.38,  -0.31,  -0.24,  -0.17,  -0.10,  -0.03,   0.03,   0.10,   0.17,   0.24,   0.31,   0.38,   0.45,   0.52,   0.59,   0.66,   0.72,   0.79,   0.86,   0.93,   1.00 }},
             mesh/ordering = y varies,
             mesh/rows =   21,
             mesh/cols =   21

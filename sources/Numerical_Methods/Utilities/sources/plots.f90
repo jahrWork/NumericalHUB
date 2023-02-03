@@ -14,11 +14,12 @@ interface plot
 end interface
 
 private 
-public :: plot_parametrics, plot_contour
-public :: open_unit_file, ini_dislin, plot  
+public :: plot, plot_parametrics, plot_contour
+public :: open_unit_file, ini_dislin, float_to_str
+public :: plot_legends, plot_title, dislin_ini 
 
 
-    contains
+contains
     
 !************************************************************************************** 
 !  It plots y-x graph for different parametrics
@@ -44,7 +45,7 @@ subroutine plot_parametrics2(x, y, legends, x_label, y_label, title, path, graph
    character(len=*), intent(in) :: legends(:), x_label, y_label
    character(len=*), optional, intent(in) :: title, path, graph_type  
    
-     character(len=3000) :: cbuf 
+   !  character(len=3000) :: cbuf 
      real :: xmin, xmax, ymin, ymax 
      integer :: M, Np, j   
      character(len=20) :: gtype
@@ -83,19 +84,11 @@ subroutine plot_parametrics2(x, y, legends, x_label, y_label, title, path, graph
            call curve( x(:, j), y(:,j), M ) 
     end do 
     
-    call color("white")
-    call legini(cbuf, Np, 30)
-    call legclr
+    call plot_legends(legends)
     
- 
-    do j=1, Np 
-          call leglin(cbuf, legends(j), j)
-    end do 
+    if (present(title)) call plot_title([title,""]) 
     
-    call legpos(750, 160)
-    call legend(cbuf, Np)
-    call height(25) 
-    
+      
     call disfin 
 
 
@@ -585,12 +578,12 @@ end subroutine
 !  If legend contains "time"  plots y(:,i) parmetrics are space 
 !****************************************************************
 subroutine  plotn(x, y, legend) 
-     real, intent(in) :: x(0:), y(0:,0:)
-     character(len=*), intent(in) :: legend 
+     real, intent(in) :: x(0:), y(:,0:) 
+     character(len=*), optional, intent(in) :: legend 
 
     real :: xmin, xmax, ymin, ymax
-    integer :: Nx, Nt, i, j  
-    Nx = size(y,dim=2)-1; Nt = size(y,dim=1)-1;
+    integer :: Nx, Np, i, j  
+    Nx = size(y,dim=2)-1; Np = size(y,dim=1);
      
     xmin = minval(x); xmax = maxval(x) 
     ymax = maxval(y); ymin = minval(y) 
@@ -599,31 +592,34 @@ subroutine  plotn(x, y, legend)
    
     call page(4000, 4000)
     call disini 
+    call winfnt("Courier New Bold")
     call texmod("on") 
-    call labdig(-2, "y");
-    call labdig(-2, "x");
+    call labels("fexp", "x")
+    call labels("fexp", "y")
+    !call labdig(-2, "y");
+    !call labdig(-2, "x");
     call height(46)
     call hname(60)
-    if ( index(legend,"time")>0 )   call name("$t$", "x" )
-    if ( index(legend,"space")>0 )  call name("$x$", "x" )
     call graf(xmin, xmax, xmin, (xmax-xmin)/5,  & 
               ymin, ymax, ymin, (ymax-ymin)/5 )
    
+    if (present(legend)) then 
+    !  call height(60)
+      call height(46)
+      call titlin(legend, 1)
+      call title
+    end if 
     
-    call titlin(legend, 1)
-    write(*,*) " index =",  index(legend,"time")
     
-    if ( index(legend,"time")>0 ) then 
-        write(*,*) legend
-         do i=0, Nx   
-           call curve(x, y(:, i), Nt+1)
-         end do 
-    elseif (index(legend,"space")>0 ) then 
-       do i=0, Nt, 20  
-         call curve(x, y(i, :), Nx+1)
-       end do 
-      end if 
-       
+    do i=1, Np 
+       call incmrk(-1);  call marker(21);call color("red"); 
+       call curve( x, y(i,:), Nx+1)
+       call incmrk(0);  ;call color("white"); 
+       call curve( x, y(i,:), Nx+1) 
+    end do 
+    
+   ! call height(60)
+    call height(46)
     call title
     call disfin 
 
@@ -647,9 +643,12 @@ subroutine  plot1(x, y, legend)
    
     call page(4000, 4000)
     call disini 
+    call winfnt("Courier New Bold")
     call texmod("on") 
-    call labdig(-2, "y");
-    call labdig(-2, "x");
+    call labels("fexp", "x")
+    call labels("fexp", "y")
+    !call labdig(-2, "y");
+    !call labdig(-2, "x");
     call height(46)
     call hname(60)
     if ( index(legend,"time")>0 )   call name("$t$", "x" )
@@ -660,16 +659,75 @@ subroutine  plot1(x, y, legend)
     call titlin(legend, 1)
     call title
     call curve(x, y, size(x))
-    do i=0, N 
-      call color("red");  call marker(21);  call incmrk(-1) 
-      call curve([x(i), x(i)], [y(i), y(i)], 2 )
-    end do 
-    
-    
+    call color("red");  call marker(21);  call incmrk(-1) 
+    call curve(x, y, size(x))
+       
     call disfin 
 
 end subroutine 
 
+
+subroutine dislin_ini(xmax, xmin, ymax, ymin) 
+ real, intent(in) :: xmax, xmin, ymax, ymin 
+ 
+    call scrmod("reverse") 
+    call metafl("xwin")
+   
+    call page(4000, 4000)
+    call disini 
+    call graf(xmin, xmax, xmin, (xmax-xmin)/5, ymin, ymax, ymin, (ymax-ymin)/5 )
+    call height(40);
+    call winfnt("Courier New Bold")
+    call color("white") 
+
+end subroutine 
+    
+    
+subroutine plot_legends(legends) 
+ character(len=*), intent(in) :: legends(:)
+
+    character(len=3000) :: cbuf 
+    integer :: j, Np 
+ 
+   
+    call winfnt("Courier New Bold")
+    Np = size(legends)
+    call height(40);
+    call color("white") 
+   
+    call legini(cbuf, Np, 30)
+    call legclr 
+    call legtit("")
+ 
+    do j=1, Np
+          call leglin(cbuf, legends(j), j)
+    end do 
+    
+    call legpos(10, 10)
+    call legend(cbuf, Np)
+    
+end subroutine     
+
+
+subroutine plot_title(tit) 
+ character(len=*), intent(in) :: tit(:)
+
+    integer :: i, N 
+    
+    call color("white") 
+    N  = size(tit) 
+    call height(30);
+    call linesp(3.) 
+    
+    do i=1, N 
+      call titlin( tit(i), i)
+    end do 
+    
+    call title
+    
+   
+
+end subroutine
 
 
 end module

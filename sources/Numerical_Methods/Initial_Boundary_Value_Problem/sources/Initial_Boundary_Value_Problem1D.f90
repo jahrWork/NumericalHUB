@@ -1,6 +1,6 @@
 
 !***********************************************************************
-! It integrates in time the Initial value boundary problem 1D.
+! Initial value boundary problem 1D.
 ! Given the differential operator and the boundary equations,
 ! the discrete solution is calculated.
 ! author: Juan A Hernandez, juanantonio.hernandez@upm.es 
@@ -12,245 +12,337 @@ use Temporal_scheme_interface
 use Collocation_methods 
 use Non_Linear_Systems
 use Utilities
-use Dependencies
+!use Dependencies
+use Dependencies_BC
 use Temporal_error
+use plots
 
 implicit none   
 
 private
-
-public :: IBVP1D, Spatial_discretization1D
-
-public :: Spatial_Error_IBVP1D
-public :: Truncation_Spatial_Error_IBVP1D  
-public :: Temporal_Error_IBVP1D 
-
-public :: IBVP1D_system, Spatial_discretization1D_system 
-
+public :: IBVP1DS,                    & 
+          Spatial_discretization1DS,  & 
+          Linear_operator1DS,         & 
+          Spatial_Truncation_Error1DS
 
 
 abstract interface  
-
-       real function DifferentialOperator1D(x, t, u, ux, uxx) 
-                        real, intent(in) :: x, t, u, ux, uxx 
-       end function  
-
-       real function BC1D(x, t, u, ux) 
-           real, intent(in) :: x, t, u, ux 
-       end function  
-       
-       function DifferentialOperator1D_system(x, t, u, ux, uxx) 
+  
+       function DifferentialOperator1DS(x, t, u, ux, uxx) 
                         real, intent(in) :: x, t, u(:), ux(:), uxx(:) 
-                        real ::  DifferentialOperator1D_system( size(u) ) 
+                        real ::  DifferentialOperator1DS( size(u) ) 
        end function  
-       
-       function IC1D(x) result(U)
-           real, intent(in) :: x(:)
-           real :: U(size(x))
-       end function 
-    
-       
-       
-       function BC1D_system(x, t, u, ux) 
+   
+       function BC1DS(x, t, u, ux) 
            real, intent(in) :: x, t, u(:), ux(:) 
-           real :: BC1D_system( size(u) )  
+           real :: BC1DS( size(u) )  
        end function  
-
-
-       function DifferentialOperatorODE(U, t) result(F) 
-                        real, intent(in) :: U(:), t 
-                        real :: F(size(U)) 
-       end function 
-
+       
 end interface
 
-type Boundary1D_system 
+! Boundaty point 1D with Nv variables per point
+type BoundaryP1DS
      
-        integer :: i 
-        real, allocatable :: value(:) 
-        real, allocatable :: equation(:)  ! Nv equations at the boundary point 
-        logical, allocatable :: impose(:) ! at least Nv boudary contitions to impose per point  
+        integer :: index                   ! grid index of the boundary condition 
+        logical, allocatable :: impose(:)  ! impose at last Nv boudary contitions per point  
+        integer, allocatable :: B_index(:) ! boundary index of variable to determine (Nb unknowns) 
+                                           ! at last Nv unknowns per bounday point
+                                           ! e.g. Nx = 40, Nv = 3, Nb = 5
+                                           ! BC(1) % B_index = [ 1, 2, 3] 
+                                           ! BC(2) % B_index = [ 4, 5]  
+        
+        logical, allocatable :: interfaces(:)  ! at last Nv interfaces per point 
         
 end type
 
 
 contains
-!**********************************************************************************************************************
-! Initial Boundary Value Problem 1D (scalar case) 
-!***********************************************************************************************************************
-subroutine IBVP1D( Time_Domain, x_nodes,  Differential_operator,  & 
-                    Boundary_conditions, Solution, Scheme) 
+                                 
+!**********************************************************************
+! Initial Boundary Value Problem 1D (vectorial case) 
+!***********************************************************************
+subroutine IBVP1DS( Time_Domain, x_nodes, Differential_operator,  & 
+                    Boundary_conditions, Solution, Scheme            ) 
 
-     real, intent(in) :: Time_Domain(:),  x_nodes(0:)
-     procedure (DifferentialOperator1D) :: Differential_operator 
-     procedure (BC1D) ::  Boundary_conditions
-     real, intent(out) :: Solution(0:,0:)
+     real, intent(in) :: Time_Domain(:) 
+     real, intent(inout) :: x_nodes(0:)
+     procedure (DifferentialOperator1DS) :: Differential_operator 
+     procedure (BC1DS) ::  Boundary_conditions
+     real, intent(out) :: Solution(0:,0:, :) 
      procedure (Temporal_Scheme), optional :: Scheme
      
-     
-     integer :: Nx
-     Nx = size(x_nodes) - 1    
-          
-     call Cauchy_ProblemS( Time_Domain, Space_discretization, & 
-                           Solution, Scheme                  )
+     real, pointer :: U_Cauchy(:, :) 
+     integer :: Nt, Nx, Nv
+     Nt=size(Time_Domain)-1; Nx=size(x_nodes)-1; Nv=size(Solution, dim=3) 
+     call my_reshape( Solution, Nt+1, Nv*(Nx+1), U_Cauchy ) 
+    
+     call Cauchy_ProblemS( Time_Domain, F_Cauchy, U_Cauchy, Scheme )
       
 contains
-
-function Space_discretization( U, t ) result(F) 
-                      real ::  U(0:), t, F(0:size(U)-1) 
-           
-  F = Spatial_discretization1D(   & 
-      Differential_operator, Boundary_conditions, x_nodes, U, t )
-         
-      
-end function     
-
+function  F_cauchy( U, t ) result(F) 
+          real ::  U(:), t, F(size(U))   
+  
+   F = Space_discretization1D( Nx, Nv, Differential_operator,  & 
+                               Boundary_conditions, x_nodes, U, t )
+end function 
 end subroutine
 
+!*************************************************************************************************
+! It gives the spatial discretization of differential operator together with boundary conditions
+!*************************************************************************************************
+function Space_discretization1D( Nx, Nv, Differential_operator, Boundary_conditions, x, U, t ) result(F) 
+          integer, intent(in) :: Nx, Nv 
+          procedure (DifferentialOperator1DS) :: Differential_operator 
+          procedure (BC1DS) ::  Boundary_conditions
+          real, intent(in) :: x(0:), t 
+          real, target ::  U(:), F(size(U))   
+  
+  real, pointer :: Uv(:,:), Fv(:,:)  
+  
+  Uv(0:Nx, 1:Nv) => U 
+  Fv(0:Nx, 1:Nv) => F 
+  
+  Fv = Spatial_discretization1DS(   & 
+       Differential_operator, Boundary_conditions, x, Uv, t )
+  !write(*,*) Fv 
+  !read(*,*) 
+  
+end function 
 
-function Spatial_discretization1D( Differential_operator, Boundary_conditions, & 
-                                   x_nodes, U, t) result(F) 
 
-     procedure (DifferentialOperator1D) :: Differential_operator 
-     procedure (BC1D) ::  Boundary_conditions 
-     real, intent(in) ::  x_nodes(0:), U(0:), t
-     real :: F(0:size(U)-1)
-       
-     logical, save :: dU(2) ! matrix of dependencies( order )
-     integer :: Nx
-     real, allocatable :: Ux(:), Uxx(:)
-     integer :: k, N1, N2 
-     logical :: BC(0:1) 
-     
-     Nx = size(x_nodes) - 1
-     allocate( Ux(0:Nx), Uxx(0:Nx) )
+function Spatial_discretization1DS(Differential_operator,      & 
+                                   Boundary_conditions, x, U, t) result(F) 
+
+     procedure (DifferentialOperator1DS) :: Differential_operator 
+     procedure (BC1DS) ::  Boundary_conditions
+     real, intent(in) ::  x(0:), t
+     real :: U(0:, :), F(0:size(U)-1, size(U,dim=2))
+        
+    integer :: i, k, l, ib 
+    integer :: Nx, Nv
+    real, allocatable :: Ux(:,:), Uxx(:,:), Fi(:), Ub(:)  
+    integer, save ::  Nb 
+    logical, allocatable, save:: dU(:,:),  dBC(:,:) 
+    type (BoundaryP1DS), save :: BC(2)
+      
+    Nx = size(x)-1; Nv = size(U, dim=2) 
  
-                 
-!  ***  Check if Differential operator depends on Ux and Uxx        
-        if (t==0) dU = IBVP1D_Dependencies( Differential_operator ) 
+! ***  Allocate internal variables and identifies the boundary unknowns 
+       !if (t==0) then 
+         call Initialize
+         call Boundary_unknowns 
+       !end if 
+       allocate (  Ux(0:Nx, Nv), Uxx(0:Nx, Nv), Fi(Nv), Ub(Nb) )
         
-!  ***  It solves one or two equations at  boundaries 
-        call Boundary_points( x_nodes, U, t, BC, Boundary_conditions) 
-              
-!  *** inner grid points 
-        if (dU(1)) call Derivative( "x", 1, U, Ux)
-        if (dU(2)) call Derivative( "x", 2, U, Uxx)  
-        
-        do k = 0, Nx
-         if ( (k==0.and.BC(0)) .or. (k==Nx.and.BC(1)) ) then 
-           F(k) = 0  
-         else 
-           F(k) = Differential_operator(x_nodes(k), t, U(k), Ux(k), Uxx(k))
-         end if 
-        enddo  
-
-end function 
-
-!----------------------------------------------------------------------
-subroutine Boundary_points( x, U, t, BC, Boundary_conditions )
-         real, target ::   x(0:), U(0:), t
-         logical, intent(out) :: BC(0:1)  
-         procedure (BC1D) ::  Boundary_conditions
-    
-      integer :: N
-      real :: U1(1), Uc(2)
-      
-          
-        N = size(x)-1
-        if (method == "Fourier") then 
-            BC = .false. 
-      
-        else if (Boundary_conditions( x(0),  t, 1.,  2.) ==       & 
-                                 PERIODIC_BOUNDARY_CONDITION) then             
-            U(0)  = U(N)
-            BC = [ .true., .false. ]
-            
-            
-       else if (Boundary_conditions( x(N),  t, 1.,  2.) ==  & 
-                                     FREE_BOUNDARY_CONDITION) then 
-           
-            U1 = U(0) 
-            call Newton( BCs1, U1 )
-            BC = [ .true., .false. ]
-            
-       else 
-            Uc = U(0:N:N)  
-            call Newton( BCs2, Uc )
-            BC =  .true.
-            
-       end if 
+! ***  It solves boundary equations to yield values at boundaries     
+       call Determine_boundary_points( Ub, dBC, BC, Nx, Nv,  x, U, t, & 
+                                       Boundary_conditions ) 
        
+! ***  It calculates only derivatives which are used 
+       call Involved_Derivatives(  Nx, Nv, dU, U, Ux, Uxx )  
+       do i=0, Nx
+           Fi = Differential_operator(x(i), t, U(i,:), Ux(i,:), Uxx(i,:)) 
+            
+      ! ** Boundary point
+           k = Boundary_index(Nx, i) 
+           if (k>0) then 
+            do l=1, Nv
+             if (BC(k) % impose(l) .or. BC(k) % interfaces(l)) & 
+                                Fi(l) = IMPOSE_ZERO
+            end do
+           end if 
+      ! ** inner point  
+           F(i, :) = Fi(:)
+       enddo 
 contains 
-
-!-----------------------------------------------------------------------
-function BCs2(Y) result(G) 
-        real, intent (in) :: Y(:)
-        real :: G(size(Y))
-
-    real :: Wx(0:N)
-   
-    U(0) = Y(1) 
-    U(N) = Y(2)
     
-    call Derivative( "x", 1, U, Wx)
-   
-    G(1)= Boundary_conditions( x(0),  t, U(0),  Wx(0) )
-    G(2)= Boundary_conditions( x(N), t, U(N), Wx(N) )
+
+subroutine Initialize
+
+       integer :: j 
+                      
+       if (allocated(dU)) then 
+            deallocate(dU, dBC) 
+        end if      
+        allocate(dU(Nv,2), dBC(Nv,2)) 
+      
   
-end function 
-
-!-----------------------------------------------------------------------
-function BCs1(Y) result(G) 
-        real, intent (in) :: Y(:)
-        real :: G(size(Y))
-
-    real :: Wx(0:N)
-  
-    U(0) = Y(1) 
-    call Derivative( "x", 1, U, Wx)
-    G(1)= Boundary_conditions( x(0),  t, U(0),  Wx(0))
-    
-end function 
-
-end subroutine
-
-
-
-subroutine Temporal_Error_IBVP1D( Differential_operator, Boundary_conditions, Initial_conditions,   & 
-                         Scheme, time, x_nodes, Order, U, Error)
-
-     procedure (DifferentialOperator1D) :: Differential_operator
-     procedure (BC1D) ::  Boundary_conditions
-     procedure (IC1D) ::  Initial_conditions
-     procedure (Temporal_Scheme), optional :: Scheme
-     integer, intent(in) :: Order
-     real, intent(in) ::  time(0:)   
-     real, intent(inout) :: x_nodes(0:), U(0:,0:) ! 0:Nt, 0:Nx 
-     real, intent(out) :: Error(0:, 0:)
-     
-    
-    call Grid_Initialization( "nonuniform", "x",  x_nodes, Order)
-    U(0,:) = Initial_conditions(x_nodes) 
-    
-    
-    call Error_Cauchy_Problem( Time, F_Cauchy, Scheme, 2, U, Error ) 
-         
-         
-contains 
-function F_Cauchy( U, t ) result(F) 
-                      real ::  U(0:), t, F(0:size(U)-1) 
+       dU  = .true. !IBVP1D_Dependencies_system( Nv, Differential_operator )
+       dBC = .true. !BC_IBVP1D_Dependencies_system( Nv, Boundary_conditions, x(0), x(Nx) ) 
+       
+             
+       do j=1, 2 
            
-  F = Spatial_discretization1D( & 
-      Differential_operator, Boundary_conditions, x_nodes, U, t )
-         
+             if (  allocated(BC(j) % B_index )) then 
+                 deallocate( BC(j) %  B_index, BC(j) % impose, BC(j) % interfaces ) 
+             end if 
+             
+             allocate( BC(j) %  B_index(Nv) ) 
+             allocate( BC(j) %  impose(Nv) ) 
+             allocate( BC(j) % interfaces(Nv) )  
+       end do
+           
+     
+end subroutine 
+
+subroutine Boundary_unknowns
+     
+ real :: u0(Nv), ux0(Nv), uy0(Nv), eq(Nv)   
+ integer :: i_BC(2), k, i, l   
+      
+  i_BC = [0, Nx ]      
+  u0 = 1.; ux0 = 2.; uy0 = 3  
+  Nb = 0 
+  
+  
+!  Fourier  
+ if (method == "Fourier") then 
+       do k=1, size(BC) 
+           BC(k) % impose = .false.     
+       end do   
+       
+ ! FD or Chebyshev       
+ else   
+  
+  do k=1, size(BC)
+      
+    i = i_BC(k) 
+    
+    eq = Boundary_conditions( x(i),  t, u0,  ux0 ) 
+    BC(k) % index = i 
+    do l=1, Nv 
+      BC(k) % interfaces(l) = eq(l) == INTERFACE_CONDITION
+      BC(k) % impose(l) = eq(l) /= FREE_BOUNDARY_CONDITION  .and.  & 
+                          eq(l) /= PERIODIC_BOUNDARY_CONDITION .and. & 
+                          eq(l) /= INTERFACE_CONDITION 
+      if (BC(k) % impose(l) ) then 
+          Nb = Nb + 1  
+          BC(k) % B_index(l) = Nb  
+      end if 
+    end do 
+  end do
+ 
+end if   
+    
+end subroutine       
+end function 
+
+
+
+
+
+subroutine Determine_boundary_points( Ub, dBC, BC, Nx, Nv, x, U, t, Boundary_conditions ) 
+        real :: Ub(:) 
+        logical, intent(in) :: dBC(:,:) 
+        type (BoundaryP1DS) :: BC(:)
+        integer, intent(in) :: Nx, Nv 
+        real, intent(in) :: x(0:Nx), t
+        real, intent(inout) :: U(0:Nx, Nv)
+        procedure (BC1DS) ::  Boundary_conditions
+        
+        integer :: i, k, l, m
+        
+!  *** Ínitial condition for Ub        
+       do k=1, size(BC); do l=1, Nv
+           i = BC(k) % index
+           m = BC(k) % B_index(l)  
+          if( BC(k)% impose(l) ) Ub(m) = U(i, l)
+       end do; end do 
+        
+ !  *** Solve boundary equations  
+        call Newton( Boundary_equations, Ub )
+          
+contains 
+
+function Boundary_equations(Z) result(G) 
+        real, intent (in) :: Z(:)
+        real :: G(size(Z))
+    
+       real :: Ux(0:Nx, Nv)
+       integer :: i, k, m, l  
+       real :: Gc(Nv), eq  
+      
+  
+  !** update unknowns      
+  do k=1, size(BC); do l=1, Nv
+      i = BC(k) % index
+      m = BC(k) % B_index(l)   
+     
+      if( BC(k)% impose(l) ) U(i, l) = Z(m)
+      
+  end do; end do 
+  
+  do l=1, Nv     
+  !   write(*,*) " x_label =", x_label 
+     call Derivative( "x", 1, U(:, l), Ux(:, l) )
+  end do 
+  
+  !** Newton equations 
+  do k=1, size(BC) 
+       i = BC(k) % index 
+       Gc = Boundary_conditions( x(i),  t, U(i, :),  Ux(i, :) )  
+       
+       do l=1, Nv  
+         m = BC(k) % B_index(l) 
+         if ( BC(k)% impose(l) ) G(m) = Gc(l)
+       end do 
+  end do
       
 end function
-                         
+end subroutine 
+
+
+
+
+!****************************************************************
+! vector of dependencies(derivatives) , ux ,uy, uxx uyy, uxy  
+!****************************************************************
+subroutine Involved_Derivatives( Nx, Nv, dU, U, Ux,  Uxx )
+  integer, intent(in) :: Nx, Nv  
+  logical, intent(in) :: dU(Nv, 2) 
+  real, intent(in) ::   U(0:Nx, Nv)
+  real, intent(out) :: Ux(0:Nx, Nv), Uxx(0:Nx, Nv)  
+        
+     integer :: k 
+  
+     !write(*,*) " Enter Involved derivatives Uxx ="
+     !read(*,*) 
+     
+!  *** inner grid points
+        do k=1, Nv 
+                    
+           if ( dU(k,1) ) call Derivative( "x", 1, U(:,k), Ux(:,k)  )
+           if ( dU(k,2) ) call Derivative( "x", 2, U(:,k), Uxx(:,k) )
+       
+        end do  
+
+end subroutine 
+                                           
+                                            
  
-end subroutine  
+function Boundary_index(N, i) result(k) 
+    integer, intent(in) :: N, i 
+    integer :: k
+    
+    
+       if (i==0) then  
+                            k = 1
+       else if (i==N) then 
+                            k = 2 
+       else 
+                            k = -1 
+       end if 
+                
+end function                                   
+       
 
 
-   
+
+
+
+
+
+
 
 !**********************************************************************************
 ! It determines the Local Truncation Spatial Error of the Solution 
@@ -258,291 +350,99 @@ end subroutine
 ! INPUTS : 
 !           Differential_operator 
 !           Boundary_conditions  
-!           Initial_conditions 
 !           x_nodes or collocation points 
+!           U solution to be discretized 
 !           Order of the interpolation 
 ! OUTPUTS:
 !           R : local truncation error of the spatial discretization 
 !
-! Author: juanantonio.hernandez@um.es (May 2021) 
+! Author: juanantonio.hernandez@um.es (May 2022) 
 !********************************************************************************** 
-subroutine Truncation_Spatial_Error_IBVP1D( Differential_operator, Boundary_conditions,   &
-                                            Initial_conditions, x_nodes, Order, R ) 
+function Spatial_Truncation_Error1DS( Nv, Differential_operator,         &
+                                      Boundary_conditions,               &
+                                      x, Order, Test_function ) result(R) 
    
-     procedure (DifferentialOperator1D) :: Differential_operator 
-     procedure (BC1D) ::  Boundary_conditions 
-     procedure (IC1D) ::  Initial_conditions
-     integer, intent(in) :: Order 
-     real, intent(inout) ::  x_nodes(0:)
-     real, intent(out) :: R(0:size(x_nodes)-1)
+     procedure (DifferentialOperator1DS) :: Differential_operator 
+     procedure (BC1DS) ::  Boundary_conditions 
+     real, intent(inout) ::  x(0:) 
+     interface 
+        function Test_function(Nv,x) result(U) 
+           integer, intent(in) :: Nv 
+           real, intent(in) :: x(0:) 
+           real :: U(0:size(x)-1, Nv) 
+        end function 
+     end interface 
+     integer, intent(in) :: Nv, Order 
+     real :: R(0:size(x)-1, Nv)
 
-   integer :: i, N 
-   real, allocatable :: x1(:), U1(:), R1(:), x2(:), U2(:), R2(:)   
-   real :: t = 0 
-       
-       N = size(x_nodes)-1;  
-       allocate ( x1(0:N),  U1(0:N), R1(0:N), x2(0:2*N), U2(0:2*N), R2(0:2*N) ) 
-       
-       
-       call Grid_Initialization( "nonuniform", "x", x_nodes, Order )
-       
-       x1 = x_nodes
-       U1 = Initial_conditions(x1)
-       R1 = Spatial_discretization1D( Differential_operator, Boundary_conditions, x1, U1, t)  
-       
-       do i=0, N-1 
-           x2(2*i)   = x1(i) 
-           x2(2*i+1) = ( x1(i) + x1(i+1) )/2
-       end do 
-       x2(2*N) = x1(N)
-       
-       call Grid_Initialization( "unmodified", "x", x2, Order )
-       U2 = Initial_conditions(x2)
-       R2 = Spatial_discretization1D( Differential_operator, Boundary_conditions, x2, U2, t)
-       
-       do i=0, N 
-            R(i) = ( R2(2*i)- R1(i) )/( 1 - 1./2**Order ) 
-       end do  
-             
-end subroutine 
-
-!**********************************************************************************
-! It determines the Spatial Error of the Solution by means of Richardson extrapolation 
-! INPUTS : 
-!           Differential_operator 
-!           Boundary_conditions  
-!           Initial_conditions 
-!           time domain    
-!           x_nodes or collocation points 
-!           Order of the interpolation 
-!               
-! OUTPUTS:
-!           U : solution ( 0:Nt, 0:Nx) ( time index, space index) 
-!           Error of the spatial discretization   
-!               
-! Note: the default temporal scheme is a Runge-Kutta of 4th order. 
-!       it is supposed that temporal error is much smaller than spatial error 
-!       to asure that time step is chosen 1/10 of the original time step 
-! Author: juanantonio.hernandez@um.es (May 2021) 
-!**********************************************************************************               
-subroutine Spatial_Error_IBVP1D( Differential_operator, Boundary_conditions,        & 
-                                 Initial_conditions, time, x_nodes, Order, U, Error ) 
+   integer :: i, Nx  
+   real, allocatable :: x1(:), x2(:), U1(:,:), F1(:,:), U2(:,:), F2(:,:)   
+   real :: t
    
-     procedure (DifferentialOperator1D) :: Differential_operator 
-     procedure (BC1D) ::  Boundary_conditions 
-     procedure (IC1D) ::  Initial_conditions
-     integer, intent(in) :: Order 
-     real, intent(in) ::  time(0:)
-     real, intent(inout) ::  x_nodes(0:)
-     real, intent(out) ::  U(0:, 0:), Error(0:, 0:)  ! 0:Nt, 0:Nx 
-
-   integer :: i, j, Nt, Nx 
-   real, allocatable :: x1(:), U1(:,:), x2(:), U2(:, :), t(:) 
-   real :: t0, tf, dt 
-       
-       Nx = size(x_nodes)-1;   Nt = size(time)-1;
-       allocate ( x1(0:Nx),  U1(0:10*Nt, 0:Nx), x2(0:2*Nx), U2(0:10*Nt, 0:2*Nx) ) 
-       allocate ( t(0:10*Nt) )
-       
-       t0 = Time(0); tf = Time(Nt); dt = (tf-t0)/(10*Nt) 
-       t = [ (t0 + dt*i, i=0, 10*Nt ) ]
-       
-       call Grid_Initialization( "nonuniform", "x", x_nodes, Order )
-       
-       x1 = x_nodes
-       U1(0, :) = Initial_conditions(x1)
-       call IBVP1D( t, x1, Differential_operator, Boundary_conditions, U1 ) 
-       
+       t = 0     
+       Nx = size(x)-1;  
+       allocate ( x1(0:Nx), x2(0:2*Nx), U1(0:Nx, Nv),F1(0:Nx, Nv), U2(0:2*Nx, Nv), F2(0:2*Nx, Nv) ) 
+        
+       x1 = x
+       call Grid_Initialization( "nonuniform", "x", x1, Order )
+       U1 = Test_function(Nv, x1) 
+       F1 = Spatial_discretization1DS( Differential_operator, Boundary_conditions, x1, U1, t)  
+         
        do i=0, Nx-1 
            x2(2*i)   = x1(i) 
            x2(2*i+1) = ( x1(i) + x1(i+1) )/2
        end do 
        x2(2*Nx) = x1(Nx)
+       call Grid_Initialization( "unmodified", "x", x2, Order ) 
        
-       call Grid_Initialization( "unmodified", "x", x2, Order )
-       U2(0, :) = Initial_conditions(x2)
-       call IBVP1D( t, x2, Differential_operator, Boundary_conditions, U2 ) 
-            
-       do i =0, Nt
-         do j=0, Nx 
-            Error(i, j) = ( U2(10*i, 2*j)- U1(10*i, j) )/( 1 - 1./2**Order )  
-            U(i, j) = U1(10*i, j)
-         end do 
-       end do   
-      
+       U2 = Test_function(Nv, x2) 
+       F2 = Spatial_discretization1DS( Differential_operator, Boundary_conditions, x2, U2, t)
        
-end subroutine 
-
-                                 
-                     
-                                 
-
-                                 
-                                 
-  
-                                 
-!**********************************************************************************************************************
-! Initial Boundary Value Problem 1D (vectorial case) 
-!***********************************************************************************************************************
-subroutine IBVP1D_system( Time_Domain, x_nodes,  Differential_operator,  Boundary_conditions, Solution, Scheme ) 
-
-     real, intent(in) :: Time_Domain(:) 
-     real, intent(inout) :: x_nodes(0:)
-     procedure (DifferentialOperator1D_system) :: Differential_operator 
-     procedure (BC1D_system) ::  Boundary_conditions
-     real, intent(out) :: Solution(0:,0:, :) 
-     procedure (Temporal_Scheme), optional :: Scheme
-     
-     real, pointer :: U_Cauchy(:, :) 
-     integer :: Nt, Nx, Nv
-     Nt = size(Time_Domain)-1;  Nx = size(x_nodes)-1; Nv = size(Solution, dim=3) 
-    
-    call my_reshape( Solution, Nt+1, Nv*(Nx+1), U_Cauchy ) 
-    
-    call Cauchy_ProblemS( Time_Domain, F_Cauchy, U_Cauchy, Scheme )
-      
-    
-contains
-function  F_cauchy( U, t ) result(F) 
-          real ::  U(:), t, F(size(U))   
-  
-   F = Space_discretization( U, t )
-           
+       do i=0, Nx
+            R(i,:) = ( F2(2*i,:) - F1(i,:) )/( 1 - 1./2**Order )  
+       end do  
+             
 end function 
 
-function  Space_discretization( U, t ) result(F) 
-          real, target ::  U(:), t, F(size(U))   
-  
-  real, pointer :: Uv(:,:), Fv(:,:)  
-  
-  Uv(0:Nx, 1:Nv) => U 
-  Fv(0:Nx, 1:Nv) => F 
-  
-  Fv = Spatial_discretization1D_system(   & 
-       Differential_operator, Boundary_conditions, x_nodes, Uv, t )
-   
-          
-end function  
-end subroutine
 
-function Spatial_discretization1D_system( Differential_operator, Boundary_conditions, & 
-                                          x,  U, t) result(F) 
+!*******************************************************************
+! Given a vector function F: RN -> RN. 
+! If the F (differential operator) is linear (F = A U + b), 
+! it gives the system matrix A
+!*******************************************************************
+function Linear_operator1DS( Nv, x, Order, Differential_operator,  & 
+                             Boundary_conditions ) result(A)
 
-     procedure (DifferentialOperator1D_system) :: Differential_operator 
-     procedure (BC1D_system) ::  Boundary_conditions
-     real, intent(in) ::  x(0:), t
-     real ::   U(0:, :)
-     real :: F(0:size(U)-1, size(U,dim=2))
-
-        
-    integer :: i,k, Nx, Nv
-    real, allocatable :: Ux(:,:), Uxx(:,:), Uc(:), Fv(:)   
-    logical, save, allocatable :: dU(:, :) 
-    
-  ! indexes of variables iU0):) ( at x0)  and iUN(:) ( at xN ) 
-  ! where boundary conditions are imposed 
-    integer,  allocatable :: iU0(:), iUN(:) 
-    
-  ! number of BCs at x0 and at xN   
-    integer :: N0, N1
-    
-        Nx = size(x) - 1;  Nv = size(U, dim=2)
-        allocate(  Ux(0:Nx, Nv), Uxx(0:Nx, Nv), Fv(Nv) ) 
-        if (t==0) then 
-                 if (allocated(dU)) deallocate(dU) 
-                 allocate( dU(Nv, 2) ) 
-                 dU = .true. 
-        end if  
-   
-!  ***  solve a system of two equations to yield the values at the boundaries
-        call Equations_at_boundary( x = x(0),  W = U(0,:),  Wx = Ux(0,:), iU = iU0 )
-        call Equations_at_boundary( x = x(Nx), W = U(Nx,:), Wx = Ux(Nx,:), iU =  iUN )
-        
-        N0 = size(iU0); N1 = size(iUN) 
+     integer, intent(in) :: Nv, Order
+     real, intent(inout) :: x(0:) 
+     procedure (DifferentialOperator1DS) :: Differential_operator 
+     procedure (BC1DS) ::  Boundary_conditions
+     real :: A(size(x)*Nv, size(x)*Nv) 
      
-        allocate( Uc(N0+N1) ) 
-        do k=1, N0;     Uc(k)    = U(0,  iU0(k) ); end do 
-        do k=1, N1;     Uc(k+N0) = U(Nx, iUN(k) ); end do 
-      
-        call Newton( BCs, Uc )
-   
-!  *** inner grid points
-        do i=1, Nv 
-           if (dU(i,1)) call Derivative( "x", 1, U(0:,i), Ux(0:,i) )
-           if (dU(i,2)) call Derivative( "x", 2, U(0:,i), Uxx(0:,i) )
-        end do    
           
-        do k=0, Nx
-            Fv = Differential_operator( x(k), t, U(k,:), Ux(k,:), Uxx(k, :) )
-            if (k==0) then 
-                            do i=1, N0;  Fv(iU0(i)) = 0;  end do
-             else if (k==Nx) then 
-                             do i=1, N1;  Fv(iUN(i)) = 0;  end do
-            else 
-                F(k, :) = Fv 
-            end if 
-        enddo
-  
-contains 
-
-subroutine Equations_at_boundary( x, W,  Wx, F, iU )
-                real, intent(in) ::  x, W(:),  Wx(:)
-                real, allocatable, optional, intent(out) ::  F(:)
-                integer, allocatable, optional, intent(out) ::  iU(:) 
-
-        integer :: i, k,  Nc           
-        real :: F1( size(W) )   
+     real ::  U( size(x)*Nv ), b( size(x)*Nv ), t  
+     integer :: j 
+     
+     call Grid_Initialization( "unmodified", "x", x, Order )
+     
+     t = 0 
+     U = 0
+     b = Space_discretization1D( size(x)-1, Nv, Differential_operator, Boundary_conditions, x, U, t ) 
+     
+     do j=1, size(x)*Nv 
+ 
+         U = 0 
+         U(j) = 1   
+         A(:, j) = Space_discretization1D( size(x)-1, Nv, Differential_operator, Boundary_conditions, x, U, t ) - b
          
-        
-        F1 = Boundary_conditions( x, t, W(:),  Wx(:) ) 
-       
-        Nc = count(F1 /= FREE_BOUNDARY_CONDITION ) 
-    
-        if (present(F) ) allocate( F(Nc) ) 
-        if (present(iU)) allocate( iU(Nc) ) 
-        
-        k = 0 
-        do i=1, Nv 
-            if ( F1(i) /= FREE_BOUNDARY_CONDITION ) then 
-              k = k + 1 
-              if (present(F))   F(k) = F1(i) 
-              if (present(iU))  iU(k) = i 
-           end if
-        end do  
-
-end subroutine 
-        
-
-function BCs(Y) result(G) 
-     real, intent (in) :: Y(:)
-     real :: G(size(Y))
-     
-     real, allocatable :: G0(:), GN(:)   
-     integer :: i,k    
-     
-     real :: Wx(0:Nx, Nv)
-
+      end do 
       
-     do k=1, N0;       U(0, iU0(k) ) = Y(k);    end do
-     do k=1, N1;       U(Nx, iUN(k) ) = Y(k+N0); end do 
-     
-     do i=1, Nv 
-           call Derivative( "x", 1, U(0:, i), Wx(0:,i) )
-     end do    
-     
-     call Equations_at_boundary( x(0),  U(0, :), Wx( 0,:), G0 )
-     call Equations_at_boundary( x(Nx), U(Nx, :), Wx(Nx,:), GN )
-      
-     G = [ G0, GN ] 
-    
+             
+end function  
+  
 
-end function 
-
-end function
-
-     
-     
-     
+                                 
 end module 
     
     
+     
