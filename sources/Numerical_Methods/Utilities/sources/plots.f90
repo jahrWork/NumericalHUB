@@ -687,15 +687,17 @@ subroutine plot_legends(legends)
  character(len=*), intent(in) :: legends(:)
 
     character(len=3000) :: cbuf 
-    integer :: j, Np 
+    integer :: j, Np, N 
  
    
     call winfnt("Courier New Bold")
     Np = size(legends)
     call height(40);
     call color("white") 
+   !do j=1, Np 
+    N = maxval( len_trim(legends) ) 
    
-    call legini(cbuf, Np, 30)
+    call legini(cbuf, Np, N)
     call legclr 
     call legtit("")
  

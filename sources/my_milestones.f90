@@ -636,7 +636,7 @@ subroutine Milestone7
      call plot_parametrics(x, transpose(U(0:Nt:200,:,1)),           & 
                    legends, "$x$", "$u(x,t)$", "Milestone 7: Heat equation") 
      
-     call Stability_Heat_equation_1D
+     call Stability_Heat_equation_1Dm
      call Error_Heat1D
    
 
@@ -675,7 +675,7 @@ end function
 !    exact eigenfunctions u_k(x) = sin( k pi x ) with 
 !          eigenvalues lambda_k = - ( k pi )**2   
 !******************************************************************
-subroutine Stability_Heat_equation_1D
+subroutine Stability_Heat_equation_1Dm
 
    integer, parameter :: Nx = 20
    real ::   x(0:Nx), A(0:Nx, 0:Nx), W(0:Nx, 0:Nx) 

@@ -25,9 +25,18 @@ program main_NumericalHUB
        
        use API_Example_Chebyshev_Fourier_interpolation
        implicit none 
+    
+   !call Stability_Heat_equation_1Dm
+   !stop 
+   !    
+   !call Advection_diffusion_1D_Chebyshev
+   !stop 
+   ! call Test_Advection_diffusion_Fourier_Chebyshev  
+       
+ !   call Test_Advection_diffusion_Fourier_Chebyshev_magnetic
+ !   stop 
        
        
-   
        call main 
        
 contains 

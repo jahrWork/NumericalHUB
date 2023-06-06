@@ -99,9 +99,14 @@ contains
 function Residual_IE(X) result(G) 
          real, target :: X(:)
          real :: G(size(X))
+         
+      real :: Fc(size(X)) 
+         
+      Fc = F(X, t2)    
       
       G = X - U1 - dt * F(X, t2) 
-      where (F(X, t2)==IMPOSE_ZERO) G = 0 
+      where (Fc==IMPOSE_ZERO) G = 0
+    
       
 end function 
 end subroutine 

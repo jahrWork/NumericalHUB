@@ -6,6 +6,9 @@ module API_Example_Chebyshev_Fourier_interpolation
     use Lagrange_interpolation
     use plots 
     use Utilities
+    use Temporal_Schemes
+    
+    use Magnetic_configuration
     
     implicit none
     
@@ -308,6 +311,215 @@ function Solution(N, M, L, x, y, z) result(U)
         U(i,j,k) = cos( x(i) + y(j) ) * (2*z(k)**2 - 1 )
     end do; end do; end do 
 
+end function 
+
+
+
+!******************************************************
+subroutine  Test_Advection_diffusion_Fourier_Chebyshev_magnetic
+!******************************************************
+
+  integer, parameter :: N = 64, M =64, L = 5, Nt = 100  
+  real :: Residual(Nt), time(Nt) 
+  real  ::  F(0:N-1, 0:M-1, 0:L) 
+  real, target  :: U(0:N-1, 0:M-1, 0:L)
+  complex Fk(-N/2:N/2-1, -M/2:M/2-1, 0:L), C(-N/2:N/2-1, -M/2:M/2-1, 0:L)
+ 
+  real :: S(0:N-1, 0:M-1, 0:L) 
+  complex ::  Sk(-N/2:N/2-1, -M/2:M/2-1, 0:L), Uc(0:N-1, 0:M-1, 0:L)
+ 
+  real, pointer :: pU(:) 
+  
+  real :: x(0:N-1), y(0:M-1), z(0:L)  
+  integer, parameter :: N_levels = 9 
+  real :: levels(0:N_levels) 
+  real :: z0, zf,  PI = 4 * atan(1.) 
+  integer :: it, i, j, k 
+  real :: dt, lambda(-N/2:N/2-1, -M/2:M/2-1, 0:L) 
+  integer :: ierr
+  real :: U2( N*M*(L+1) )
+ 
+  
+!  call read_ddkes2data("D:/Dropbox/this week/JavierEscoto/coefficientes/magnetic_configurations/w7x__KJM.0.0/s_0204/ddkes2.data")
+ call read_ddkes2data("C:/Users/Juan/Dropbox/this week/JavierEscoto/coefficientes/magnetic_configurations/w7x__KJM.0.0/s_0204/ddkes2.data")
+  
+   x = [ ( 2*PI*i/N, i=0, N-1 ) ] 
+   y = [ ( 2*PI*j/M, j=0, M-1 ) ]  
+   z = [ (-1 + 2*k/real(L), k=0, L ) ] 
+   levels = [ ( z0 + (zf-z0) * j/real(N_levels)  , j=0, N_levels )]
+   
+   call Grid_Initialization( "Fourier", "x",  x )
+   call Grid_Initialization( "Fourier", "y",  y )
+   call Grid_Initialization( "Chebyshev", "z", z )
+  
+  
+   
+   dt =  3d-2
+   do i=-N/2, N/2-1; do j=-M/2, M/2-1; do k=0, L   
+        lambda(i,j,k) = 30 * dt / ( max(abs(i),1) + max(abs(j),1) + max(k**4,1) )   
+   end do; end do; end do    
+    
+   !U = Solution( N, M, L, x, y, z)
+   !call scrmod("reverse")
+   !call plot_contour(x, z, U(:, M/2, :), "x","z", levels, graph_type ="isolines") 
+   
+   pU( 1:N*M*(L+1) )  => U
+   U = 0 
+   C = 0 
+     
+   do it=1, Nt
+       
+  !   S = Source_term_magnetic( N, M, L, x, y, z ) 
+     U(0,0,0) = 0  
+   !  S = Source_toy( N, M, L, x, y, z ) 
+
+  !   F = Spatial_discretization_magnetic( N, M, L, U, x, y, z)  
+  !   U = U + dt * ( F + S )   
+      call Runge_Kutta4( F_Cauchy, 0., dt, pU, U2, ierr )
+      pU = U2 
+     
+     
+     U(0,0,0) = 0 
+     
+     !Sk = Spectral_transform( N, M, L, S )
+     !Fk = Spectral_transform( N, M, L, F )
+     !    
+     !C = C + lambda * ( Fk + Sk )
+     !Uc = iSpectral_transform( N, M, L, C )
+     !U = real(Uc)  
+     
+     time(it) = it 
+     Residual(it) =  norm2( F_Cauchy( pU, time(it) ) )
+     write(*,*) " it, Residual =", it, Residual(it)
+   !  read(*,*)
+    
+   end do 
+   
+   call plot(time, Residual,"Residuals") 
+  
+   
+   call plot_contour(x, z, U(:, M/2, :), "x","z", levels, graph_type ="isolines") 
+   call plot_contour(x, y, U(:, :, 0), "x","y", levels, graph_type ="isolines") 
+   call plot_contour(x, y, U(:, :, L), "x","y", levels, graph_type ="isolines") 
+   
+contains  
+  
+
+function  F_Cauchy( U, t ) result(F) 
+          real ::  U(:), t         
+          real :: F(size(U)) 
+          
+    F = Space_discretization3D( N, M, L, x, y, z, U )  
+           
+end function
+
+end subroutine
+
+function  Space_discretization3D( N, M, L, x, y, z, U ) result(F) 
+
+      integer, intent(in) :: N, M, L 
+      real, intent(in) :: x(0:), y(0:), z(0:) 
+      real, target ::  U(:), F(size(U))   
+  
+  real, pointer :: Uv(:, :, :), Fv(:, :, :)  
+  
+  Uv(0:N-1, 0:M-1, 0:L) => U 
+  Fv(0:N-1, 0:M-1, 0:L) => F 
+  
+  Fv =   Spatial_discretization_magnetic(N, M, L, U, x, y, z) & 
+       + Source_term_magnetic( N, M, L, x, y, z ) 
+  
+end function  
+
+
+
+!***********************************************************
+! L(u) = a Ux + b Uy + c Uz + d U + e Uzz 
+!***********************************************************
+function Spatial_discretization_magnetic(N, M, L, U, x, y, z) result(F) 
+         integer, intent(in) :: N, M, L 
+         real, intent(in):: U(0:N-1, 0:M-1, 0:L), x(0:N-1), y(0:M-1), z(0:L) 
+         real ::  F(0:N-1, 0:M-1, 0:L) 
+
+         real ::  a(0:N-1, 0:M-1, 0:L), b(0:N-1, 0:M-1, 0:L)
+         real ::  c(0:N-1, 0:M-1, 0:L), d(0:N-1, 0:M-1, 0:L)
+         real ::  e(0:N-1, 0:M-1, 0:L)
+         integer :: i, j, k 
+         
+         
+   do i=0, N-1; do j=0, N-1; do k=0, L
+          a(i,j,k) =  Coefficient_ux( x(i), y(j), z(k) )
+          b(i,j,k) =  Coefficient_uy( x(i), y(j), z(k) )
+          c(i,j,k) =  Coefficient_uz( x(i), y(j), z(k) )
+          d(i,j,k) = 0
+          e(i,j,k) =  Coefficient_uzz( x(i), y(j), z(k) )
+   end do; end do; end do 
+ 
+   F = - a * Derivative_3D( "x", 1, U) - b * Derivative_3D( "y", 1, U)  & 
+       - c * Derivative_3D( "z", 1, U) - e * Derivative_3D( "z", 2, U)  &  
+       - d * U 
+         
+end function 
+
+function Source_term_magnetic(N, M, L, x, y, z) result(S) 
+    integer, intent(in) :: N, M, L 
+    real, intent(in):: x(0:N-1), y(0:M-1), z(0:L) 
+    real :: S(0:N-1, 0:M-1, 0:L) 
+      
+    
+    integer :: i, j, k 
+    real :: U, Ux, Uy, Uz, Uzz 
+    
+    do i=0, N-1 
+        do j=0, M-1 
+            do k=0, L
+                S(i,j,k) = Source_term_dke( x(i), y(j), z(k) )
+            end do 
+        end do 
+    end do 
+    
+end function 
+
+!***********************************************************
+! L(u) = a Ux + b Uy + c Uz + d U + e Uzz 
+!***********************************************************
+function Source_toy(N, M, L, x, y, z) result(F) 
+         integer, intent(in) :: N, M, L 
+         real, intent(in)::  x(0:N-1), y(0:M-1), z(0:L) 
+         real ::  F(0:N-1, 0:M-1, 0:L) 
+
+         real :: U(0:N-1, 0:M-1, 0:L)
+         real :: Ux(0:N-1, 0:M-1, 0:L), Uy(0:N-1, 0:M-1, 0:L), & 
+                 Uz(0:N-1, 0:M-1, 0:L), Uzz(0:N-1, 0:M-1, 0:L)
+         real ::  a(0:N-1, 0:M-1, 0:L), b(0:N-1, 0:M-1, 0:L)
+         real ::  c(0:N-1, 0:M-1, 0:L), d(0:N-1, 0:M-1, 0:L)
+         real ::  e(0:N-1, 0:M-1, 0:L)
+         integer :: i, j, k, Ns, Ms, Ls  
+         
+     
+         
+  Ns = 1
+  Ms = 1
+  Ls = 2 
+         
+   do i=0, N-1; do j=0, M-1; do k=0, L
+          a(i,j,k) =  Coefficient_ux( x(i), y(j), z(k) )
+          b(i,j,k) =  Coefficient_uy( x(i), y(j), z(k) )
+          c(i,j,k) =  Coefficient_uz( x(i), y(j), z(k) )
+          d(i,j,k) = 0
+          e(i,j,k) =  Coefficient_uzz( x(i), y(j), z(k) )
+          
+          U(i,j,k) = cos ( Ns * x(i) ) * cos ( Ms * y(j) ) * z(k)**Ls
+          Ux(i,j,k) = -Ns * sin ( Ns * x(i) ) * cos ( Ms * y(j) ) * z(k)**Ls
+          Uy(i,j,k) = -Ms * cos ( Ns * x(i) ) * sin ( Ms * y(j) ) * z(k)**Ls
+        
+          Uz(i,j,k) = Ls * cos ( Ns * x(i) ) * cos ( Ms * y(j) ) * z(k)**(Ls-1)
+          Uzz(i,j,k) = Ls* (Ls-1) * cos ( Ns * x(i) ) * cos ( Ms * y(j) ) * z(k)**(Ls-2)
+          
+   end do; end do; end do 
+ 
+   F = - a * Ux - b * Uy - c * Uz - e * Uzz - d * U 
+         
 end function 
 
 

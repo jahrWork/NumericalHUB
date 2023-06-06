@@ -110,7 +110,8 @@
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Chebyshev_Fourier_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Chebyshev_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Fourier_series.f90"/>
-		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Lagrange_Interpolation.f90"/></Filter>
+		<File RelativePath=".\sources\Numerical_Methods\Interpolation\examples\API_Example_Lagrange_Interpolation.f90"/>
+		<File RelativePath="..\..\..\this week\JavierEscoto\coefficientes\Magnetic_configuration.f90"/></Filter>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Chebyshev_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Fourier_interpolation.f90"/>
 		<File RelativePath=".\sources\Numerical_Methods\Interpolation\sources\Interpolation.f90"/>

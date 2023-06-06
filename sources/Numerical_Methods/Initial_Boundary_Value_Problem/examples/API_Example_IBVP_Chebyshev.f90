@@ -237,11 +237,11 @@ end subroutine
 !******************************************************************
  subroutine Advection_diffusion_1D_Chebyshev
 
-    integer, parameter :: Nx = 8, Nt = 100000, Nv = 1 
+    integer, parameter :: Nx = 32, Nt = 100000, Nv = 1 
     real :: x(0:Nx), Time(0:Nt), U(0:Nt,0:Nx, Nv)  
     real ::  x0 = 0, xf = 1, t0 = 0, tf = 10.0
     integer :: i, Order = Nx 
-    real, parameter :: PI = 4 * atan(1.), w = 4 * PI, nu = 0.005
+    real, parameter :: PI = 4 * atan(1.), w = 16 * PI, nu = 0.0005
          
      Time = [ (t0 + (tf-t0)/Nt*i, i=0, Nt ) ] 
      x(0) = x0; x(Nx) = xf
@@ -250,13 +250,16 @@ end subroutine
      x = [ ( (x0+xf)/2 + (x0-xf)/2 *cos( i*PI/Nx), i=0, Nx) ]  
      call Grid_Initialization( "unmodified", "x", x, Order )
      call Initial_Boundary_Value_Problem( Time, x, AD_eq, AD_BC, U ) 
-     call plotN     
-    ! stop 
- 
+     call plotN("Chebyshev")   
+    
      call Grid_Initialization( "Chebyshev", "x", x )
      call Initial_Boundary_Value_Problem( Time, x, AD_eq, AD_BC, U ) 
-     call plotN 
+     call plotN("Chebyshev") 
      
+     Order = 12 
+     call Grid_Initialization( "nonuniform", "x", x, q=Order )
+     call Initial_Boundary_Value_Problem( Time, x, AD_eq, AD_BC, U ) 
+     call plotN("FD12")      
         
 contains 
 
@@ -285,12 +288,12 @@ function AD_BC(x, t, u, ux) result(BC)
 
 end function
 
-subroutine  plotN
-
+subroutine  plotN(tit)
+    character(len=*), intent(in) :: tit 
     real :: xmin, xmax, ymin, ymax
     integer :: j, N 
-    integer, parameter ::  M = 100 
-    real ::  U_exact(0:M), xp(0:M), Up(0:8, 0:M)
+    integer, parameter ::  M = 200 
+    real ::  U_exact(0:M), xp(0:M), Up(0:Order, 0:M)
     real :: alpha 
     
    
@@ -299,7 +302,7 @@ subroutine  plotN
     call dislin_ini(xmax, xmin, ymax, ymin)  
   
     xp = [ (x0 + (xf-x0)*i/M, i=0, M ) ] 
-    Up(0:8,:) = Interpolant(x, U(Nt,:,1), 8, xp)  
+    Up(0:Order,:) = Interpolant(x, U(Nt,:,1), Order, xp)  
     
     alpha = ( -1/nu + sqrt( 1/nu**2 + 4 * w**2 ) )/2
     U_exact = exp( - alpha * xp  )  * sin( w*(tf-xp) ) 
@@ -314,10 +317,10 @@ subroutine  plotN
     call curve( xp, U_exact, M+1 )
     
     call plot_title( ["Advection diffusion equation with collocation Chebyshev",  & 
-                        " du/dt + du/dx = nu d2u/dx2 with N=8(sampling rule : N > 4 k)", & 
-                        " u(0,t) = sin ( w t ), x=+1 outflow with w=4*PI, nu=0.005 "  ] ) 
+                        " du/dt + du/dx = nu d2u/dx2 with N=32(sampling rule : N > 4 k)", & 
+                        " u(0,t) = sin ( w t ), x=+1 outflow with w=16*PI, nu=0.0005 "  ] ) 
     
-    call plot_legends( ["Chebyshev (N=8)  "," Chebyshev interpolated",  "Exact solution " ] ) 
+    call plot_legends( [tit//"(N=32)", tit // " interpolated",  "Exact solution " ] ) 
     call disfin 
 
 end subroutine 
