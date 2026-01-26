@@ -9,8 +9,8 @@ Numerical methods:
 
 Procedure to run the NumericalHUB: 
 
-1) Install Microsoft Visual Studio and Intel compiler
-2) Code / open with Visual Studio 
+1) Install Microsoft Visual Studio and Intel compiler  
+2) Code / open with Visual Studio   
 3) Choose your local path and clone solution 
 4) Select VS solution and open it 
 

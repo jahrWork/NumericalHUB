@@ -140,5 +140,6 @@
 		<File RelativePath=".\sources\Advanced_problems.f90"/>
 		<File RelativePath=".\sources\main_NumericalHUB.f90"/>
 		<File RelativePath=".\sources\my_examples.f90"/>
-		<File RelativePath=".\sources\my_milestones.f90"/></Filter></Files>
+		<File RelativePath=".\sources\my_milestones.f90"/></Filter>
+		<File RelativePath=".\README.md"/></Files>
 	<Globals/></VisualStudioProject>
