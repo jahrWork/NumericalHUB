@@ -21,7 +21,7 @@ program main_NumericalHUB
        
        use Boundary_layer
        use Navier_Stokes_cavities
-       use Burgers 
+       use Burgers  
        
        use API_Example_Chebyshev_Fourier_interpolation
        implicit none 
@@ -34,7 +34,12 @@ program main_NumericalHUB
    ! call Test_Advection_diffusion_Fourier_Chebyshev  
        
  !   call Test_Advection_diffusion_Fourier_Chebyshev_magnetic
- !   stop 
+       !call myexampleD
+       !stop 
+       !call myExamples 
+  !   call myWave_equation_2D
+  !   stop 
+       
        
        
        call main 

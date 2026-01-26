@@ -50,7 +50,7 @@ end subroutine
 !***********************************************************
 subroutine Milestone1_2A 
  
- integer, parameter :: N=10, M=400 
+ integer, parameter :: N=25, M=400 
  real :: x(0:N), f(0:N)    ! N+1 given points
                            ! M+1 interpolated points 
  real :: I_N(0:N, 0:M), fe(0:2, 0:M), Error(0:2, 0:M) 

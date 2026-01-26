@@ -1,0 +1,14 @@
+  \begin{tikzpicture}[]
+     \begin{axis}[ height = 0.8\textwidth, width = 0.8\textwidth,
+        title style={at={(0.5,-0.5)}, yshift=-0.1}, title={(a)},
+        xlabel={ $x$ },    xmin=   -1.00, xmax =    1.00,
+        xlabel={ $y$ },    ymin=   -1.00, ymax =    1.00,
+        view={0}{90}, colormap/bluered, colorbar ]
+  \addplot3[smooth, surf,
+            shader=interp, z buffer=sort,
+            mesh/rows =   26,
+            mesh/cols =   26
+           ]
+           table [skip first n=2] {./results/Waves2Da.plt};
+     \end{axis}
+ \end{tikzpicture}

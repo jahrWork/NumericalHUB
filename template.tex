@@ -1,0 +1,146 @@
+% !TeX program = lualatex
+\documentclass[twoside,english]{book}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+
+\newcommand{\fourgraphs}[6]
+  {
+   \begin{figure}[htpb]
+     
+      \begin{minipage}[t]{0.5\textwidth} {#1} \end{minipage}
+      \begin{minipage}[t]{0.5\textwidth} {#2} \end{minipage}
+      
+      \begin{minipage}[t]{0.5\textwidth} {#3} \end{minipage}
+      \begin{minipage}[t]{0.5\textwidth} {#4} \end{minipage}
+      \caption{#5} \label{#6} 
+   \end{figure}  
+  }
+  
+\newcommand{\twographs}[4]
+{
+	\begin{figure}[htpb]
+		\begin{minipage}[t]{0.5\textwidth} {#1} \end{minipage}
+		\begin{minipage}[t]{0.5\textwidth} {#2} \end{minipage}
+		\caption{#3} \label{#4} 
+	\end{figure}  
+}   
+
+\newcommand{\onegraph}[3]
+{
+	\begin{figure}[htpb]
+		\begin{minipage}[t]{\textwidth} {#1} \end{minipage}
+		\caption{#2} \label{#3} 
+	\end{figure}  
+}   
+  
+  
+\begin{document}
+	
+	
+	\fourgraphs
+	{\input{./results/Waves2Da.tex} }
+	{\input{./results/Waves2Db.tex} }
+	{\input{./results/Waves2Dc.tex} }
+	{\input{./results/Waves2Dd.tex} }
+	{Wave equation 2D with Chebyshev interpolation, $ N_x = 25, N_y = 25 $. Time integration  Euler with $ N_t = 120000$
+		(a) $ t= 0$. 
+		(b) $t= 0.5$. 
+		(c) $t= 1$.
+		(d) $t= 1.5$.}
+	{fig:exampleCad}
+	
+	
+	\onegraph
+	{\input{./results/Waves2De.tex} }
+	{Wave equation 2D with Chebyshev interpolation,  $ N_x = 25, N_y = 25 $. Time integration  Euler with $ N_t = 120000$
+		(e) $ t= 2$. 
+	}
+	{fig:exampleCae}
+	
+	
+\end{document}  
+  
+  
+  
+  
+  
+\begin{document}
+                  
+            
+            \fourgraphs
+            {\input{./results/Waves2Da.tex} }
+            {\input{./results/Waves2Db.tex} }
+            {\input{./results/Waves2Dc.tex} }
+            {\input{./results/Waves2Dd.tex} }
+            {Wave equation 2D with Chebyshev interpolation, $ N_x = 50, N_y = 50 $. Time integration  RK4 with $ N_t = 600$
+      	      	(a) $ t= 0$. 
+      	      	(b) $t= 0.5$. 
+      	      	(c) $t= 1$.
+      	      	(d) $t= 1.5$.}
+            {fig:exampleCad}
+            
+            
+            \onegraph
+            {\input{./results/Waves2De.tex} }
+            {Wave equation 2D with Chebyshev interpolation,  $ N_x = 50, N_y = 50 $. Time integration  RK4 with $ N_t = 600$
+            	(e) $ t= 2$. 
+            }
+            {fig:exampleCae}
+            
+      
+      \end{document}
+      
+      
+      
+          
+\end{document}
+     
+     
+ 
+   \newcommand{\isolines}
+     {
+        \begin{tikzpicture}
+             \begin{axis}[
+                          height = \textwidth, width = \textwidth,
+                          title style={at={(0.5,-0.4)}, yshift=-0.05}, title={(a)},
+                          xlabel={ $x$ },
+                          ylabel={ $y$ },
+                          view={0}{90},
+                          colormap/blackwhite,
+                          ]
+               \addplot3[contour gnuplot = { levels={-8., -4., -1.6,  0.0,  1.6, 4., 8. }}, 
+                         mesh/ordering = y varies, 
+                         mesh/rows = 21, 
+                         mesh/cols = 21
+                         ] 
+                         table [skip first n=2] {./results/Uxx.plt};   
+            \end{axis}
+       \end{tikzpicture}
+     }      
+         
+     
+  \newcommand{\contour}
+    {
+      \begin{tikzpicture}
+              \begin{axis}[
+                 height = 0.8\textwidth, width = 0.8\textwidth,
+                 title style={at={(0.5,-0.5)}, yshift=-0.1}, 
+                 title={(a)},
+                 view={0}{90},
+                 colorbar, 
+                 domain=-2:2,
+              %   enlargelimits,
+                 xlabel = $x$, ylabel = $y$, colormap/bluered,
+                 view={0}{90}]
+                 \addplot3[smooth, surf, mesh/rows=21, shader=interp, z buffer=sort] table [skip first n=2] {./results/Uxx.plt}; 
+              \end{axis}
+           \end{tikzpicture}
+    }      
+          
+    
+      
+  
+
+      
