@@ -57,13 +57,11 @@ pure function Lagrange_polynomials( x, xp )
 
  ! ** k derivative of lagrange(x) at xp 
       do  r = 0, N 
-
          if (r/=j) then 
           do k = Nk, 0, -1
             d(k) = ( d(k) *( xp - x(r) ) + k * d(k-1) ) /( x(j) - x(r) )  
           end do 
         endif 
-
       enddo 
 
 !  ** integral of lagrange(x) form x(jp) to xp 
