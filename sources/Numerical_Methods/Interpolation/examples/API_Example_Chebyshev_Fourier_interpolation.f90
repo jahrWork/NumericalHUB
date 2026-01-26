@@ -9,7 +9,7 @@ module API_Example_Chebyshev_Fourier_interpolation
     use Temporal_Schemes
     
     use Magnetic_configuration
-    
+     
     implicit none
     
     contains

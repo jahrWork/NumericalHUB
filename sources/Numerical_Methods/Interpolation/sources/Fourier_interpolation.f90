@@ -4,7 +4,7 @@ module Fourier_interpolation
  real :: PI = 4 * atan(1d0)
  complex   :: II = (0, 1)
  
- 
+  
  private 
  public ::                  & 
      FFT,                   & ! Fast Fourier transform  

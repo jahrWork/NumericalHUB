@@ -6,7 +6,7 @@ module Chebyshev_interpolation
 
  !private 
  !public :: DCT2
- 
+  
  private 
  public ::                  & 
    Chebyshev_transform,             & ! Chebyshev coefficients c_k

@@ -3,7 +3,7 @@ module Legendre_points
     
     implicit none 
     
-    
+     
     
 contains 
     
