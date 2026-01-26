@@ -8,6 +8,7 @@ module Chebyshev_interpolation
  !public :: DCT2
  
  private 
+ 
  public ::                  & 
    Chebyshev_transform,             & ! Chebyshev coefficients c_k
    iChebyshev_transform,            & ! Inverse Chebyshev  f(x_j)  

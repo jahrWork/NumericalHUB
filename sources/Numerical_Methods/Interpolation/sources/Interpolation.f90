@@ -60,6 +60,7 @@ real pure function Interpolated_value1D(x, f, xp, degree)
     end if
    
 
+    
 
     if (mod(Nk,2)==0) then 
         s = max( 0, min(j-Nk/2, N-Nk) )   ! For Nk=2 

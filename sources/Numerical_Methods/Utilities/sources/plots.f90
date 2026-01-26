@@ -297,7 +297,7 @@ subroutine plot_contour(x, y, z, x_label, y_label, levels, legend, path, graph_t
    character(len=*), intent(in) ::  x_label, y_label
    character(len=*), optional, intent(in) :: legend, path, graph_type  
    
-    
+     
      real :: xmin, xmax, ymin, ymax, zmin, zmax 
      integer ::  i, Nl 
      character(len=20) :: g_type
