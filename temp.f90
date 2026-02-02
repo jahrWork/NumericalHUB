@@ -1,17 +1,17 @@
-     call set_solver(family_name="wABM")
-     do j=1, Np  
-       call set_tolerance(tolerances(j))
-       call Cauchy_ProblemS( Time, Arenstorf_equations, U(:, :, j) )
-     end do 
-     call plot_parametrics( U(:, 1, :), U(:, 2, :) , names,         &
-                            "$x$", "$y$", "(a)", path(1) )
-    
-     call set_solver(family_name="ABM")
-     do j=1, Np 
-       call set_tolerance(tolerances(j))
-       call Cauchy_ProblemS( Time, Arenstorf_equations, U(:, :, j) )
-     end do 
-     call plot_parametrics( U(:, 1, :), U(:, 2, :) , names,        &
-                               "$x$", "$y$", "(b)", path(2) )
-     
-end subroutine
+   \newcommand{\twographs}[4]
+     {
+      \begin{figure}[htpb]
+         \begin{minipage}[t]{0.5\textwidth} {#1} \end{minipage}
+         \begin{minipage}[t]{0.5\textwidth} {#2} \end{minipage}
+         \caption{#3} \label{#4} 
+      \end{figure}  
+     } 
+                           
+       \twographs
+        {\input{./results/myexampleDa.tex}}
+        {\input{./results/myexampleDa.tex}}
+        {Heinon-Heiles system solution. 
+        (a) Trajectory of the star $(x,y)$. 
+        (b) Projection $(x,\dot{x})$ of the solution. 
+        }
+        {fig:exampleDa} 
