@@ -8,7 +8,6 @@ Numerical methods:
 2) Temporal discretization: Euler, Inverse Euler, Embedded Runge-Kutta of different orders, GBS methods (Gragg-Bulirsch-Stoer), Predictor-Corrector (ABM).
 
 Procedure to run the NumericalHUB: 
-
 1) Install Microsoft Visual Studio and Intel compiler  
 2) Code / open with Visual Studio   
 3) Choose your local path and clone solution 
